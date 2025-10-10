@@ -57,12 +57,31 @@
                 </ul>
 
 
-                <!-- Search Bar -->
-                <form action="#" method="GET" class="flex items-center bg-emerald-50 px-3 py-1 rounded-full 2xl:p-2">
-                    <i class="fa-solid fa-magnifying-glass text-gray-500"></i>
-                    <input type="text" placeholder="Search..."
-                        class="bg-transparent outline-none px-2 text-gray-700 w-24 2xl:w-48" />
-                </form>
+                <div x-data="{ open: false }" class="flex space-x-1 relative -translate-x-8 items-center"
+                    @click="open = !open">
+                    <!-- Image (clickable trigger) -->
+                    <div class="flex cursor-pointer">
+                        <img src="images/icon.png" class="h-3 2xl:h-13" alt="">
+                    </div>
+
+                    <!-- Dropdown menu -->
+                    <div x-show="open" @click.outside="open = false" x-transition
+                        class="absolute left-10 top-2 mt-2 2xl:top-11 w-18 2xl:w-35 text-xs bg-white border border-gray-200 rounded-lg shadow-lg z-100">
+                        <ul class="text-gray-700 text-sm">
+                            <li>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <span class="text-white">User1</span>
+                </div>
+
             </nav>
 
             <div class="w-full flex">
@@ -70,23 +89,26 @@
                     <div class="flex flex-col mx-4 2xl:mx-10 w-full 2xl:w-1/2">
                         <h1 class="text-[25px] font-semibold w-[150px] 2xl:text-8xl 2xl:w-full">Bet. Break. Win Big!
                         </h1>
-                        <p class="break-words text-xs 2xl:text-3xl 2xl:py-6">Dive into the ultimate billiards betting
+                        <p class="break-words text-[10px] 2xl:text-3xl 2xl:py-6">Dive into the ultimate billiards
+                            betting
                             experience — where every shot counts
                             and every match could make you a winner.</p>
-                        <div class="flex space-x-2 my-2 text-[10px] 2xl:text-xl font-semibold text-black">
+                        <div
+                            class="flex space-x-2 my-2 text-[10px] 2xl:text-xl 2xl:translate-y-26 font-semibold text-black">
                             <div
                                 class="flex bg-emerald-400 px-3 py-1 2xl:py-4 2xl:px-5 items-center gap-1 2xl:gap-2 rounded-full hover:bg-emerald-500 transition-colors duration-200">
                                 <i class="fa-solid fa-star"></i>
-                                <a href="" class="">Join now</a>
+                                <a href="" class="text-[8px] 2xl:text-lg">Join now</a>
                             </div>
                             <div
                                 class="flex bg-yellow-300 px-3 py-1 2xl:py-4 2xl:px-5 items-center gap-1 2xl:gap-2 rounded-full hover:bg-yellow-400 transition-colors duration-200">
                                 <i class="fa-solid fa-sack-dollar"></i>
-                                <a href="" class="">Start Betting</a>
+                                <a href="" class="text-[8px] 2xl:text-lg">Start Betting</a>
                             </div>
                         </div>
                     </div>
-                    <img src="images/billiardGirl.png" class="h-50 2xl:h-140" alt="">
+                    <img src="images/peoples.png"
+                        class="h-40 w-40 translate-y-2 -translate-x-2 2xl:h-140 2xl:w-180 2xl:translate-y-1" alt="">
                 </div>
             </div>
 
@@ -191,23 +213,31 @@
 
             <div class="flex justify-center my-10">
                 <div class="relative text-center">
-                    <img src="images/player.png" alt="" class="w-[320px] h-25 rounded-lg 2xl:w-[800px]">
+                    <!-- Banner Image -->
+                    <img src="images/addbanner.png" alt=""
+                        class="w-[320px] h-20 rounded-lg 2xl:w-[800px] 2xl:h-40 object-cover">
 
+                    <!-- Dark Overlay -->
+                    <div class="absolute inset-0 bg-black/40 rounded-lg"></div>
+
+                    <!-- Overlayed Text & Buttons -->
                     <a href=""
-                        class="absolute top-3 left-3 text-gray-50 font-semibold py-1 px-2 rounded-full text-[14px]">
+                        class="absolute top-3 left-3 text-gray-50 font-semibold py-1 px-2 rounded-full text-[14px] 2xl:text-3xl drop-shadow-lg">
                         Billiard League is back!
                     </a>
 
                     <a href=""
-                        class="absolute top-8 left-3 text-gray-50 font-semibold py-1 px-2 rounded-full text-[9px]">
+                        class="absolute top-8 left-3 text-gray-50 font-semibold py-1 px-2 rounded-full text-[9px] 2xl:text-lg 2xl:translate-y-6 2xl:translate-x-1 drop-shadow-lg">
                         10% Cashback up to 1000!
                     </a>
 
-                    <a href="" class="absolute top-14 left-3 bg-yellow-300 font-bold py-1 px-2 rounded-full text-[9px]">
+                    <a href=""
+                        class="absolute top-14 left-3 bg-yellow-300 font-bold py-1 px-2 rounded-full text-[9px] 2xl:text-sm 2xl:translate-y-14 2xl:translate-x-4 shadow-md hover:bg-yellow-400 transition">
                         Deposit now
                     </a>
                 </div>
             </div>
+
 
             <!--Promotions and Bonuses-->
             <div data-aos="fade-down"
@@ -279,37 +309,56 @@
             </div>
 
             <!--Footer-->
-            <div class="flex bg-emerald-100/10 space-x-4 mx-4 rounded-xl p-3 text-white">
-                <div class="flex-col space-y-2">
-                    <h1 class="font-bold text-lg text-emerald-100 2xl:text-4xl">Let's Talk</h1>
-                    <p class="text-[8px] 2xl:text-xl 2xl:w-1/2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa.</p>
-                    <p class="bg-yellow-300 font-semibold text-black text-sm rounded-full px-2 w-12">FAQs</p>
-                </div>
-                <div class="flex-col space-y-2 text-[10px] mt-7 2xl:text-x 2xl:mr-40 2xl:text-lg">
-                    <div class="flex space-x-2">
-                        <h1 class="font-bold">Email:</h1>
-                        <h1>Hello@gmail.com</h1>
+            <div class="flex-col">
+                <div
+                    class="flex bg-emerald-950/60 space-x-4 mx-4 2xl:mx-24 rounded-xl p-3 text-white border border-emerald-500 my-8">
+                    <div class="flex-col space-y-2 p-4">
+                        <h1 class="font-bold text-lg text-emerald-100 2xl:text-4xl">Let's Talk</h1>
+                        <p class="text-[8px] 2xl:text-xl 2xl:w-1/2">Lorem ipsum dolor sit amet, consectetur adipiscing
+                            elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis
+                            sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed
+                            augue semper porta. Mauris massa.</p>
+                        <p
+                            class="bg-yellow-300 font-semibold text-black text-sm rounded-full px-2 w-12 text-center 2xl:text-xl 2xl:px-7 2xl:w-fit">
+                            FAQs
+                        </p>
+
                     </div>
-                    <div class="flex space-x-2">
-                        <h1 class="font-bold">Phone:</h1>
-                        <h1>09123456789</h1>
-                    </div>
-                    <div class="flex space-x-2">
-                        <h1 class="font-bold">Address:</h1>
-                        <div class="flex-col space-y-1">
-                            <h1>Visayas Ave.</h1>
-                            <h1>Espana, 1882</h1>
-                            <h1>Quezon City</h1>
+                    <div class="flex-col space-y-2 text-[10px] mt-7 2xl:text-x 2xl:mr-40 2xl:text-lg p-4">
+                        <div class="flex space-x-2">
+                            <h1 class="font-bold text-emerald-500">Email:</h1>
+                            <h1>Hello@gmail.com</h1>
+                        </div>
+                        <div class="flex space-x-2">
+                            <h1 class="font-bold text-emerald-500">Phone:</h1>
+                            <h1>09123456789</h1>
+                        </div>
+                        <div class="flex space-x-2">
+                            <h1 class="font-bold text-emerald-500">Address:</h1>
+                            <div class="flex-col space-y-1">
+                                <h1>Visayas Ave.</h1>
+                                <h1>Espana, 1882</h1>
+                                <h1>Quezon City</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                <footer class="flex justify-center items-center text-sm text-gray-300 py-4">
+                    <span class="flex items-center justify-center space-x-1">
+                        <span>&copy;</span>
+                        <span id="year"></span>
+                        <span>GJL/JBL | BilarPH</span>
+                    </span>
+                </footer>
             </div>
+
         </div>
 
 
         <script>
             AOS.init();
+            // Auto set current year
+            document.getElementById("year").textContent = new Date().getFullYear();
         </script>
 
 </body>
