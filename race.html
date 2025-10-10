@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drag Race Dashboard • Totalizator Style</title>
+  <style>
+    :root{
+      --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
+      --red:#ff3b30; --red2:#7a1212;
+      --blue:#2f7cff; --blue2:#0b3ca8;
+      --dark:#0a0c11; --card:#12172a; --glass:#0b1222cc; --muted:#b8c3d8; --light:#ebf3ff; --accent:#00ffba;
+      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --emboss-hi:rgba(255,255,255,.06);
+      --emboss-lo:rgba(0,0,0,.38);
+      --emboss-edge:rgba(255,255,255,.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color:var(--light); background:var(--dark)}
+    .bg::before{content:""; position:fixed; inset:0; z-index:-2; background-image:var(--bg); background-size:cover; background-position:center; filter:blur(2px) brightness(.45) saturate(1.0); transform:scale(1.03);}      
+    .bg::after{content:""; position:fixed; inset:0; z-index:-1; background:linear-gradient(rgba(6,8,12,.40), rgba(6,8,12,.40)), radial-gradient(1200px 1200px at 80% -10%, #141a2b77, transparent 70%), radial-gradient(800px 800px at -10% 110%, #0b0f1c66, transparent 60%);}
+
+    .wrap{max-width:1180px; margin:auto; padding:20px; display:grid; gap:16px}
+
+    /* HEADER */
+    header{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand h1{margin:0; font-size:clamp(18px,3vw,26px); letter-spacing:.4px}
+    .chip{padding:6px 10px; border-radius:999px; background:#101522; color:var(--muted); font-size:12px; border:1px solid #1e2535}
+    .user{margin-left:auto; display:flex; align-items:center; gap:10px}
+    .avatar{width:36px; height:36px; border-radius:999px; border:2px solid #1f2b50; box-shadow:0 4px 12px rgba(0,0,0,.35)}
+    .logout{background:linear-gradient(90deg,#172646,#0f1b37); border:1px solid #263a66; color:#e6f0ff; padding:8px 12px; border-radius:10px; font-weight:700; cursor:pointer}
+
+    /* BADGES */
+    .topbar{display:flex; gap:10px; flex-wrap:wrap}
+    .pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0f1a33; border:1px solid #1c2d54; color:#d5e1ff}
+    .dot{width:10px; height:10px; border-radius:50%}
+    .dot.red{background:var(--red)} .dot.blue{background:var(--blue)}
+
+    /* PANELS */
+    .panel{background:var(--glass); border:1px solid #1c2846; border-radius:var(--radius); backdrop-filter:blur(10px); box-shadow:var(--shadow); overflow:hidden}
+
+    /* TABS + VIDEO */
+    .video{padding:12px}
+    .tabs{display:flex; gap:8px; padding:8px 12px; border-bottom:1px solid #1b2743}
+    .tab{cursor:pointer; padding:10px 14px; border-radius:10px; font-weight:800; letter-spacing:.3px; color:#dfe8ff; background:#0f1b33; border:1px solid #203058}
+    .tab.active{background:linear-gradient(90deg, #1e3a8a 0%, #7c0a0a 100%); border-color:#2b3f73}
+    .frame{position:relative; aspect-ratio:16/9; border-radius:14px; overflow:hidden; background:#000; border:1px solid #222f52}
+    iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+
+    /* GRID */
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    /* LEFT COLUMN */
+    .board{padding:12px; display:grid; gap:14px}
+    .mini{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+    .box{position:relative; padding:12px; border-radius:14px; border:1px solid #27385e; overflow:hidden}
+    .box::before{content:""; position:absolute; inset:-1px; z-index:-1; background:linear-gradient(135deg, #2b0b0b 0%, #0a1f55 100%); filter:blur(8px); opacity:.35}
+    .box .label{font-size:12px; color:#b8c7e6}
+    .box .value{font-size:24px; font-weight:900; letter-spacing:.5px}
+
+    /* KIOSK: chips • odds • slip */
+    .kiosk{display:grid; grid-template-columns: 160px 1fr 220px; gap:12px; align-items:stretch}
+    .kiosk>*{min-width:0; height:100%; display:flex; flex-direction:column}
+    @media (max-width:1020px){.kiosk{grid-template-columns:1fr}}
+
+    .pad{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:10px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; height:100%}
+    .chipbtn{width:100%; height:52px; display:flex; align-items:center; justify-content:center; padding:0 10px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35)}
+    /* DARK RED GRADIENT (unchanged style) */
+    .chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#7a1212,#4b0a0a); color:#ffecec}
+    /* DARK BLUE GRADIENT (updated darker) */
+    .chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#18408f,#0d2b66); color:#e6f0ff}
+    .chipbtn:hover{filter:brightness(1.06)}
+
+    .oddslist{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:10px; display:grid; grid-template-columns:1fr; gap:8px; width:100%; height:100%; overflow:auto}
+    .oddsitem{display:flex; align-items:center; justify-content:center; min-height:52px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer}
+    /* dark red / dark blue list items */
+    .oddsitem.red{background:linear-gradient(90deg,#5b1010,#1d2a58); color:#e9ecff; border:1px solid #3a1a1f}
+    .oddsitem.blue{background:linear-gradient(90deg,#0e224f,#0a317a); color:#e6f0ff; border:1px solid #1f2b50}
+    .oddsitem.active{outline:2px solid #40b9ff99}
+
+    .slip{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:12px; display:grid; gap:10px; height:100%}
+    .slip input{width:100%; height:52px; background:#0a1122; color:#e9f3ff; border:1px solid #203058; padding:0 12px; border-radius:12px; font-weight:800}
+    .actions{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; height:52px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25)}
+    .btn.red{background:linear-gradient(180deg,#8a1313,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
+    .btn.blue{background:linear-gradient(180deg,#18408f,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
+    .btn.ghost{background:#0e1934; border:1px solid #253455; color:#dfe6ff}
+
+    /* RIGHT COLUMN */
+    .side{padding:12px; display:grid; gap:12px}
+    .totbox{background:var(--card); border:1px solid #223049; border-radius:14px; padding:14px}
+    .row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed #2a3954}
+    .row:last-child{border-bottom:0}
+    .meter{height:12px; background:#0c1220; border:1px solid #263553; border-radius:999px; overflow:hidden}
+    .meter>span{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--blue))}
+
+    /* RESULTS / LOGROHAN */
+    .results{background:#0b1326; border:1px solid #1c2e55; border-radius:14px; padding:12px; display:grid; gap:14px}
+    .rhead{display:flex; justify-content:space-between; align-items:center}
+    .rhead h3{margin:0; font-size:16px; letter-spacing:.4px}
+    .table{width:100%; border-collapse:separate; border-spacing:0 8px}
+    .table thead th{font-size:12px; color:#bcd1ff; text-align:left; padding:0 10px}
+    .table tbody tr{background:#0f1a33; border:1px solid #22365f}
+    .table td{padding:10px; font-weight:700}
+    .badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid #2a3e6a}
+    .b-red{background:#3b1212} .b-blue{background:#11244d}
+
+    /* Roadmap styles */
+    .roadwrap{display:grid; gap:12px}
+    .roadgrid{display:grid; grid-template-rows:repeat(6, 26px); grid-auto-columns:26px; grid-auto-flow:column; padding:10px; border:1px solid #22365f; border-radius:12px; background:#0f1a33; overflow:auto}
+    .cell{width:24px; height:24px; border-radius:50%; border:2px solid #2a3e6a; display:flex; align-items:center; justify-content:center; font-size:11px; color:#ffffff; font-weight:900; text-shadow:0 1px 0 rgba(0,0,0,.35)}
+    .cell.red{background:radial-gradient(circle at 30% 30%, #ff7a70, #b71c1c)}
+    .cell.blue{background:radial-gradient(circle at 30% 30%, #8fb6ff, #0b3ca8)}
+    .roadhead{display:flex; align-items:center; gap:8px; color:#bcd1ff; font-weight:800}
+    .roadcontrols{display:flex; gap:8px; flex-wrap:wrap}
+    .roadbtn{height:36px; padding:0 10px; border-radius:10px; border:1px solid #2a3e6a; color:#e6f0ff; cursor:pointer; font-weight:800}
+    .roadbtn.red{background:linear-gradient(180deg,#8a1313,#4b0a0a)}
+    .roadbtn.blue{background:linear-gradient(180deg,#18408f,#0d2b66)}
+    .roadbtn.ghost{background:#0e1934}
+    /* Odds pill for logrohan */
+    .roadodds{display:inline-flex; align-items:center; gap:10px; padding:6px 12px; border-radius:999px; background:#0e1934; border:1px solid #2a3e6a; font-weight:900; color:#e6f0ff}
+    .roadodds .r{color:#ffecec; background:linear-gradient(180deg,#8a1313,#4b0a0a); border:1px solid #3a1a1f; padding:2px 8px; border-radius:999px}
+    .roadodds .b{color:#e6f0ff; background:linear-gradient(180deg,#18408f,#0d2b66); border:1px solid #1f2b50; padding:2px 8px; border-radius:999px}
+
+    /* ---------- EMBOSS (inbose) LOOK: global apply to key components ---------- */
+    .panel, .box, .pad, .slip, .oddslist, .oddsitem, .chipbtn, .btn,
+    .totbox, .table tbody tr, .roadgrid, .cell, .pill, .tab, .links a, .meter, .roadodds, .roadbtn {
+      box-shadow:
+        inset 1px 1px 0 var(--emboss-hi),
+        inset -2px -2px 0 var(--emboss-lo),
+        0 6px 14px rgba(0,0,0,.25);
+      border-color: var(--emboss-edge);
+    }
+    /* keep specific borders stronger where needed */
+    .oddsitem.red{border-color:#3a1a1f}
+    .oddsitem.blue{border-color:#1f2b50}
+    .chipbtn.red{border-color:#3a1a1f}
+    .chipbtn.blue{border-color:#1f2b50}
+    .btn.red{border-color:#3a1a1f}
+    .btn.blue{border-color:#1f2b50}
+    .roadodds .r{border-color:#3a1a1f}
+    .roadodds .b{border-color:#1f2b50}
+
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1e3a8a"/>
+              <stop offset="100%" stop-color="#7c0a0a"/>
+            </linearGradient>
+          </defs>
+          <path d="M4 17h4l2 3 4-6 2 3h4" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="5" cy="17" r="2" fill="#00ffba"/>
+          <circle cx="19" cy="17" r="2" fill="#00ffba"/>
+        </svg>
+        <h1>Drag Race Dashboard</h1>
+        <span class="chip">mobile-first • single file</span>
+      </div>
+      <div class="topbar">
+        <div class="pill"><strong>TOTAL POT:</strong> <span id="pot">0</span></div>
+        <div class="pill"><span class="dot red"></span> Rider Red: <strong id="tR">0</strong></div>
+        <div class="pill"><span class="dot blue"></span> Rider Blue: <strong id="tB">0</strong></div>
+      </div>
+      <div class="user">
+        <img class="avatar" src="https://i.pravatar.cc/64?img=67" alt="profile"/>
+        <button class="logout" title="Logout (design only)">Logout</button>
+      </div>
+    </header>
+
+    <!-- VIDEO / TABS -->
+    <section class="panel video">
+      <div class="tabs">
+        <button class="tab active" data-tab="odds">ODDS</button>
+        <button class="tab" data-tab="total">TOTAL</button>
+      </div>
+      <div class="frame" aria-label="YouTube video">
+        <iframe id="yt" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- LEFT: Interactions -->
+      <section class="panel board">
+        <div id="oddsView">
+          <div class="mini">
+            <div class="box">
+              <div class="label">ODDS — Rider Red</div>
+              <div class="value" id="oddsRed">1.88</div>
+            </div>
+            <div class="box">
+              <div class="label">ODDS — Rider Blue</div>
+              <div class="value" id="oddsBlue">2.08</div>
+            </div>
+          </div>
+
+          <div class="kiosk">
+            <!-- chips -->
+            <div class="pad" id="chips">
+              <button class="chipbtn red" data-chip="50">₱50</button>
+              <button class="chipbtn red" data-chip="100">₱100</button>
+              <button class="chipbtn blue" data-chip="200">₱200</button>
+              <button class="chipbtn blue" data-chip="500">₱500</button>
+            </div>
+
+            <!-- odds grid -->
+            <div class="oddslist" id="oddslist">
+              <div class="oddsitem red" data-odd="10-10">10-10</div>
+              <div class="oddsitem red" data-odd="10-9">10-9</div>
+              <div class="oddsitem blue" data-odd="9-10">9-10</div>
+              <div class="oddsitem blue" data-odd="9-9">9-9</div>
+              <div class="oddsitem red" data-odd="8-10">8-10</div>
+              <div class="oddsitem blue" data-odd="8-9">8-9</div>
+            </div>
+
+            <!-- slip -->
+            <div class="slip">
+              <div class="row" style="border:0; padding-top:0"><span class="muted">Napiling Market:</span> <strong id="market">10-10</strong></div>
+              <input id="amount" type="number" min="1" placeholder="Ilagay amount" />
+              <div class="actions">
+                <button class="btn red" data-bet="red">BET RIDER RED</button>
+                <button class="btn blue" data-bet="blue">BET RIDER BLUE</button>
+              </div>
+              <button class="btn ghost" id="reset">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOTALIZATOR VIEW -->
+        <div id="totalView" hidden>
+          <div class="mini">
+            <div class="box"><div class="label">Kabuuang Taya — Red</div><div class="value" id="totalRed">0</div></div>
+            <div class="box"><div class="label">Kabuuang Taya — Blue</div><div class="value" id="totalBlue">0</div></div>
+          </div>
+          <div class="mini">
+            <div class="box"><div class="label">Bahagi ng Pool — Red</div><div class="value" id="shareRed">0%</div></div>
+            <div class="box"><div class="label">Bahagi ng Pool — Blue</div><div class="value" id="shareBlue">0%</div></div>
+          </div>
+          <div class="mini">
+            <div class="box"><div class="label">Odds (x) — Red</div><div class="value" id="txRed">1.88</div></div>
+            <div class="box"><div class="label">Odds (x) — Blue</div><div class="value" id="txBlue">2.08</div></div>
+          </div>
+        </div>
+
+        <!-- RESULTS / LOGROHAN -->
+        <div class="results">
+          <div class="rhead">
+            <h3>Logrohan • Mga Resulta</h3>
+            <div style="display:flex; gap:8px">
+              <button class="btn red" id="winRed">Itala: Panalo si Red</button>
+              <button class="btn blue" id="winBlue">Itala: Panalo si Blue</button>
+            </div>
+          </div>
+          <div class="center" style="margin-top:-4px"><div class="roadodds" id="roadOdds"><span class="r">Red × 1.88</span> • <span class="b">Blue × 2.08</span></div></div>
+          <div class="roadwrap">
+            <div class="roadhead">Bead Road</div>
+            <div id="bead" class="roadgrid"></div>
+            <div class="roadhead">Big Road</div>
+            <div id="big" class="roadgrid"></div>
+            <div class="roadcontrols">
+              <button class="roadbtn red" id="markRed">Mark Red</button>
+              <button class="roadbtn blue" id="markBlue">Mark Blue</button>
+              <button class="roadbtn ghost" id="undo">Undo</button>
+              <span class="muted">(visual log gaya ng screenshot)</span>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Oras</th>
+                <th>Panalo</th>
+                <th>Pot</th>
+                <th>Odds</th>
+                <th>Payout per ₱100</th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+              <!-- rows append here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RIGHT: Pool + links -->
+      <aside class="panel side">
+        <div class="totbox">
+          <div class="row"><strong>POT</strong><strong id="pot2">0</strong></div>
+          <div class="row"><span>Mga Taya (Rider Red / Rider Blue)</span><strong><span id="tR2">0</span> / <span id="tB2">0</span></strong></div>
+          <div class="row"><span>Est. Payout (x)</span>
+            <strong><span class="muted">Rider Red</span> <span id="payoutR">× 1.88</span> • <span class="muted">Rider Blue</span> <span id="payoutB">× 2.08</span></strong>
+          </div>
+          <div class="meter"><span id="bar" style="width:0%"></span></div>
+        </div>
+        <div class="totbox">
+          <div class="center muted" style="margin-bottom:8px">Mga Link sa Ibang Site</div>
+          <div class="links" id="links">
+            <a href="https://www.nba.com" target="_blank" rel="noopener">NBA</a>
+            <a href="https://www.pokerstars.com" target="_blank" rel="noopener">Poker</a>
+            <a href="https://www.mobilelegends.com" target="_blank" rel="noopener">Mobile Legends</a>
+            <a href="https://en.wikipedia.org/wiki/Drag_racing" target="_blank" rel="noopener">Ano ang Drag Racing?</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ---- YouTube embed ----
+    (function(){
+      const url = 'https://youtu.be/mzBv3fUDxRA?si=0X903bZ6UrB-v6UF';
+      const embed = url.replace('https://youtu.be/','https://www.youtube.com/embed/').replace('watch?v=','embed/');
+      document.getElementById('yt').src = embed + (embed.includes('?') ? '&' : '?') + 'rel=0&modestbranding=1';
+    })();
+
+    // ---- State ----
+    const state = { red:0, blue:0, oddsRed:1.88, oddsBlue:2.08, market:'10-10' };
+    const el = (id)=>document.getElementById(id);
+    const fmt = n => Number(n).toLocaleString('en-PH',{maximumFractionDigits:0});
+
+    function sync(){
+      const pot = state.red + state.blue;
+      const r = pot? state.red/pot*100 : 0; const b = 100 - r;
+      el('tR').textContent = fmt(state.red); el('tB').textContent = fmt(state.blue); el('pot').textContent = fmt(pot);
+      el('tR2').textContent = fmt(state.red); el('tB2').textContent = fmt(state.blue); el('pot2').textContent = fmt(pot);
+      el('bar').style.width = b + '%';
+      el('oddsRed').textContent = state.oddsRed.toFixed(2); el('oddsBlue').textContent = state.oddsBlue.toFixed(2);
+      el('payoutR').textContent = '× ' + state.oddsRed.toFixed(2); el('payoutB').textContent = '× ' + state.oddsBlue.toFixed(2);
+      // update odds pill in logrohan
+      const ro = document.getElementById('roadOdds');
+      if(ro){ ro.innerHTML = `<span class="r">Red × ${state.oddsRed.toFixed(2)}</span> • <span class="b">Blue × ${state.oddsBlue.toFixed(2)}</span>`; }
+      el('market').textContent = state.market;
+      // total view
+      el('totalRed').textContent = fmt(state.red);
+      el('totalBlue').textContent = fmt(state.blue);
+      el('shareRed').textContent = (r||0).toFixed(1)+'%';
+      el('shareBlue').textContent = (b||0).toFixed(1)+'%';
+      el('txRed').textContent = state.oddsRed.toFixed(2);
+      el('txBlue').textContent = state.oddsBlue.toFixed(2);
+    }
+
+    // Chips
+    document.querySelectorAll('#chips [data-chip]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const amt = Number(b.getAttribute('data-chip'))||0;
+        const input = el('amount');
+        input.value = Number(input.value||0) + amt;
+      })
+    })
+
+    // Odds select
+    document.querySelectorAll('.oddsitem').forEach(item=>{
+      item.addEventListener('click',()=>{
+        document.querySelectorAll('.oddsitem').forEach(i=>i.classList.remove('active'));
+        item.classList.add('active');
+        state.market = item.dataset.odd;
+      })
+    });
+    document.querySelector('.oddsitem').classList.add('active');
+
+    // Bets
+    document.querySelectorAll('[data-bet]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const side = btn.getAttribute('data-bet');
+        const val = Math.max(0, Number(el('amount').value||0));
+        if(!val) return;
+        state[side]+=val; el('amount').value='';
+        const pot = state.red + state.blue; // dynamic-ish odds by pool share
+        if(pot>0){
+          const rshare = state.red/pot; const bshare = state.blue/pot;
+          state.oddsRed = Number((1 + (bshare*1.2)).toFixed(2));
+          state.oddsBlue = Number((1 + (rshare*1.2)).toFixed(2));
+        }
+        sync();
+      })
+    })
+
+    // Results / Logrohan — compute payout per ₱100 at time of logging
+    function addLog(winner){
+      const pot = state.red + state.blue;
+      const odds = winner==='Red' ? state.oddsRed : state.oddsBlue;
+      const payoutPer100 = (100 * odds).toFixed(0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'})}</td>
+        <td><span class="badge ${winner==='Red'?'b-red':'b-blue'}">${winner}</span></td>
+        <td>₱${fmt(pot)}</td>
+        <td>× ${odds.toFixed(2)}</td>
+        <td>₱${fmt(payoutPer100)}</td>`;
+      document.getElementById('logBody').prepend(tr);
+    }
+    document.getElementById('winRed').addEventListener('click',()=>{ mark('R'); addLog('Red'); });
+    document.getElementById('winBlue').addEventListener('click',()=>{ mark('B'); addLog('Blue'); });
+
+    // ---- Roadmap / Logrohan visuals ----
+    const seq = []; // 'R' | 'B'
+    const ROWS = 6, COLS = 36;
+
+    function renderBead(){
+      const bead = document.getElementById('bead');
+      bead.innerHTML = '';
+      for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+        const slot = document.createElement('div');
+        slot.style.gridRow = (r+1);
+        slot.className = 'cell';
+        bead.appendChild(slot);
+      }
+      seq.forEach((v,i)=>{
+        const col = Math.floor(i/ROWS), row = i % ROWS;
+        const idx = col*ROWS + row; // child index
+        const cell = bead.children[idx];
+        if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent= String(i+1); }
+      });
+    }
+
+    function renderBig(){
+      const big = document.getElementById('big');
+      big.innerHTML='';
+      // pre-fill grid cells
+      for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+        const slot=document.createElement('div');
+        slot.style.gridRow=(r+1);
+        slot.className='cell';
+        big.appendChild(slot);
+      }
+      let col=0,row=0,last=null;
+      const place=(v,i)=>{
+        if(last===null){last=v; col=0; row=0;}
+        else if(v===last){ row++; if(row>=ROWS){ col++; row=ROWS-1; } }
+        else { last=v; col++; row=0; }
+        const idx = col*ROWS + row;
+        const cell = big.children[idx];
+        if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent = String(i+1); }
+      };
+      seq.forEach((v,i)=>place(v,i));
+    }
+
+    function mark(v){
+      seq.push(v); renderBead(); renderBig();
+    }
+    document.getElementById('markRed').addEventListener('click',()=>mark('R'));
+    document.getElementById('markBlue').addEventListener('click',()=>mark('B'));
+    document.getElementById('undo').addEventListener('click',()=>{ seq.pop(); renderBead(); renderBig(); });
+
+    // Tabs
+    function showTab(name){
+      document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===name));
+      document.getElementById('oddsView').hidden = name!== 'odds';
+      document.getElementById('totalView').hidden = name!== 'total';
+    }
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+
+    // ---- Init
+    (function initEmboss(){ /* no-op, styles are CSS-based */ })();
+    sync();
+  </script>
+</body>
+</html>
