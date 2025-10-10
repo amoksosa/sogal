@@ -232,6 +232,19 @@
 
     .matches-pill{ white-space:nowrap; }
     .matches-pill.active{ outline:2px solid rgba(250,204,21,.9); background:rgba(250,204,21,.15); }
+
+    /* Slide-down panel animation */
+    .slide-panel {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    .slide-panel.open {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body class="text-white font-sans bg-black">
@@ -260,15 +273,17 @@
           <nav class="hidden md:flex items-center gap-4 text-sm text-gray-200">
             <a href="index.html" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Home</a>
             <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Matches</a>
-            <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">My Bets</a>
             <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Support</a>
           </nav>
 
-          <div class="flex items-center gap-2">
-            
-            <div class="">
-              
+          <div class="flex items-center gap-2 relative">
+            <!-- Header Balance (mirror) -->
+            <div class="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full border border-yellow-300/30 bg-yellow-500/10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 opacity-90" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 5 5 3-5 3-3 5-3-5-5-3 5-3 3-5z"/></svg>
+              <span id="header-balance" class="text-xs font-bold">—</span>
             </div>
+
+            <!-- Notifications -->
             <button class="relative p-2 rounded-lg hover:bg-white/10 transition" aria-label="Notifications">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.25 18.75a1.5 1.5 0 11-3 0m8.25-1.5H4.5l1.2-1.2a2.25 2.25 0 00.66-1.59V10.5a5.25 5.25 0 1110.5 0v2.46c0 .6.24 1.18.66 1.6l1.29 1.19z"/>
@@ -276,6 +291,33 @@
               <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-gray-900"></span>
             </button>
 
+            <!-- NEW: Header Bet History button -->
+            <div class="relative">
+              <button id="header-history-btn" class="relative p-2 rounded-lg hover:bg-white/10 transition" aria-label="Bet History">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-90" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 4h10a2 2 0 012 2v1H5V6a2 2 0 012-2zm-2 5h14v9a2 2 0 01-2 2H7a2 2 0 01-2-2V9zm4 2v2h6v-2H9z"/>
+                </svg>
+                <span id="header-history-dot" class="hidden absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full ring-2 ring-gray-900"></span>
+              </button>
+
+              <!-- NEW: Header Bet History dropdown -->
+              <div id="header-history-menu" class="menu-card absolute right-0 mt-2 w-80 p-2 hidden">
+                <div class="px-3 py-2 flex items-center justify-between">
+                  <div>
+                    <div class="text-xs opacity-70">Recent Bets</div>
+                    <div class="text-sm font-bold">Last 8</div>
+                  </div>
+                  <button id="header-history-clear" class="text-[11px] px-2 py-1 rounded bg-gray-800/70 border border-white/10 hover:bg-gray-700">Clear</button>
+                </div>
+                <div id="header-history-empty" class="px-3 pb-2 text-xs text-white/60 italic">No bets yet.</div>
+                <div id="header-history-list" class="max-h-72 overflow-auto divide-y divide-white/10 hidden"></div>
+                <div class="px-3 pt-2">
+                  <button id="open-full-history" class="w-full text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/15">Open full history</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account -->
             <div class="relative">
               <button id="account-btn" class="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/10 transition">
                 <div class="text-left">
@@ -316,14 +358,49 @@
       <div class="grid grid-cols-3 items-center mb-2 text-sm text-gray-300">
         <div id="event-date" class="text-left"></div>
 
-        <!-- ⭐ Center Balance with Diamond -->
+        <!-- ⭐ Center Balance with Realistic Diamond -->
         <div class="flex justify-center">
           <div class="balance-pill text-yellow-300">
-            <!-- diamond icon -->
-            <svg class="w-4 h-4 opacity-90" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 2l3.5 5H20l-8 15L4 7h4.5L12 2zM8.5 7l3.5 10.5L15.5 7H8.5z"/>
+            <!-- Diamond -->
+            <svg class="w-5 h-5 opacity-90" viewBox="0 0 64 64" aria-hidden="true">
+              <defs>
+                <linearGradient id="gemTop" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#e9f7ff"/>
+                  <stop offset="40%" stop-color="#c6e6ff"/>
+                  <stop offset="70%" stop-color="#9fd3ff"/>
+                  <stop offset="100%" stop-color="#e6fbff"/>
+                </linearGradient>
+                <linearGradient id="gemSide" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#b5e3ff"/>
+                  <stop offset="100%" stop-color="#80c3f7"/>
+                </linearGradient>
+                <radialGradient id="gemGlow" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/>
+                  <stop offset="60%" stop-color="rgba(255,255,255,0.0)"/>
+                </radialGradient>
+                <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <polygon points="32,60 6,24 58,24" fill="url(#gemSide)" stroke="#a7d8ff" stroke-width="1"/>
+              <polygon points="12,24 20,8 44,8 52,24 12,24" fill="url(#gemTop)" stroke="#bfe6ff" stroke-width="1"/>
+              <polyline points="20,8 32,24 44,8" fill="none" stroke="#d8f1ff" stroke-width="1" opacity=".9"/>
+              <polyline points="12,24 32,24 52,24" fill="none" stroke="#cfeaff" stroke-width="1" opacity=".9"/>
+              <polyline points="6,24 32,60 58,24" fill="none" stroke="#a7d8ff" stroke-width="1" opacity=".7"/>
+              <circle cx="32" cy="30" r="16" fill="url(#gemGlow)" opacity=".35"/>
+              <g opacity=".95">
+                <polygon points="32,14 34,20 40,22 34,24 32,30 30,24 24,22 30,20" fill="url(#spark)" opacity=".85">
+                  <animateTransform attributeName="transform" type="rotate" from="-10 32 22" to="10 32 22" dur="1.8s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.2;1;0.2" dur="1.8s" repeatCount="indefinite"/>
+                </polygon>
+                <polygon points="46,32 47,34 50,35 47,36 46,38 45,36 42,35 45,34" fill="#ffffff" opacity=".9">
+                  <animateTransform attributeName="transform" type="scale" values="1;1.4;1" dur="1.6s" repeatCount="indefinite" additive="sum"/>
+                  <animate attributeName="opacity" values="0.3;0.9;0.3" dur="1.6s" repeatCount="indefinite"/>
+                </polygon>
+              </g>
             </svg>
-            <span class="text-[11px] opacity-80 tracking-widest">BALANCE</span>
+            <span class="text-[11px] opacity-80 tracking-widest"></span>
             <span id="mid-balance" class="amount text-base">5,000</span>
           </div>
         </div>
@@ -344,7 +421,7 @@
       <div class="mb-3">
         <div class="flex items-center justify-between mb-1">
           <div class="text-[11px] uppercase tracking-widest text-white/70">Matches</div>
-          <div class="text-xs text-yellow-300 font-bold">Click a pill to load names</div>
+          <div class="text-xs text-yellow-300 font-bold"></div>
         </div>
         <div id="matches-strip" class="flex gap-2 overflow-x-auto pb-2"></div>
       </div>
@@ -360,9 +437,39 @@
       <div class="flex gap-2 mb-3 toggle-wrap">
         <button id="btn-odds" class="toggle-btn red text-sm">Odds</button>
         <button id="btn-totalizator" class="toggle-btn blue text-sm">Totalizator</button>
+        <!-- NEW: Bet History toggle -->
+        <button id="btn-history" class="toggle-btn text-sm bg-yellow-600/70 hover:brightness-110 border border-yellow-300/30">
+          <span class="inline-flex items-center gap-1">
+            Bet History
+            <svg id="chev-history" class="w-4 h-4 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.2l3.71-3.97a.75.75 0 111.08 1.04l-4.24 4.54a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+            </svg>
+          </span>
+        </button>
       </div>
 
-      <div id="bet-area" class="bet-area grid grid-cols-2 gap-3 mb-4">
+      <!-- NEW: Slide-down Bet History panel -->
+      <div id="history-panel" class="slide-panel bg-gray-900/60 border border-white/10 rounded-xl">
+        <div class="p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[11px] uppercase tracking-widest text-white/70">Recent Bets</div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-white/70">Total Bets: <b id="history-count">0</b></span>
+              <button id="btn-clear-history" class="px-2 py-1 rounded bg-gray-800/70 hover:bg-gray-700 text-xs border border-white/10">Clear</button>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="history-empty" class="text-xs text-white/60 italic">Wala pang bet history.</div>
+
+          <!-- List -->
+          <div id="history-list" class="hidden divide-y divide-white/10">
+            <!-- items injected here -->
+          </div>
+        </div>
+      </div>
+
+      <div id="bet-area" class="bet-area grid grid-cols-2 gap-3 mt-3 mb-4">
         <div class="bet-card red tilt text-center">
           <div class="flex items-center justify-between"><span class="name-chip text-xl md:text-2xl">R</span></div>
           <div class="mt-2 text-sm font-semibold opacity-90" id="player1-name"></div>
@@ -477,8 +584,8 @@
         </div>
 
         <div class="flex items-center gap-2 mb-2">
-          <button id="btn-win-meron" class="px-2 py-1 rounded bg-red-700/70 border border-white/10 text-xs font-bold hover:bg-red-700">+ Meron win</button>
-          <button id="btn-win-wala"  class="px-2 py-1 rounded bg-blue-700/70 border border-white/10 text-xs font-bold hover:bg-blue-700">+ Wala win</button>
+          <button id="btn-win-meron" class="px-2 py-1 rounded bg-red-700/70 border border-white/10 text-xs font-bold hover:bg-red-700">+ Red win</button>
+          <button id="btn-win-wala"  class="px-2 py-1 rounded bg-blue-700/70 border border-white/10 text-xs font-bold hover:bg-blue-700">+ Blue win</button>
           <button id="btn-undo"      class="px-2 py-1 rounded bg-gray-700/70 border border-white/10 text-xs hover:bg-gray-700">Undo</button>
           <button id="btn-clear"     class="px-2 py-1 rounded bg-gray-800/70 border border-white/10 text-xs hover:bg-gray-800">Clear</button>
         </div>
@@ -545,8 +652,8 @@
     }
 
     /* ======= BIG ROAD LOGIC ======= */
-    const MAX_ROWS = 6;          // standard Big Road height
-    let results = [];            // sequence of 'R' / 'B'
+    const MAX_ROWS = 6;
+    let results = []; // sequence of 'R' / 'B'
 
     function buildBigRoadColumns(seq, maxRows = MAX_ROWS){
       const cols = [];
@@ -608,7 +715,10 @@
     /* ===== Rest of app ===== */
     let meronAmount, walaAmount, meronOdds, walaOdds;
     let pickedMarket="10-10";
-    let currentBalance = 5000; // you can hook this to real data
+    let currentBalance = 500000; // hook to real data later
+
+    // NEW: bet history store
+    const betHistory = [];
 
     function getRandomAmount(){ return Math.floor(Math.random()*(50000-10000+1))+10000; }
 
@@ -648,6 +758,130 @@
       if(head) head.textContent = Number(currentBalance).toLocaleString();
     }
 
+    // ===== BALANCE HELPERS =====
+    function adjustBalance(delta){
+      const next = currentBalance + delta;
+      if(next < 0) return false;
+      currentBalance = next;
+      renderBalance();
+      return true;
+    }
+
+    // NEW: history panel toggling with smooth height
+    function toggleHistoryPanel(){
+      const panel = document.getElementById('history-panel');
+      const chev = document.getElementById('chev-history');
+      const isOpen = panel.classList.contains('open');
+
+      if(isOpen){
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        requestAnimationFrame(()=>{
+          panel.style.maxHeight = '0px';
+          panel.classList.remove('open');
+          chev.style.transform = 'rotate(0deg)';
+        });
+      }else{
+        panel.classList.add('open');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        chev.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // NEW: add bet to history
+    function addToHistory(entry){
+      betHistory.unshift(entry); // latest on top
+      renderHistory();
+      renderHeaderHistory();
+      // ping header dot
+      document.getElementById('header-history-dot').classList.toggle('hidden', betHistory.length === 0);
+    }
+
+    // NEW: render bet history list (main)
+    function renderHistory(){
+      const list = document.getElementById('history-list');
+      const empty = document.getElementById('history-empty');
+      const count = document.getElementById('history-count');
+
+      count.textContent = betHistory.length;
+      if(betHistory.length === 0){
+        empty.classList.remove('hidden');
+        list.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+      }
+      empty.classList.add('hidden');
+      list.classList.remove('hidden');
+
+      list.innerHTML = betHistory.map(item=>{
+        const badgeClass = item.side === 'MERON'
+          ? 'bg-red-600/70 border-red-300/30'
+          : 'bg-blue-600/70 border-blue-300/30';
+        const balTrail = `<span class="text-white/50 text-xs"> • Bal: ${Number(item.balanceBefore).toLocaleString()} → <span class="text-white/80 font-semibold">${Number(item.balanceAfter).toLocaleString()}</span></span>`;
+
+        return `
+          <div class="py-2 px-1 text-sm flex items-start gap-3">
+            <div class="px-2 py-0.5 rounded-md text-[10px] border ${badgeClass}">
+              ${item.side}
+            </div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-x-2">
+                <span class="font-bold">${item.player}</span>
+                <span class="text-white/60">• Match #${item.matchId}</span>
+                <span class="text-white/60">• ${item.market ? ('Mkt ' + item.market) : 'Straight'}</span>
+                ${balTrail}
+              </div>
+              <div class="text-white/80">
+                <span class="font-semibold">${Number(item.amount).toLocaleString()}</span>
+                @ <span class="font-semibold">${item.odds}</span>
+                = <span class="text-yellow-300 font-bold">${Number(item.payout).toLocaleString()}</span>
+              </div>
+              <div class="text-xs text-white/50">${item.time}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const panel = document.getElementById('history-panel');
+      if(panel.classList.contains('open')){
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+      }
+    }
+
+    // NEW: render header dropdown (top 8)
+    function renderHeaderHistory(){
+      const list = document.getElementById('header-history-list');
+      const empty = document.getElementById('header-history-empty');
+      if(betHistory.length === 0){
+        empty.classList.remove('hidden');
+        list.classList.add('hidden');
+        list.innerHTML = '';
+        return;
+      }
+      empty.classList.add('hidden');
+      list.classList.remove('hidden');
+      const top = betHistory.slice(0,8);
+      list.innerHTML = top.map(item=>{
+        const color = item.side==='MERON' ? 'text-red-400' : 'text-blue-400';
+        return `
+          <div class="py-2 px-2 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="font-bold ${color}">${item.side}</div>
+              <div class="text-white/50">${item.time}</div>
+            </div>
+            <div class="text-white/80">
+              ${item.player} • Match #${item.matchId} ${item.market ? '• Mkt '+item.market : ''}
+            </div>
+            <div>
+              <span class="font-semibold">${Number(item.amount).toLocaleString()}</span>
+              @ <span class="font-semibold">${item.odds}</span>
+              = <span class="text-yellow-300 font-bold">${Number(item.payout).toLocaleString()}</span>
+            </div>
+            <div class="text-white/50 mt-0.5">Bal: ${Number(item.balanceBefore).toLocaleString()} → <span class="text-white/80 font-semibold">${Number(item.balanceAfter).toLocaleString()}</span></div>
+          </div>
+        `;
+      }).join('');
+    }
+
     window.onload=()=>{
       setDateTime();
 
@@ -682,6 +916,15 @@
       document.getElementById('btn-bet-wala').addEventListener('click',()=>betFromOdds('WALA',pickedMarket));
       document.getElementById('btn-reset').addEventListener('click',()=>{ pickedMarket='10-10'; updatePickedMarket(pickedMarket); document.getElementById('odds-amount').value=50; });
 
+      // NEW: history toggles
+      document.getElementById('btn-history').addEventListener('click', toggleHistoryPanel);
+      document.getElementById('btn-clear-history').addEventListener('click', ()=>{
+        betHistory.length = 0;
+        renderHistory(); renderHeaderHistory();
+        document.getElementById('header-history-dot').classList.add('hidden');
+      });
+      renderHistory(); renderHeaderHistory();
+
       updatePickedMarket(pickedMarket);
 
       // account name
@@ -704,8 +947,32 @@
       results = ['R','B','R','R','B','B','B'];
       renderBigRoad(results);
 
-      // show balance (center + hidden header mirror)
+      // show balance (center + header mirror)
       renderBalance();
+
+      // Header history dropdown wiring
+      const hBtn = document.getElementById('header-history-btn');
+      const hMenu = document.getElementById('header-history-menu');
+      const openFull = document.getElementById('open-full-history');
+      const hClear = document.getElementById('header-history-clear');
+
+      hBtn.addEventListener('click', (e)=>{ e.stopPropagation(); hMenu.classList.toggle('hidden'); });
+      openFull.addEventListener('click', ()=>{
+        hMenu.classList.add('hidden');
+        // open main panel if closed
+        const panel = document.getElementById('history-panel');
+        if(!panel.classList.contains('open')) toggleHistoryPanel();
+        // scroll to panel
+        panel.scrollIntoView({ behavior:'smooth', block:'start' });
+      });
+      hClear.addEventListener('click', ()=>{
+        betHistory.length = 0;
+        renderHeaderHistory(); renderHistory();
+        document.getElementById('header-history-dot').classList.add('hidden');
+      });
+      document.addEventListener('click', (e)=>{
+        if(!hBtn.contains(e.target) && !hMenu.contains(e.target)) hMenu.classList.add('hidden');
+      });
     };
 
     function updatePickedMarket(mkt){
@@ -714,23 +981,60 @@
       document.getElementById('picked-b').textContent=b;
     }
 
+    // ====== Bets from ODDS grid ======
     function betFromOdds(side, market){
       const amt=parseFloat(document.getElementById('odds-amount').value);
       if(isNaN(amt)||amt<=0){ alert('Please enter a valid amount.'); return; }
+      // Balance check
+      const balanceBefore = currentBalance;
+      if(!adjustBalance(-amt)){ alert('Insufficient balance.'); return; }
       const odds= side==='MERON'? meronOdds : walaOdds;
       const payout=(amt*parseFloat(odds)).toFixed(2);
-      alert(`ODDS BET: ${side} @ ${market}\nAmount: ${amt}\nPossible payout: ${payout}`);
+
+      // Add to history
+      const player = side==='MERON' ? (document.getElementById('player1-name').textContent || 'Red') : (document.getElementById('player2-name').textContent || 'Blue');
+      const matchId = document.getElementById('match-no').textContent || '—';
+      const time = new Date().toLocaleString('en-PH', { hour12: true });
+      addToHistory({ side, player, matchId, market, amount: amt, odds, payout, time, balanceBefore, balanceAfter: currentBalance });
+
+      alert(`ODDS BET: ${side} @ ${market}\nAmount: ${amt}\nPossible payout: ${payout}\nNew Balance: ${currentBalance.toLocaleString()}`);
     }
 
+    // ====== Straight BET buttons ======
     function placeBet(betType){
-      let betAmount = betType==='MERON'? document.getElementById('meron-bet').value : document.getElementById('wala-bet').value;
+      let betAmount = parseFloat(betType==='MERON'? document.getElementById('meron-bet').value : document.getElementById('wala-bet').value);
       let odds = betType==='MERON'? meronOdds : walaOdds;
       let chosenPlayer = betType==='MERON'? document.getElementById('player1-name').textContent : document.getElementById('player2-name').textContent;
-      if(betAmount===""||betAmount<=0){ alert("Please enter a valid bet amount."); return; }
-      let totalWinnings = parseFloat(betAmount)*odds;
+
+      if(isNaN(betAmount)||betAmount<=0){ alert("Please enter a valid bet amount."); return; }
+
+      // Balance check
+      const balanceBefore = currentBalance;
+      if(!adjustBalance(-betAmount)){ alert('Insufficient balance.'); return; }
+
+      let totalWinnings = parseFloat(betAmount)*parseFloat(odds);
+
+      // Update local results text
       if(betType==='MERON'){ document.getElementById('meron-result').textContent = `${chosenPlayer} Winnings: ${totalWinnings.toFixed(2)}`; }
       else { document.getElementById('wala-result').textContent = `${chosenPlayer} Winnings: ${totalWinnings.toFixed(2)}`; }
-      alert(`You placed a bet of ${betAmount} on ${chosenPlayer}. Possible payout: ${totalWinnings.toFixed(2)}.`);
+
+      // Add to history
+      const matchId = document.getElementById('match-no').textContent || '—';
+      const time = new Date().toLocaleString('en-PH', { hour12: true });
+      addToHistory({
+        side: betType,
+        player: chosenPlayer || (betType==='MERON'?'Red':'Blue'),
+        matchId,
+        market: null,
+        amount: betAmount,
+        odds: odds,
+        payout: totalWinnings.toFixed(2),
+        time,
+        balanceBefore,
+        balanceAfter: currentBalance
+      });
+
+      alert(`You placed a bet of ${betAmount} on ${chosenPlayer}.\nPossible payout: ${totalWinnings.toFixed(2)}.\nNew Balance: ${currentBalance.toLocaleString()}.`);
     }
 
     function loadYouTubeVideo(){
