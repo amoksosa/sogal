@@ -1,332 +1,520 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Drag Race Dashboard • Totalizator Style</title>
   <style>
+    /* ==========================================================
+       THEME TOKENS (Dark & Light) — toggled via [data-theme]
+    ==========================================================*/
     :root{
-      --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
-      --red:#ff3b30; --red2:#7a1212;
-      --blue:#2f7cff; --blue2:#0b3ca8;
-      --dark:#0a0c11; --card:#12172a; --glass:#0b1222cc; --muted:#b8c3d8; --light:#ebf3ff; --accent:#00ffba;
-      --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35);
-      --emboss-hi:rgba(255,255,255,.06);
-      --emboss-lo:rgba(0,0,0,.38);
-      --emboss-edge:rgba(255,255,255,.04);
+      --radius:18px; --shadow:0 16px 40px rgba(0,0,0,.45);
+      --speed:260ms; --speed-slow:520ms; --e:cubic-bezier(.2,.8,.2,1);
+
+      --emboss-hi:rgba(255,255,255,.10);
+      --emboss-lo:rgba(0,0,0,.46);
+      --emboss-edge:rgba(255,255,255,.06);
+
+      --red:#ff3b30; --blue:#2f7cff; --accent:#00ffba;
     }
+    [data-theme="dark"]{
+      --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
+      --dark:#070a10; --card:#0e1426; --glass:#0b1222da; --muted:#b8c3d8; --light:#ebf3ff;
+      --panel:#0b1326; --panel-2:#0d1529; --panel-3:#0f1a33;
+      --stroke-1:#15203a; --stroke-2:#1a2746; --stroke-3:#203155; --stroke-4:#263963; --stroke-5:#2f477a;
+      --chip-1:#0e1730; --chip-2:#0e1934; --chip-3:#0c1630;
+      --text:#e8f0ff; --text-muted:#bcd1ff;
+      --blur-bg:brightness(.45) saturate(1.0);
+      --glare:radial-gradient(900px 320px at 10% -20%, rgba(255,255,255,.06), transparent 70%),
+              radial-gradient(900px 320px at 90% -30%, rgba(255,255,255,.05), transparent 70%);
+    }
+    [data-theme="light"]{
+      --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
+      --dark:#eef3ff; --card:#ffffff; --glass:#ffffffcc; --muted:#51607e; --light:#0b1222;
+      --panel:#ffffff; --panel-2:#f7f9ff; --panel-3:#f2f6ff;
+      --stroke-1:#d9e2ff; --stroke-2:#d0dbff; --stroke-3:#c8d6ff; --stroke-4:#c0d0ff; --stroke-5:#b6caff;
+      --chip-1:#eef3ff; --chip-2:#eaf0ff; --chip-3:#e6edff;
+      --text:#0b1222; --text-muted:#40507a;
+      --blur-bg:brightness(.9) saturate(1.05);
+      --glare:radial-gradient(900px 320px at 10% -20%, rgba(0,0,0,.03), transparent 70%),
+              radial-gradient(900px 320px at 90% -30%, rgba(0,0,0,.03), transparent 70%);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color:var(--light); background:var(--dark)}
-    .bg::before{content:""; position:fixed; inset:0; z-index:-2; background-image:var(--bg); background-size:cover; background-position:center; filter:blur(2px) brightness(.45) saturate(1.0); transform:scale(1.03);}      
-    .bg::after{content:""; position:fixed; inset:0; z-index:-1; background:linear-gradient(rgba(6,8,12,.40), rgba(6,8,12,.40)), radial-gradient(1200px 1200px at 80% -10%, #141a2b77, transparent 70%), radial-gradient(800px 800px at -10% 110%, #0b0f1c66, transparent 60%);}
+    body{margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color:var(--text); background:var(--dark)}
+    .bg::before{content:""; position:fixed; inset:0; z-index:-3; background-image:var(--bg); background-size:cover; background-position:center; filter:blur(2px) var(--blur-bg); transform:scale(1.03); transition:filter var(--speed-slow) var(--e)}
+    .bg::after{content:""; position:fixed; inset:0; z-index:-2; background:
+      linear-gradient(rgba(6,8,12,.40), rgba(6,8,12,.40)),
+      radial-gradient(1200px 1200px at 80% -10%, #141a2b77, transparent 70%),
+      radial-gradient(800px 800px at -10% 110%, #0b0f1c66, transparent 60%),
+      var(--glare); pointer-events:none}
 
-    .wrap{max-width:1180px; margin:auto; padding:20px; display:grid; gap:16px}
+    .wrap{max-width:1180px; margin:auto; padding:20px; display:grid; gap:18px}
 
-    /* HEADER */
-    header{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+    /* ============== GLOBAL EMBOSS + MOTION (video excluded) ============== */
+    .emboss{
+      box-shadow: inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo), 0 12px 30px rgba(0,0,0,.35);
+      border-color:var(--emboss-edge)!important;
+    }
+    .hover-raise{transition:transform var(--speed) var(--e), filter var(--speed) var(--e)}
+    .hover-raise:hover{transform:translateY(-2px)}
+    .press{transition:transform var(--speed) var(--e)}
+    .press:active{transform:translateY(1px) scale(.99)}
+    .floaty{animation:floaty 5s var(--e) infinite both}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .pulse{animation:pulse 2200ms ease-in-out infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(64,185,255,.0)}50%{box-shadow:0 0 0 6px rgba(64,185,255,.08)}}
+    .shine{position:relative; overflow:hidden}
+    .shine::after{content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.12),transparent); transform:translateX(-120%); animation:shine 4s linear infinite}
+    @keyframes shine{to{transform:translateX(120%)}}
+    .slide-in{animation:slideIn var(--speed-slow) var(--e) both}
+    @keyframes slideIn{from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:none}}
+
+    /* Fancy off (no-fancy) */
+    .no-fancy .floaty,
+    .no-fancy .pulse,
+    .no-fancy .shine::after,
+    .no-fancy .slide-in{animation:none}
+    .no-fancy .hover-raise:hover{transform:none}
+    .no-fancy .press:active{transform:none}
+
+    /* Compact + High-contrast */
+    .compact .wrap{gap:14px}
+    .compact .panel{padding:8px}
+    .compact .btn, .compact .chipbtn, .compact .oddsitem, .compact .slip input {height:46px}
+    .high-contrast *{text-shadow:none!important}
+    .high-contrast .panel, .high-contrast .box, .high-contrast .totbox{border-width:2px}
+    .high-contrast .meter{border-color:#fff}
+
+    @media (prefers-reduced-motion:reduce){.floaty,.pulse,.shine::after,.slide-in{animation:none}}
+
+    /* =================== HEADER =================== */
+    header{display:flex; align-items:center; gap:14px; flex-wrap:wrap; position:relative; z-index:1000}
     .brand{display:flex; align-items:center; gap:12px}
     .brand h1{margin:0; font-size:clamp(18px,3vw,26px); letter-spacing:.4px}
-    .chip{padding:6px 10px; border-radius:999px; background:#101522; color:var(--muted); font-size:12px; border:1px solid #1e2535}
-    .user{margin-left:auto; display:flex; align-items:center; gap:10px}
-    .avatar{width:36px; height:36px; border-radius:999px; border:2px solid #1f2b50; box-shadow:0 4px 12px rgba(0,0,0,.35)}
-    .logout{background:linear-gradient(90deg,#172646,#0f1b37); border:1px solid #263a66; color:#e6f0ff; padding:8px 12px; border-radius:10px; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block}
-    /* added text-decoration:none + display so <a.logout> looks like the old button */
-
-    /* BADGES */
+    .chip{padding:6px 10px; border-radius:999px; background:var(--chip-1); color:var(--muted); font-size:12px; border:1px solid var(--stroke-1)}
     .topbar{display:flex; gap:10px; flex-wrap:wrap}
-    .pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0f1a33; border:1px solid #1c2d54; color:#d5e1ff}
+    .pill{display:flex; align-items:center; gap:8px; padding:9px 12px; border-radius:999px; background:var(--chip-2); border:1px solid var(--stroke-2); color:var(--text); font-weight:700}
     .dot{width:10px; height:10px; border-radius:50%}
     .dot.red{background:var(--red)} .dot.blue{background:var(--blue)}
+    .user{margin-left:auto; display:flex; align-items:center; gap:10px; position:relative} /* removed contain */
+    .iconbtn{height:40px; min-width:40px; border-radius:12px; display:grid; place-items:center; cursor:pointer; background:linear-gradient(180deg,#1a2848,#0f1b37); border:1px solid #263a66; color:#e6f0ff; transform:translateZ(0)!important}
+    [data-theme="light"] .iconbtn{background:#ffffff; color:#102044; border-color:var(--stroke-3)}
+    .avatar{width:40px; height:40px; border-radius:12px; border:2px solid #1f2b50; background-size:cover; background-position:center; transform:translateZ(0)!important}
+    [data-theme="light"] .avatar{border-color:#cfe0ff}
 
-    /* PANELS */
-    .panel{background:var(--glass); border:1px solid #1c2846; border-radius:var(--radius); backdrop-filter:blur(10px); box-shadow:var(--shadow); overflow:hidden}
+    /* Profile menu */
+    .menu{position:absolute; top:48px; right:0; width:260px; padding:12px; border-radius:14px; background:var(--glass); border:1px solid var(--stroke-1); backdrop-filter:blur(14px); z-index:1200; opacity:0; transform:translateY(-8px) scale(.98); pointer-events:none; transition:all var(--speed) var(--e)}
+    .menu.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+    .menu .title{font-size:12px; color:var(--text-muted); margin:4px 6px 8px}
+    .menu .row{display:flex; align-items:center; gap:10px; padding:10px 12px; margin:8px 0; border-radius:12px; text-decoration:none; color:var(--text); background:var(--panel-2); border:1px solid var(--stroke-3); transition:transform var(--speed) var(--e), filter var(--speed) var(--e)}
+    .menu .row:hover{filter:brightness(1.05)}
+    .menu .row:active{transform:translateY(1px)}
+    .divider{height:1px; background:linear-gradient(90deg,transparent,var(--stroke-3),transparent); margin:6px 4px}
 
-    /* TABS + VIDEO */
+    /* =================== PANELS / TABS / VIDEO =================== */
+    .panel{background:var(--glass); border:1px solid var(--stroke-1); border-radius:var(--radius); backdrop-filter:blur(10px)}
     .video{padding:12px}
-    .tabs{display:flex; gap:8px; padding:8px 12px; border-bottom:1px solid #1b2743}
-    .tab{cursor:pointer; padding:10px 14px; border-radius:10px; font-weight:800; letter-spacing:.3px; color:#dfe8ff; background:#0f1b33; border:1px solid #203058}
-    .tab.active{background:linear-gradient(90deg, #1e3a8a 0%, #7c0a0a 100%); border-color:#2b3f73}
+    .tabs{display:flex; gap:8px; padding:8px 12px; border-bottom:1px solid var(--stroke-2)}
+    .tab{cursor:pointer; padding:10px 14px; border-radius:12px; font-weight:900; letter-spacing:.3px; color:var(--text); background:var(--chip-2); border:1px solid var(--stroke-3)}
+    .tab.active{background:linear-gradient(90deg,#1e3a8a 0%, #7c0a0a 100%); border-color:#2b3f73; color:#fff}
     .frame{position:relative; aspect-ratio:16/9; border-radius:14px; overflow:hidden; background:#000; border:1px solid #222f52}
     iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 
-    /* GRID */
-    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:16px}
+    /* =================== GRID =================== */
+    .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:18px}
     @media (max-width:980px){.grid{grid-template-columns:1fr}}
 
-    /* LEFT COLUMN */
-    .board{padding:12px; display:grid; gap:14px}
+    /* =================== LEFT =================== */
+    .board{padding:12px; display:grid; gap:16px}
     .mini{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
-    .box{position:relative; padding:12px; border-radius:14px; border:1px solid #27385e; overflow:hidden}
-    .box::before{content:""; position:absolute; inset:-1px; z-index:-1; background:linear-gradient(135deg, #2b0b0b 0%, #0a1f55 100%); filter:blur(8px); opacity:.35}
-    .box .label{font-size:12px; color:#b8c7e6}
-    .box .value{font-size:24px; font-weight:900; letter-spacing:.5px}
+    .box{position:relative; padding:12px; border-radius:14px; border:1px solid var(--stroke-3); overflow:hidden; background:var(--panel-3)}
+    .box::before{content:""; position:absolute; inset:-1px; z-index:-1; background:linear-gradient(135deg,#391010 0%, #0a1f55 100%); filter:blur(10px); opacity:.35}
+    .box .label{font-size:12px; color:var(--text-muted)}
+    .box .value{font-size:24px; font-weight:900; letter-spacing:.5px; text-shadow:0 1px 0 rgba(0,0,0,.25)}
 
-    /* KIOSK: chips • odds • slip */
-    .kiosk{display:grid; grid-template-columns: 160px 1fr 220px; gap:12px; align-items:stretch}
+    .kiosk{display:grid; grid-template-columns:170px 1fr 230px; gap:12px; align-items:stretch}
     .kiosk>*{min-width:0; height:100%; display:flex; flex-direction:column}
     @media (max-width:1020px){.kiosk{grid-template-columns:1fr}}
 
-    .pad{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:10px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px; height:100%}
-    .chipbtn{width:100%; height:52px; display:flex; align-items:center; justify-content:center; padding:0 10px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35)}
-    /* DARK RED GRADIENT (unchanged style) */
-    .chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#7a1212,#4b0a0a); color:#ffecec}
-    /* DARK BLUE GRADIENT (updated darker) */
-    .chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#18408f,#0d2b66); color:#e6f0ff}
-    .chipbtn:hover{filter:brightness(1.06)}
+    .pad{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:10px; display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+    .chipbtn{width:100%; height:54px; display:flex; align-items:center; justify-content:center; padding:0 10px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35)}
+    .chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#8b1515,#4b0a0a)}
+    .chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#1a489b,#0d2b66)}
+    .chipbtn.hover-raise:hover{filter:brightness(1.06)}
 
-    .oddslist{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:10px; display:grid; grid-template-columns:1fr; gap:8px; width:100%; height:100%; overflow:auto}
-    .oddsitem{display:flex; align-items:center; justify-content:center; min-height:52px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer}
-    /* dark red / dark blue list items */
+    .oddslist{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:10px; display:grid; grid-template-columns:1fr; gap:8px; width:100%; height:100%; overflow:auto}
+    .oddsitem{display:flex; align-items:center; justify-content:center; min-height:54px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; user-select:none}
     .oddsitem.red{background:linear-gradient(90deg,#5b1010,#1d2a58); color:#e9ecff; border:1px solid #3a1a1f}
     .oddsitem.blue{background:linear-gradient(90deg,#0e224f,#0a317a); color:#e6f0ff; border:1px solid #1f2b50}
     .oddsitem.active{outline:2px solid #40b9ff99}
 
-    .slip{background:#0d1529; border:1px solid #21335a; border-radius:14px; padding:12px; display:grid; gap:10px; height:100%}
-    .slip input{width:100%; height:52px; background:#0a1122; color:#e9f3ff; border:1px solid #203058; padding:0 12px; border-radius:12px; font-weight:800}
+    .slip{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:12px; display:grid; gap:10px}
+    .slip input{width:100%; height:54px; background:#0a1122; color:#e9f3ff; border:1px solid var(--stroke-4); padding:0 12px; border-radius:12px; font-weight:800}
+    [data-theme="light"] .slip input{background:#f6f8ff; color:#0a0c11}
     .actions{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    .btn{display:inline-flex; align-items:center; justify-content:center; height:52px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25)}
-    .btn.red{background:linear-gradient(180deg,#8a1313,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
-    .btn.blue{background:linear-gradient(180deg,#18408f,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
-    .btn.ghost{background:#0e1934; border:1px solid #253455; color:#dfe6ff}
+    .btn{display:inline-flex; align-items:center; justify-content:center; height:54px; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25)}
+    .btn.red{background:linear-gradient(180deg,#9a1616,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
+    .btn.blue{background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
+    .btn.ghost{background:var(--chip-3); border:1px solid var(--stroke-5); color:var(--text)}
 
-    /* RIGHT COLUMN */
+    /* =================== RIGHT =================== */
     .side{padding:12px; display:grid; gap:12px}
-    .totbox{background:var(--card); border:1px solid #223049; border-radius:14px; padding:14px}
-    .row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed #2a3954}
+    .totbox{background:var(--card); border:1px solid var(--stroke-3); border-radius:14px; padding:14px}
+    .row{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed var(--stroke-5)}
     .row:last-child{border-bottom:0}
     .meter{height:12px; background:#0c1220; border:1px solid #263553; border-radius:999px; overflow:hidden}
-    .meter>span{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--blue))}
+    [data-theme="light"] .meter{background:#e9efff; border-color:#cdd8ff}
+    .meter>span{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--blue)); transition:width var(--speed) var(--e)}
+    .links{display:grid; gap:8px}
+    .links a{display:block; padding:10px 12px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--panel); border:1px solid var(--stroke-2)}
 
-    /* RESULTS / ROADMAP */
-    .results{background:#0b1326; border:1px solid #1c2e55; border-radius:14px; padding:12px; display:grid; gap:14px}
+    /* =================== RESULTS / ROADMAP =================== */
+    .results{background:var(--panel); border:1px solid var(--stroke-1); border-radius:14px; padding:12px; display:grid; gap:14px}
     .rhead{display:flex; justify-content:space-between; align-items:center}
-    .rhead h3{margin:0; font-size:16px; letter-spacing:.4px}
     .table{width:100%; border-collapse:separate; border-spacing:0 8px}
-    .table thead th{font-size:12px; color:#bcd1ff; text-align:left; padding:0 10px}
-    .table tbody tr{background:#0f1a33; border:1px solid #22365f}
+    .table thead th{font-size:12px; color:var(--text-muted); text-align:left; padding:0 10px}
+    .table tbody tr{background:var(--panel-3); border:1px solid var(--stroke-3)}
     .table td{padding:10px; font-weight:700}
-    .badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid #2a3e6a}
-    .b-red{background:#3b1212} .b-blue{background:#11244d}
+    .badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--stroke-5)}
+    .b-red{background:#3b1212; color:#ffecec} .b-blue{background:#11244d; color:#e6f0ff}
+    [data-theme="light"] .b-red{background:#ffe3e3; color:#7a1212} [data-theme="light"] .b-blue{background:#e3ecff; color:#0b3ca8}
 
-    /* Roadmap styles */
     .roadwrap{display:grid; gap:12px}
-    .roadgrid{display:grid; grid-template-rows:repeat(6, 26px); grid-auto-columns:26px; grid-auto-flow:column; padding:10px; border:1px solid #22365f; border-radius:12px; background:#0f1a33; overflow:auto}
-    .cell{width:24px; height:24px; border-radius:50%; border:2px solid #2a3e6a; display:flex; align-items:center; justify-content:center; font-size:11px; color:#ffffff; font-weight:900; text-shadow:0 1px 0 rgba(0,0,0,.35)}
+    .roadgrid{display:grid; grid-template-rows:repeat(6, 26px); grid-auto-columns:26px; grid-auto-flow:column; padding:10px; border:1px solid var(--stroke-3); border-radius:12px; background:var(--panel-3); overflow:auto}
+    .cell{width:24px; height:24px; border-radius:50%; border:2px solid var(--stroke-5); display:flex; align-items:center; justify-content:center; font-size:11px; color:#ffffff; font-weight:900; text-shadow:0 1px 0 rgba(0,0,0,.35)}
     .cell.red{background:radial-gradient(circle at 30% 30%, #ff7a70, #b71c1c)}
     .cell.blue{background:radial-gradient(circle at 30% 30%, #8fb6ff, #0b3ca8)}
-    .roadhead{display:flex; align-items:center; gap:8px; color:#bcd1ff; font-weight:800}
-    .roadcontrols{display:flex; gap:8px; flex-wrap:wrap}
-    .roadbtn{height:36px; padding:0 10px; border-radius:10px; border:1px solid #2a3e6a; color:#e6f0ff; cursor:pointer; font-weight:800}
-    .roadbtn.red{background:linear-gradient(180deg,#8a1313,#4b0a0a)}
-    .roadbtn.blue{background:linear-gradient(180deg,#18408f,#0d2b66)}
+    [data-theme="light"] .cell{color:#0b1222}
+
+    .roadcontrols{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .roadbtn{height:40px; padding:0 12px; border-radius:10px; border:1px solid var(--stroke-3); color:#e6f0ff; cursor:pointer; font-weight:800; background:var(--chip-2)}
+    .roadbtn.red{background:linear-gradient(180deg,#8a1313,#4b0a0a); border-color:#3a1a1f}
+    .roadbtn.blue{background:linear-gradient(180deg,#18408f,#0d2b66); border-color:#1f2b50}
     .roadbtn.ghost{background:#0e1934}
-    /* Odds pill for roadmap */
-    .roadodds{display:inline-flex; align-items:center; gap:10px; padding:6px 12px; border-radius:999px; background:#0e1934; border:1px solid #2a3e6a; font-weight:900; color:#e6f0ff}
-    .roadodds .r{color:#ffecec; background:linear-gradient(180deg,#8a1313,#4b0a0a); border:1px solid #3a1a1f; padding:2px 8px; border-radius:999px}
-    .roadodds .b{color:#e6f0ff; background:linear-gradient(180deg,#18408f,#0d2b66); border:1px solid #1f2b50; padding:2px 8px; border-radius:999px}
+    [data-theme="light"] .roadbtn{color:#0b1222}
 
-    /* ---------- EMBOSS (inbose) LOOK: global apply to key components ---------- */
-    .panel, .box, .pad, .slip, .oddslist, .oddsitem, .chipbtn, .btn,
-    .totbox, .table tbody tr, .roadgrid, .cell, .pill, .tab, .links a, .meter, .roadodds, .roadbtn {
-      box-shadow:
-        inset 1px 1px 0 var(--emboss-hi),
-        inset -2px -2px 0 var(--emboss-lo),
-        0 6px 14px rgba(0,0,0,.25);
-      border-color: var(--emboss-edge);
+    /* heavy emboss hooks */
+    .panel, .box, .pad, .slip, .oddslist, .oddsitem, .chipbtn, .btn, .totbox, .table tbody tr, .roadgrid, .cell, .pill, .tab, .links a, .meter, .menu, .row, .chip, .roadbtn{
+      box-shadow: inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo), 0 12px 30px rgba(0,0,0,.35);
+      border-color:var(--emboss-edge)
     }
-    /* keep specific borders stronger where needed */
-    .oddsitem.red{border-color:#3a1a1f}
-    .oddsitem.blue{border-color:#1f2b50}
-    .chipbtn.red{border-color:#3a1a1f}
-    .chipbtn.blue{border-color:#1f2b50}
-    .btn.red{border-color:#3a1a1f}
-    .btn.blue{border-color:#1f2b50}
-    .roadodds .r{border-color:#3a1a1f}
-    .roadodds .b{border-color:#1f2b50}
 
-    .muted{color:var(--muted)}
+    /* ========== Modal ========== */
+    .modal{position:fixed; inset:0; display:grid; place-items:center; visibility:hidden; opacity:0; transition:opacity var(--speed) var(--e), visibility var(--speed) var(--e); z-index:1300}
+    .modal .scrim{position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(2px); opacity:0; transition:opacity var(--speed) var(--e)}
+    .modal .sheet{position:relative; width:min(720px, calc(100% - 24px)); max-height:80vh; overflow:auto; background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px; transform:translateY(10px) scale(.98); opacity:0; transition:transform var(--speed) var(--e), opacity var(--speed) var(--e)}
+    .modal.show{visibility:visible; opacity:1}
+    .modal.show .scrim{opacity:1}
+    .modal.show .sheet{transform:none; opacity:1}
+
+    .modal .actions{display:flex; align-items:center; gap:8px; justify-content:flex-end; margin-top:12px}
+
+    /* ========== Settings switches ========== */
+    .switch{position:relative; width:48px; height:28px; border-radius:999px; border:1px solid var(--stroke-4); background:#18223c; cursor:pointer}
+    [data-theme="light"] .switch{background:#e7efff}
+    .switch .knob{position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.35); transition:left var(--speed) var(--e)}
+    .switch.on{background:linear-gradient(90deg,var(--blue),var(--red))}
+    .switch.on .knob{left:23px}
   </style>
 </head>
 <body>
   <div class="bg"></div>
+
   <div class="wrap">
-    <header>
+    <!-- ================== HEADER ================== -->
+    <header class="slide-in">
       <div class="brand">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1e3a8a"/>
-              <stop offset="100%" stop-color="#7c0a0a"/>
-            </linearGradient>
-          </defs>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="pulse" aria-hidden="true">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#7c0a0a"/></linearGradient></defs>
           <path d="M4 17h4l2 3 4-6 2 3h4" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="5" cy="17" r="2" fill="#00ffba"/>
-          <circle cx="19" cy="17" r="2" fill="#00ffba"/>
-        </svg>
-        <h1>Drag Race Dashboard</h1>
-        <span class="chip">mobile-first • single file</span>
+          <circle cx="5" cy="17" r="2" fill="var(--accent)"/><circle cx="19" cy="17" r="2" fill="var(--accent)"/></svg>
+        <h1 class="shine">Drag Race Dashboard</h1>
+        <span class="chip">inbose • mobile-first</span>
       </div>
+
       <div class="topbar">
-        <div class="pill"><strong>TOTAL POT:</strong> <span id="pot">0</span></div>
-        <div class="pill"><span class="dot red"></span> Rider Red: <strong id="tR">0</strong></div>
-        <div class="pill"><span class="dot blue"></span> Rider Blue: <strong id="tB">0</strong></div>
+        <div class="pill emboss hover-raise"><strong>TOTAL POT:</strong> <span id="pot">0</span></div>
+        <div class="pill emboss hover-raise"><span class="dot red"></span> Rider Red: <strong id="tR">0</strong></div>
+        <div class="pill emboss hover-raise"><span class="dot blue"></span> Rider Blue: <strong id="tB">0</strong></div>
       </div>
+
       <div class="user">
-        <img class="avatar" src="https://i.pravatar.cc/64?img=67" alt="profile"/>
-        <a class="logout" href="index.html" title="Logout">Logout</a>
+        <!-- Settings -->
+        <button id="openSettings" class="iconbtn emboss hover-raise press" aria-haspopup="dialog" aria-controls="settingsModal" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.03.03a2 2 0 1 1-2.83 2.83l-.03-.03A1.8 1.8 0 0 0 15 19.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+
+        <!-- Profile -->
+        <div style="position:relative; z-index:1100">
+          <button id="profileBtn" class="iconbtn emboss hover-raise press" aria-haspopup="menu" aria-expanded="false" title="Profile">
+            <div class="avatar" style="background-image:url('https://i.pravatar.cc/96?img=67')"></div>
+          </button>
+          <div id="profileMenu" class="menu emboss" role="menu" aria-hidden="true">
+            <div class="title">Account</div>
+            <div class="row emboss" style="cursor:default; gap:12px">
+              <div class="avatar" style="width:32px;height:32px;border-radius:8px;background-image:url('https://i.pravatar.cc/96?img=67')"></div>
+              <div style="display:grid"><strong>Wilyonaryo</strong><small style="color:var(--text-muted)">Pro Member</small></div>
+            </div>
+            <a href="#" class="row emboss hover-raise" id="cashInBtn" role="menuitem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Cash In
+            </a>
+            <a href="#" class="row emboss hover-raise" id="withdrawBtn" role="menuitem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21V9m0 0-4 4m4-4 4 4M4 3h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Withdraw
+            </a>
+            <a href="#" class="row emboss hover-raise" id="editProfile" role="menuitem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L8 18l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              Edit Profile
+            </a>
+            <div class="divider"></div>
+            <a href="index.html" class="row emboss hover-raise" id="logoutLink" role="menuitem" style="background:linear-gradient(180deg,#9a1616,#4b0a0a); color:#ffecec; border-color:#3a1a1f">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              Logout
+            </a>
+          </div>
+        </div>
       </div>
     </header>
 
-    <!-- VIDEO / TABS -->
-    <section class="panel video">
+    <!-- ================== VIDEO / TABS ================== -->
+    <section class="panel emboss video floaty">
       <div class="tabs">
-        <button class="tab active" data-tab="odds">ODDS</button>
-        <button class="tab" data-tab="total">TOTAL</button>
+        <button class="tab emboss hover-raise active" data-tab="odds">ODDS</button>
+        <button class="tab emboss hover-raise" data-tab="total">TOTAL</button>
       </div>
-      <div class="frame" aria-label="YouTube video">
+      <div class="frame emboss" aria-label="YouTube video">
         <iframe id="yt" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </section>
 
     <div class="grid">
-      <!-- LEFT: Interactions -->
-      <section class="panel board">
+      <!-- ================== LEFT ================== -->
+      <section class="panel emboss board slide-in">
         <div id="oddsView">
           <div class="mini">
-            <div class="box">
-              <div class="label">ODDS — Rider Red</div>
-              <div class="value" id="oddsRed">1.88</div>
-            </div>
-            <div class="box">
-              <div class="label">ODDS — Rider Blue</div>
-              <div class="value" id="oddsBlue">2.08</div>
-            </div>
+            <div class="box emboss hover-raise"><div class="label">ODDS — Rider Red</div><div class="value" id="oddsRed">1.88</div></div>
+            <div class="box emboss hover-raise"><div class="label">ODDS — Rider Blue</div><div class="value" id="oddsBlue">2.08</div></div>
           </div>
 
           <div class="kiosk">
-            <!-- chips -->
-            <div class="pad" id="chips">
-              <button class="chipbtn red" data-chip="50">₱50</button>
-              <button class="chipbtn red" data-chip="100">₱100</button>
-              <button class="chipbtn blue" data-chip="200">₱200</button>
-              <button class="chipbtn blue" data-chip="500">₱500</button>
+            <div class="pad emboss" id="chips">
+              <button class="chipbtn red emboss hover-raise press">₱50</button>
+              <button class="chipbtn red emboss hover-raise press">₱100</button>
+              <button class="chipbtn blue emboss hover-raise press">₱200</button>
+              <button class="chipbtn blue emboss hover-raise press">₱500</button>
             </div>
 
-            <!-- odds grid -->
-            <div class="oddslist" id="oddslist">
-              <div class="oddsitem red" data-odd="10-10">10-10</div>
-              <div class="oddsitem red" data-odd="10-9">10-9</div>
-              <div class="oddsitem blue" data-odd="9-10">9-10</div>
-              <div class="oddsitem blue" data-odd="9-9">9-9</div>
-              <div class="oddsitem red" data-odd="8-10">8-10</div>
-              <div class="oddsitem blue" data-odd="8-9">8-9</div>
+            <div class="oddslist emboss" id="oddslist">
+              <div class="oddsitem red emboss hover-raise press">10-10</div>
+              <div class="oddsitem red emboss hover-raise press">10-9</div>
+              <div class="oddsitem blue emboss hover-raise press">9-10</div>
+              <div class="oddsitem blue emboss hover-raise press">9-9</div>
+              <div class="oddsitem red emboss hover-raise press">8-10</div>
+              <div class="oddsitem blue emboss hover-raise press">8-9</div>
             </div>
 
-            <!-- slip -->
-            <div class="slip">
-              <div class="row" style="border:0; padding-top:0"><span class="muted">Selected Market:</span> <strong id="market">10-10</strong></div>
-              <input id="amount" type="number" min="1" placeholder="Enter amount" />
+            <div class="slip emboss">
+              <div class="row" style="border:0; padding-top:0"><span style="color:var(--text-muted)">Selected Market:</span> <strong id="market">10-10</strong></div>
+              <input id="amount" type="number" min="1" placeholder="Enter amount" class="emboss"/>
               <div class="actions">
-                <button class="btn red" data-bet="red">BET</button>
-                <button class="btn blue" data-bet="blue">BET</button>
+                <button class="btn red emboss hover-raise press" data-bet="red">BET</button>
+                <button class="btn blue emboss hover-raise press" data-bet="blue">BET</button>
               </div>
-              <button class="btn ghost" id="reset">Reset</button>
+              <button class="btn ghost emboss hover-raise press" id="reset">Reset</button>
             </div>
           </div>
         </div>
 
-        <!-- TOTALIZATOR VIEW -->
+        <!-- TOTAL VIEW -->
         <div id="totalView" hidden>
           <div class="mini">
-            <div class="box"><div class="label">Total Bets — Red</div><div class="value" id="totalRed">0</div></div>
-            <div class="box"><div class="label">Total Bets — Blue</div><div class="value" id="totalBlue">0</div></div>
+            <div class="box emboss hover-raise"><div class="label">Total Bets — Red</div><div class="value" id="totalRed">0</div></div>
+            <div class="box emboss hover-raise"><div class="label">Total Bets — Blue</div><div class="value" id="totalBlue">0</div></div>
           </div>
           <div class="mini">
-            <div class="box"><div class="label">Pool Share — Red</div><div class="value" id="shareRed">0%</div></div>
-            <div class="box"><div class="label">Pool Share — Blue</div><div class="value" id="shareBlue">0%</div></div>
+            <div class="box emboss hover-raise"><div class="label">Pool Share — Red</div><div class="value" id="shareRed">0%</div></div>
+            <div class="box emboss hover-raise"><div class="label">Pool Share — Blue</div><div class="value" id="shareBlue">0%</div></div>
           </div>
           <div class="mini">
-            <div class="box"><div class="label">Odds (x) — Red</div><div class="value" id="txRed">1.88</div></div>
-            <div class="box"><div class="label">Odds (x) — Blue</div><div class="value" id="txBlue">2.08</div></div>
+            <div class="box emboss hover-raise"><div class="label">Odds (x) — Red</div><div class="value" id="txRed">1.88</div></div>
+            <div class="box emboss hover-raise"><div class="label">Odds (x) — Blue</div><div class="value" id="txBlue">2.08</div></div>
           </div>
         </div>
 
         <!-- RESULTS / ROADMAP -->
-        <div class="results">
+        <div class="results emboss">
           <div class="rhead">
             <h3>Roadmap • Results</h3>
             <div style="display:flex; gap:8px">
-              <button class="btn red" id="winRed">Record: Red Wins</button>
-              <button class="btn blue" id="winBlue">Record: Blue Wins</button>
+              <button class="roadbtn red emboss hover-raise press" id="winRed">Record: Red Wins</button>
+              <button class="roadbtn blue emboss hover-raise press" id="winBlue">Record: Blue Wins</button>
             </div>
           </div>
-          <div class="center" style="margin-top:-4px"><div class="roadodds" id="roadOdds"><span class="r">Red × 1.88</span> • <span class="b">Blue × 2.08</span></div></div>
+          <div class="center" style="margin-top:-4px"><div class="roadodds emboss" id="roadOdds"><span class="r">Red × 1.88</span> • <span class="b">Blue × 2.08</span></div></div>
           <div class="roadwrap">
             <div class="roadhead">Bead Road</div>
-            <div id="bead" class="roadgrid"></div>
+            <div id="bead" class="roadgrid emboss"></div>
             <div class="roadhead">Big Road</div>
-            <div id="big" class="roadgrid"></div>
+            <div id="big" class="roadgrid emboss"></div>
             <div class="roadcontrols">
-              <button class="roadbtn red" id="markRed">Mark Red</button>
-              <button class="roadbtn blue" id="markBlue">Mark Blue</button>
-              <button class="roadbtn ghost" id="undo">Undo</button>
-              <span class="muted">(visual log like the screenshot)</span>
+              <button class="roadbtn red emboss hover-raise press" id="markRed">Mark Red</button>
+              <button class="roadbtn blue emboss hover-raise press" id="markBlue">Mark Blue</button>
+              <button class="roadbtn emboss hover-raise press" id="undo">Undo</button>
+              <span style="color:var(--text-muted)">(visual log)</span>
             </div>
           </div>
           <table class="table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Winner</th>
-                <th>Pot</th>
-                <th>Odds</th>
-                <th>Payout per ₱100</th>
-              </tr>
-            </thead>
-            <tbody id="logBody">
-              <!-- rows append here -->
-            </tbody>
+            <thead><tr><th>Time</th><th>Winner</th><th>Pot</th><th>Odds</th><th>Payout per ₱100</th></tr></thead>
+            <tbody id="logBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- RIGHT: Pool + links -->
-      <aside class="panel side">
-        <div class="totbox">
-          <div class="row"><strong>POT</strong><strong id="pot2">0</strong></div>
-          <div class="row"><span>Bets (Rider Red / Rider Blue)</span><strong><span id="tR2">0</span> / <span id="tB2">0</span></strong></div>
-          <div class="row"><span>Est. Payout (x)</span>
-            <strong><span class="muted">Rider Red</span> <span id="payoutR">× 1.88</span> • <span class="muted">Rider Blue</span> <span id="payoutB">× 2.08</span></strong>
+      <!-- ================== RIGHT ================== -->
+      <aside class="panel emboss side floaty">
+        <div class="totbox emboss">
+          <div class="row emboss"><strong>POT</strong><strong id="pot2">0</strong></div>
+          <div class="row emboss"><span>Bets (Rider Red / Rider Blue)</span><strong><span id="tR2">0</span> / <span id="tB2">0</span></strong></div>
+          <div class="row emboss"><span>Est. Payout (x)</span>
+            <strong><span style="color:var(--text-muted)">Rider Red</span> <span id="payoutR">× 1.88</span> • <span style="color:var(--text-muted)">Rider Blue</span> <span id="payoutB">× 2.08</span></strong>
           </div>
-          <div class="meter"><span id="bar" style="width:0%"></span></div>
+          <div class="meter emboss"><span id="bar" style="width:0%"></span></div>
         </div>
-        <div class="totbox">
-          <div class="center muted" style="margin-bottom:8px">Links to Other Sites</div>
-          <div class="links" id="links">
-            <a href="https://www.nba.com" target="_blank" rel="noopener">NBA</a>
-            <a href="https://www.pokerstars.com" target="_blank" rel="noopener">Poker</a>
-            <a href="https://www.mobilelegends.com" target="_blank" rel="noopener">Mobile Legends</a>
-            <a href="https://en.wikipedia.org/wiki/Drag_racing" target="_blank" rel="noopener">What is Drag Racing?</a>
+        <div class="totbox emboss">
+          <div class="center" style="margin-bottom:8px; color:var(--text-muted)">Links to Other Sites</div>
+          <div class="links">
+            <a class="emboss hover-raise press" href="https://www.nba.com" target="_blank" rel="noopener">NBA</a>
+            <a class="emboss hover-raise press" href="https://www.pokerstars.com" target="_blank" rel="noopener">Poker</a>
+            <a class="emboss hover-raise press" href="https://www.mobilelegends.com" target="_blank" rel="noopener">Mobile Legends</a>
+            <a class="emboss hover-raise press" href="https://en.wikipedia.org/wiki/Drag_racing" target="_blank" rel="noopener">What is Drag Racing?</a>
           </div>
         </div>
       </aside>
     </div>
   </div>
 
+  <!-- ================== SETTINGS MODAL ================== -->
+  <div id="settingsModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Settings">
+    <div class="scrim" data-close></div>
+    <div class="sheet emboss">
+      <h2 style="margin:0 0 8px">Settings</h2>
+      <p style="margin:0 0 12px; color:var(--text-muted)">All toggles are persistent.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>Dark Mode</strong><br><small style="color:var(--text-muted)">Switch between themes</small></div>
+          <div id="sw-dark" class="switch"><div class="knob"></div></div>
+        </div>
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>Fancy Animations</strong><br><small style="color:var(--text-muted)">Glow, pulse, float</small></div>
+          <div id="sw-fancy" class="switch"><div class="knob"></div></div>
+        </div>
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>Sound Effects</strong><br><small style="color:var(--text-muted)">Clicks & beeps</small></div>
+          <div id="sw-sound" class="switch"><div class="knob"></div></div>
+        </div>
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>Compact Mode</strong><br><small style="color:var(--text-muted)">Tighter paddings</small></div>
+          <div id="sw-compact" class="switch"><div class="knob"></div></div>
+        </div>
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>High Contrast</strong><br><small style="color:var(--text-muted)">Stronger borders/text</small></div>
+          <div id="sw-contrast" class="switch"><div class="knob"></div></div>
+        </div>
+        <div class="setting emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:space-between">
+          <div><strong>Haptic Feedback</strong><br><small style="color:var(--text-muted)">Vibrate on actions</small></div>
+          <div id="sw-haptic" class="switch"><div class="knob"></div></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn ghost emboss press" data-close>Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== POPUPS: EDIT / CASH IN / WITHDRAW ================== -->
+  <div id="modal-edit" class="modal" role="dialog" aria-label="Edit Profile">
+    <div class="scrim" data-close></div>
+    <div class="sheet emboss">
+      <h2 style="margin:0 0 8px">Edit Profile</h2>
+      <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+        <label>Display Name <input id="prof-name" type="text" placeholder="Your name" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+        <label>Avatar URL <input id="prof-avatar" type="url" placeholder="https://..." style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+      </div>
+      <div class="actions">
+        <button class="btn ghost emboss press" data-close>Back</button>
+        <button class="btn blue emboss press" id="saveProfile">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-cash" class="modal" role="dialog" aria-label="Cash In">
+    <div class="scrim" data-close></div>
+    <div class="sheet emboss">
+      <h2 style="margin:0 0 8px">Cash In</h2>
+      <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+        <label>Amount <input id="cash-amt" type="number" min="1" placeholder="₱0" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+        <label>Method
+          <select id="cash-method" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px">
+            <option>GCash</option><option>PayMaya</option><option>Bank Transfer</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn ghost emboss press" data-close>Back</button>
+        <button class="btn red emboss press" id="cashSubmit">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-withdraw" class="modal" role="dialog" aria-label="Withdraw">
+    <div class="scrim" data-close></div>
+    <div class="sheet emboss">
+      <h2 style="margin:0 0 8px">Withdraw</h2>
+      <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+        <label>Amount <input id="wd-amt" type="number" min="1" placeholder="₱0" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+        <label>Destination
+          <select id="wd-method" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px">
+            <option>GCash</option><option>PayMaya</option><option>Bank Transfer</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn ghost emboss press" data-close>Back</button>
+        <button class="btn blue emboss press" id="wdSubmit">Request</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ---- YouTube embed ----
+    /* ================== YouTube embed (no video animations) ================== */
     (function(){
       const url = 'https://youtu.be/mzBv3fUDxRA?si=0X903bZ6UrB-v6UF';
       const embed = url.replace('https://youtu.be/','https://www.youtube.com/embed/').replace('watch?v=','embed/');
       document.getElementById('yt').src = embed + (embed.includes('?') ? '&' : '?') + 'rel=0&modestbranding=1';
     })();
 
-    // ---- State ----
+    /* ================== App State ================== */
     const state = { red:0, blue:0, oddsRed:1.88, oddsBlue:2.08, market:'10-10' };
-    const el = (id)=>document.getElementById(id);
+    const el = id => document.getElementById(id);
     const fmt = n => Number(n).toLocaleString('en-PH',{maximumFractionDigits:0});
 
+    /* ================== Sound + Haptics ================== */
+    let SOUND_ON = true, HAPTIC_ON = false;
+    function beep(type='click', dur=80, freq=440, vol=0.05){
+      if(!SOUND_ON || typeof AudioContext==='undefined') return;
+      const ctx = beep.ctx || (beep.ctx = new AudioContext());
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type = (type==='low'?'square':'sine'); o.frequency.value=freq; g.gain.value=vol;
+      o.connect(g); g.connect(ctx.destination); o.start();
+      setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.02); o.stop(ctx.currentTime+0.03); }, dur);
+    }
+    function vibe(ms=10){ if(HAPTIC_ON && navigator.vibrate) navigator.vibrate(ms); }
+
+    /* ================== UI Sync ================== */
     function sync(){
       const pot = state.red + state.blue;
       const r = pot? state.red/pot*100 : 0; const b = 100 - r;
@@ -335,11 +523,9 @@
       el('bar').style.width = b + '%';
       el('oddsRed').textContent = state.oddsRed.toFixed(2); el('oddsBlue').textContent = state.oddsBlue.toFixed(2);
       el('payoutR').textContent = '× ' + state.oddsRed.toFixed(2); el('payoutB').textContent = '× ' + state.oddsBlue.toFixed(2);
-      // update odds pill in roadmap
       const ro = document.getElementById('roadOdds');
       if(ro){ ro.innerHTML = `<span class="r">Red × ${state.oddsRed.toFixed(2)}</span> • <span class="b">Blue × ${state.oddsBlue.toFixed(2)}</span>`; }
       el('market').textContent = state.market;
-      // total view
       el('totalRed').textContent = fmt(state.red);
       el('totalBlue').textContent = fmt(state.blue);
       el('shareRed').textContent = (r||0).toFixed(1)+'%';
@@ -348,43 +534,40 @@
       el('txBlue').textContent = state.oddsBlue.toFixed(2);
     }
 
-    // Chips
-    document.querySelectorAll('#chips [data-chip]').forEach(b=>{
+    /* ================== Chips ================== */
+    document.querySelectorAll('#chips .chipbtn').forEach(b=>{
       b.addEventListener('click',()=>{
-        const amt = Number(b.getAttribute('data-chip'))||0;
-        const input = el('amount');
-        input.value = Number(input.value||0) + amt;
-      })
-    })
+        const amt = Number(b.textContent.replace(/[^\d]/g,''))||0;
+        const input = el('amount'); input.value = Number(input.value||0) + amt;
+        beep('click',70,660,0.05); vibe(8);
+      });
+    });
 
-    // Odds select
-    document.querySelectorAll('.oddsitem').forEach(item=>{
+    /* ================== Odds select ================== */
+    document.querySelectorAll('#oddslist .oddsitem').forEach(item=>{
       item.addEventListener('click',()=>{
         document.querySelectorAll('.oddsitem').forEach(i=>i.classList.remove('active'));
-        item.classList.add('active');
-        state.market = item.dataset.odd;
+        item.classList.add('active'); state.market = item.textContent.trim();
+        beep('click',70,520,0.05); vibe(6);
       })
-    });
-    document.querySelector('.oddsitem').classList.add('active');
+    }); document.querySelector('#oddslist .oddsitem')?.classList.add('active');
 
-    // Bets
+    /* ================== Bets ================== */
     document.querySelectorAll('[data-bet]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const side = btn.getAttribute('data-bet');
-        const val = Math.max(0, Number(el('amount').value||0));
-        if(!val) return;
+        const val = Math.max(0, Number(el('amount').value||0)); if(!val) return;
         state[side]+=val; el('amount').value='';
-        const pot = state.red + state.blue; // dynamic-ish odds by pool share
-        if(pot>0){
-          const rshare = state.red/pot; const bshare = state.blue/pot;
+        const pot = state.red + state.blue;
+        if(pot>0){ const rshare = state.red/pot; const bshare = state.blue/pot;
           state.oddsRed = Number((1 + (bshare*1.2)).toFixed(2));
           state.oddsBlue = Number((1 + (rshare*1.2)).toFixed(2));
         }
-        sync();
+        sync(); beep('click',90,760,0.06); vibe(12);
       })
-    })
+    }); el('reset').addEventListener('click',()=>{ el('amount').value=''; beep('low',60,220,0.05); vibe(8); });
 
-    // Results / Roadmap — compute payout per ₱100 at time of logging
+    /* ================== Results / Roadmap ================== */
     function addLog(winner){
       const pot = state.red + state.blue;
       const odds = winner==='Red' ? state.oddsRed : state.oddsBlue;
@@ -398,70 +581,198 @@
         <td>₱${fmt(payoutPer100)}</td>`;
       document.getElementById('logBody').prepend(tr);
     }
-    document.getElementById('winRed').addEventListener('click',()=>{ mark('R'); addLog('Red'); });
-    document.getElementById('winBlue').addEventListener('click',()=>{ mark('B'); addLog('Blue'); });
 
-    // ---- Roadmap visuals ----
-    const seq = []; // 'R' | 'B'
-    const ROWS = 6, COLS = 36;
-
+    const seq = []; const ROWS = 6, COLS = 36;
     function renderBead(){
-      const bead = document.getElementById('bead');
-      bead.innerHTML = '';
+      const bead = document.getElementById('bead'); bead.innerHTML = '';
       for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
-        const slot = document.createElement('div');
-        slot.style.gridRow = (r+1);
-        slot.className = 'cell';
-        bead.appendChild(slot);
+        const slot = document.createElement('div'); slot.style.gridRow = (r+1); slot.className = 'cell'; bead.appendChild(slot);
       }
-      seq.forEach((v,i)=>{
-        const col = Math.floor(i/ROWS), row = i % ROWS;
-        const idx = col*ROWS + row; // child index
-        const cell = bead.children[idx];
-        if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent= String(i+1); }
-      });
+      seq.forEach((v,i)=>{ const col = Math.floor(i/ROWS), row = i % ROWS; const idx = col*ROWS + row; const cell = bead.children[idx];
+        if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent= String(i+1); }});
     }
-
     function renderBig(){
-      const big = document.getElementById('big');
-      big.innerHTML='';
-      // pre-fill grid cells
-      for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
-        const slot=document.createElement('div');
-        slot.style.gridRow=(r+1);
-        slot.className='cell';
-        big.appendChild(slot);
-      }
+      const big = document.getElementById('big'); big.innerHTML='';
+      for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){ const slot=document.createElement('div'); slot.style.gridRow=(r+1); slot.className='cell'; big.appendChild(slot); }
       let col=0,row=0,last=null;
-      const place=(v,i)=>{
-        if(last===null){last=v; col=0; row=0;}
-        else if(v===last){ row++; if(row>=ROWS){ col++; row=ROWS-1; } }
-        else { last=v; col++; row=0; }
-        const idx = col*ROWS + row;
-        const cell = big.children[idx];
-        if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent = String(i+1); }
-      };
+      const place=(v,i)=>{ if(last===null){last=v; col=0; row=0;} else if(v===last){ row++; if(row>=ROWS){ col++; row=ROWS-1; } } else { last=v; col++; row=0; }
+        const idx = col*ROWS + row; const cell = big.children[idx]; if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent = String(i+1); } };
       seq.forEach((v,i)=>place(v,i));
     }
+    function mark(v){ seq.push(v); renderBead(); renderBig(); addLog(v==='R'?'Red':'Blue'); }
+    el('markRed').addEventListener('click',()=>mark('R'));
+    el('markBlue').addEventListener('click',()=>mark('B'));
+    el('undo').addEventListener('click',()=>{ seq.pop(); renderBead(); renderBig(); beep('low',70,260,0.05); vibe(10); });
 
-    function mark(v){
-      seq.push(v); renderBead(); renderBig();
-    }
-    document.getElementById('markRed').addEventListener('click',()=>mark('R'));
-    document.getElementById('markBlue').addEventListener('click',()=>mark('B'));
-    document.getElementById('undo').addEventListener('click',()=>{ seq.pop(); renderBead(); renderBig(); });
+    el('winRed').addEventListener('click',()=>{ mark('R'); });
+    el('winBlue').addEventListener('click',()=>{ mark('B'); });
 
-    // Tabs
+    /* ================== Tabs ================== */
     function showTab(name){
       document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===name));
-      document.getElementById('oddsView').hidden = name!== 'odds';
-      document.getElementById('totalView').hidden = name!== 'total';
+      document.getElementById('oddsView').hidden = name!=='odds';
+      document.getElementById('totalView').hidden = name!=='total';
+      beep('click',60,520,0.045);
     }
     document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
 
-    // ---- Init
-    (function initEmboss(){ /* no-op, styles are CSS-based */ })();
-    sync();
+    /* ================== Profile menu (robust) ================== */
+    const profileBtn = el('profileBtn');
+    const profileMenu = el('profileMenu');
+    function toggleMenu(force){
+      const show = typeof force === 'boolean' ? force : !profileMenu.classList.contains('show');
+      profileMenu.classList.toggle('show', show);
+      profileBtn.setAttribute('aria-expanded', show?'true':'false');
+    }
+    // Direct toggle on button click (so hindi maapektuhan ng ripple spans)
+    profileBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
+    // Close when clicking outside
+    document.addEventListener('click', (e)=>{
+      if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) toggleMenu(false);
+    });
+
+    /* ================== Settings ================== */
+    const settingsModal = el('settingsModal');
+    function openModal(m){ m.classList.add('show'); }
+    function closeModal(m){ m.classList.remove('show'); }
+    document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click', ()=>document.querySelectorAll('.modal.show').forEach(closeModal)));
+    el('openSettings').addEventListener('click', ()=>openModal(settingsModal));
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') { toggleMenu(false); document.querySelectorAll('.modal.show').forEach(closeModal); } });
+
+    // Switch helpers
+    const sw = id => document.getElementById(id);
+    const switches = { dark: sw('sw-dark'), fancy: sw('sw-fancy'), sound: sw('sw-sound'), compact: sw('sw-compact'), contrast: sw('sw-contrast'), haptic: sw('sw-haptic') };
+    function setSwitch(elem, on){ elem.classList.toggle('on', !!on); elem.setAttribute('aria-checked', on?'true':'false'); }
+    function applyFromStorage(){
+      const theme = localStorage.getItem('theme') || 'dark'; document.documentElement.setAttribute('data-theme', theme); setSwitch(switches.dark, theme==='dark');
+      const fancy = localStorage.getItem('fancy')!=='0'; document.body.classList.toggle('no-fancy', !fancy); setSwitch(switches.fancy, fancy);
+      SOUND_ON = localStorage.getItem('sound')!=='0'; setSwitch(switches.sound, SOUND_ON);
+      const compact = localStorage.getItem('compact')==='1'; document.body.classList.toggle('compact', compact); setSwitch(switches.compact, compact);
+      const contrast = localStorage.getItem('contrast')==='1'; document.body.classList.toggle('high-contrast', contrast); setSwitch(switches.contrast, contrast);
+      HAPTIC_ON = localStorage.getItem('haptic')==='1'; setSwitch(switches.haptic, HAPTIC_ON);
+    } applyFromStorage();
+
+    Object.entries(switches).forEach(([key, elem])=>{
+      elem.addEventListener('click', ()=>{
+        const isOn = !elem.classList.contains('on'); setSwitch(elem, isOn);
+        switch(key){
+          case 'dark': document.documentElement.setAttribute('data-theme', isOn?'dark':'light'); localStorage.setItem('theme', isOn?'dark':'light'); break;
+          case 'fancy': document.body.classList.toggle('no-fancy', !isOn); localStorage.setItem('fancy', isOn?'1':'0'); break;
+          case 'sound': SOUND_ON = isOn; localStorage.setItem('sound', isOn?'1':'0'); break;
+          case 'compact': document.body.classList.toggle('compact', isOn); localStorage.setItem('compact', isOn?'1':'0'); break;
+          case 'contrast': document.body.classList.toggle('high-contrast', isOn); localStorage.setItem('contrast', isOn?'1':'0'); break;
+          case 'haptic': HAPTIC_ON = isOn; localStorage.setItem('haptic', isOn?'1':'0'); break;
+        }
+        beep('click',60,540,0.045); vibe(5);
+      });
+    });
+
+    /* ================== Popups: Edit / Cash / Withdraw ================== */
+    const modals = {
+      edit: document.getElementById('modal-edit'),
+      cash: document.getElementById('modal-cash'),
+      wd: document.getElementById('modal-withdraw')
+    };
+    document.getElementById('editProfile').addEventListener('click', (e)=>{ e.preventDefault(); openModal(modals.edit); toggleMenu(false); });
+    document.getElementById('cashInBtn').addEventListener('click', (e)=>{ e.preventDefault(); openModal(modals.cash); toggleMenu(false); });
+    document.getElementById('withdrawBtn').addEventListener('click', (e)=>{ e.preventDefault(); openModal(modals.wd); toggleMenu(false); });
+
+    // Save profile (updates display + avatar only in UI)
+    document.getElementById('saveProfile').addEventListener('click', ()=>{
+      const name = (document.getElementById('prof-name').value||'').trim();
+      const avatar = (document.getElementById('prof-avatar').value||'').trim();
+      if(name) { document.querySelector('#profileMenu .row strong').textContent = name; }
+      if(avatar) { document.querySelectorAll('.avatar').forEach(a=>{ a.style.backgroundImage = `url('${avatar}')`; }); }
+      closeModal(modals.edit); beep('click',70,660,0.05); vibe(8);
+    });
+
+    // Cash In / Withdraw demo confirmations
+    document.getElementById('cashSubmit').addEventListener('click', ()=>{
+      const amt = Number(document.getElementById('cash-amt').value||0); closeModal(modals.cash);
+      alert(amt?`Cash In submitted: ₱${fmt(amt)}`:'Please enter an amount.');
+    });
+    document.getElementById('wdSubmit').addEventListener('click', ()=>{
+      const amt = Number(document.getElementById('wd-amt').value||0); closeModal(modals.wd);
+      alert(amt?`Withdraw requested: ₱${fmt(amt)}`:'Please enter an amount.');
+    });
+
+    /* ================== Init ================== */
+    function init(){ renderBead(); renderBig(); sync(); }
+    init();
+
+    /* ==========================================================
+       HOVER ENHANCEMENT PACK (Additive, no removals)
+       - Ripple on click (buttons/odds/tabs)
+       - Soft 3D tilt (cards/panels)  [disabled on header]
+       - Magnetize hover (clamped & header-safe)
+    ==========================================================*/
+
+    // Ripple
+    function addRipple(root=document){
+      root.querySelectorAll('.btn, .chipbtn, .oddsitem, .tab, .roadbtn, .links a, .iconbtn').forEach(el=>{
+        if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+        el.style.overflow = 'hidden';
+        el.addEventListener('pointerdown', e=>{
+          const r = document.createElement('span');
+          const rect = el.getBoundingClientRect();
+          const d = Math.max(rect.width, rect.height);
+          r.style.width=r.style.height=d+'px';
+          r.style.position='absolute';
+          r.style.pointerEvents='none';     /* ensure di haharang sa clicks */
+          r.style.borderRadius='50%';
+          r.style.left=(e.clientX-rect.left-d/2)+'px';
+          r.style.top=(e.clientY-rect.top-d/2)+'px';
+          r.style.background='rgba(255,255,255,.18)';
+          r.style.transform='scale(0)';
+          r.style.transition='transform 600ms var(--e), opacity 700ms var(--e)';
+          el.appendChild(r);
+          requestAnimationFrame(()=>{ r.style.transform='scale(1)'; r.style.opacity='0'; });
+          setTimeout(()=>r.remove(), 700);
+        });
+      });
+    }
+
+    // Tilt (disabled for header elements to keep alignment rock solid)
+    function addTilt(root=document){
+      root.querySelectorAll('.panel, .box, .totbox, .oddsitem, .tab, .roadbtn').forEach(card=>{
+        if(card.closest('header')) return; // no tilt in header area
+        card.addEventListener('mousemove', e=>{
+          const b = card.getBoundingClientRect();
+          const x = (e.clientX - b.left)/b.width - .5;
+          const y = (e.clientY - b.top)/b.height - .5;
+          card.style.transform = `perspective(800px) rotateX(${(-y*4)}deg) rotateY(${(x*4)}deg) translateY(-2px)`;
+        });
+        card.addEventListener('mouseleave', ()=>{ card.style.transform=''; });
+      });
+    }
+
+    // Magnetize (header-safe & clamped)
+    function magnetize(el, strength=10){
+      const MAX_PX = 6;
+      const SCALE = 1.02;
+      el.addEventListener('mousemove', (e)=>{
+        const rect = el.getBoundingClientRect();
+        const dx = (e.clientX - (rect.left + rect.width/2)) / (rect.width/2);
+        const dy = (e.clientY - (rect.top + rect.height/2)) / (rect.height/2);
+        const nx = Math.max(-1, Math.min(1, dx));
+        const ny = Math.max(-1, Math.min(1, dy));
+        const tx = Math.max(-MAX_PX, Math.min(MAX_PX, nx * strength));
+        const ty = Math.max(-MAX_PX, Math.min(MAX_PX, ny * strength));
+        el.style.transform = `translate(${tx}px, ${ty}px) scale(${SCALE})`;
+      });
+      el.addEventListener('mouseleave', ()=>{ el.style.transform=''; });
+    }
+    function addMagnetize(){
+      document.querySelectorAll('.iconbtn, .tab, .roadbtn').forEach(el=>{
+        const inHeader = !!el.closest('header');
+        magnetize(el, inHeader ? 2.5 : 10);
+      });
+    }
+
+    // Boot the enhancement pack
+    addRipple();
+    addTilt();
+    addMagnetize();
   </script>
 </body>
 </html>
