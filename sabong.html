@@ -19,7 +19,12 @@
       background:url('https://i.ibb.co/BKQvKBXG/dffa7d34-4988-4aaa-802f-7fb649a8f8f5.png') center/cover no-repeat;
       opacity:.85; z-index:-1; animation:moveBg 30s infinite alternate ease-in-out; will-change:transform;}
     @keyframes moveBg{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-2%,-2%,0)}100%{transform:translate3d(0,-1%,0)}}
-    .bet-area{ perspective:1200px; }
+    @keyframes glow-border {
+      0% { box-shadow: 0 0 10px -5px rgba(255,0,0,0.8), 0 0 20px -10px rgba(255,255,0,0.8), 0 0 30px -15px rgba(0,0,255,0.8); }
+      50% { box-shadow: 0 0 15px -3px rgba(255,0,0,0.9), 0 0 25px -8px rgba(255,255,0,0.9), 0 0 35px -13px rgba(0,0,255,0.9); }
+      100% { box-shadow: 0 0 20px 0 rgba(255,0,0,1), 0 0 30px -5px rgba(255,255,0,1), 0 0 40px -10px rgba(0,0,255,1); }
+    }
+.bet-area{ perspective:1200px; }
     .bet-card{ position:relative; border-radius:var(--card-radius); overflow:hidden; padding:14px; color:#fff;
       transform-style:preserve-3d; will-change:transform, box-shadow; transition:transform .2s, box-shadow .2s, filter .2s;
       border:1px solid rgba(255,255,255,.12); backdrop-filter:saturate(120%) blur(2px);
@@ -108,7 +113,7 @@
     .chip3d{ position:relative; display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:14px;
       font-weight:900; letter-spacing:.4px; user-select:none; border:1px solid rgba(255,255,255,.18);
       background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-      box-shadow:0 14px 28px rgba(0,0,0,.45), inset 0 1px 2px rgba(0,0,0,.25);
+      box-shadow:0 14px 28px rgba(0,0,0,.45), inset 0 1px 2px rgba(255,255,255,.25);
       transform:translateZ(12px); transition:transform .12s, box-shadow .12s, filter .12s; backdrop-filter: blur(2px) saturate(120%);}
     .chip3d::before{ content:""; position:absolute; inset:0; border-radius:14px; background:var(--gloss); mix-blend-mode:screen; pointer-events:none; transform:translateZ(14px);}
     .chip3d:hover{ transform:translateY(-3px) translateZ(14px); filter:saturate(110%); }
@@ -116,6 +121,49 @@
     .chip-red{ background:linear-gradient(180deg,#b91c1c,#7f1d1d); } .chip-blue{ background:linear-gradient(180deg,#1d4ed8,#1e3a8a); }
     .chip-amber{ background:linear-gradient(180deg,#d97706,#92400e); } .chip-emerald{ background:linear-gradient(180deg,#059669,#065f46); }
     .chip-slate{ background:linear-gradient(180deg,#1f2937,#0f172a); } .chip-outline{ border:1px solid rgba(250,204,21,.45); }
+
+    /* ===== 3D RESULT BADGE ===== */
+    .result-3d { perspective: 900px; display:inline-block; }
+    .badge-3d {
+      display:inline-flex; align-items:center; justify-content:center; min-width:72px;
+      padding:6px 10px; border-radius:12px; font-weight:900; letter-spacing:.6px;
+      transform-style:preserve-3d; transform:rotateX(0deg) translateZ(8px);
+      box-shadow: 0 14px 24px rgba(0,0,0,.45), inset 0 1px 2px rgba(255,255,255,.25);
+      border:1px solid rgba(255,255,255,.22); position:relative; user-select:none;
+      text-shadow: 0 1px 0 rgba(0,0,0,.45), 0 6px 14px rgba(0,0,0,.45);
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+    .badge-3d::before{
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      background: radial-gradient(120% 80% at 10% -30%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%), var(--gloss);
+      transform: translateZ(12px);
+    }
+    .badge-3d:hover{ transform: rotateX(6deg) translateZ(12px); filter:saturate(1.08); box-shadow: 0 18px 30px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.28); }
+    .badge-win{ background: linear-gradient(180deg,#16a34a,#065f46); color:#fff; }
+    .badge-lose{ background: linear-gradient(180deg,#991b1b,#3f0d0d); color:#ffd0d0; }
+    .badge-pending{ background: linear-gradient(180deg,#374151,#111827); color:#e5e7eb; }
+    @keyframes popFlip { 0% { transform: rotateX(-90deg) translateZ(0); opacity: 0; } 60% { transform: rotateX(18deg) translateZ(10px); opacity: 1; } 100% { transform: rotateX(0deg) translateZ(8px); } }
+    .badge-pop { animation: popFlip .5s cubic-bezier(.2,.8,.2,1); }
+
+    /* ===== 3D SIDE (MERON/WALA) CHIP ===== */
+    .side-3d { perspective: 900px; display:inline-block; }
+    .side-badge{
+      display:inline-flex; align-items:center; justify-content:center; min-width:80px;
+      padding:6px 12px; border-radius:12px; font-weight:900; letter-spacing:.6px;
+      transform-style:preserve-3d; transform:rotateX(0deg) translateZ(10px);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow: 0 14px 24px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.22);
+      text-shadow: 0 1px 0 rgba(0,0,0,.55), 0 8px 16px rgba(0,0,0,.55);
+      position:relative; user-select:none; transition:transform .18s, filter .18s, box-shadow .18s;
+    }
+    .side-badge::before{
+      content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+      background: radial-gradient(120% 80% at 10% -30%, rgba(255,255,255,.32), rgba(255,255,255,0) 60%), var(--gloss);
+      transform: translateZ(14px);
+    }
+    .side-badge:hover{ transform: rotateX(6deg) translateZ(14px); filter:saturate(1.08); box-shadow: 0 18px 32px rgba(0,0,0,.55), inset 0 1px 2px rgba(255,255,255,.28); }
+    .side-meron{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
+    .side-wala { background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
   </style>
 </head>
 <body class="text-white font-sans bg-black">
@@ -221,13 +269,23 @@
         <div class="flex justify-center"></div>
         <div id="event-time" class="text-right"></div>
       </div>
-
       <!-- Video -->
-      <div class="mb-4">
-        <div class="aspect-w-16 aspect-h-9">
-          <iframe id="youtube-video" class="w-full h-64 rounded-lg"
-                  src="https://www.youtube.com/embed/lefHUxQurhU?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1"
-                  frameborder="0"
+      <div class="mb-4 relative">
+        <div class="aspect-w-16 aspect-h-9 relative">
+            <div class="absolute inset-0 rounded-xl overflow-hidden z-10">
+              <div class="absolute inset-0 rounded-xl 
+                bg-gradient-to-tr from-red-500 via-yellow-500 to-blue-500 
+                animate-[pulse_4s_infinite] mix-blend-overlay opacity-70"></div>
+              <div class="absolute inset-0 rounded-xl border-4 border-transparent
+                bg-gradient-to-tr from-red-500/60 via-yellow-500/60 to-blue-500/60 
+                mix-blend-overlay opacity-50 blur-sm"></div>
+              <div class="absolute inset-0 border-[6px] border-transparent rounded-xl
+                box-content bg-gradient-to-tr from-red-500/20 via-yellow-500/20 to-blue-500/20
+                mix-blend-overlay animate-[glow-border_2s_ease-in-out_infinite_alternate]"></div>
+            </div>
+<iframe id="youtube-video" class="w-full h-64 rounded-lg relative z-20 border-4 border-transparent"
+                  src="https://www.youtube.com/embed/lefHUxQurhU?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=0"
+frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowfullscreen></iframe>
         </div>
@@ -249,7 +307,6 @@
           <div class="amount-3d text-3xl md:text-4xl mt-1" id="meron-amount"></div>
           <div class="mt-3">
             <div class="mt-2"><span class="odds-ribbon" id="meron-odds"></span></div>
-            <!-- BET button moved here -->
             <button class="bet-btn red mt-2 w-full px-3 py-2 text-sm" id="bet-meron">BET</button>
             <div id="meron-result" class="mt-2 text-xs text-yellow-300 result-glow"></div>
           </div>
@@ -261,14 +318,13 @@
           <div class="amount-3d text-3xl md:text-4xl mt-1" id="wala-amount"></div>
           <div class="mt-3">
             <div class="mt-2"><span class="odds-ribbon" id="wala-odds"></span></div>
-            <!-- BET button moved here -->
             <button class="bet-btn blue mt-2 w-full px-3 py-2 text-sm" id="bet-wala">BET</button>
             <div id="wala-result" class="mt-2 text-xs text-yellow-300 result-glow"></div>
           </div>
         </div>
       </div>
 
-      <!-- Bet Amount (single input, diamond balance beside input) -->
+      <!-- Bet Amount -->
       <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-2">
         <div class="flex items-center justify-between mb-2">
           <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
@@ -277,7 +333,6 @@
         <div class="flex flex-wrap items-center gap-2 mb-2">
           <input type="number" id="bet-amount" class="bet-input p-2 text-sm text-white bg-black/30 w-[160px]"
                  placeholder="Enter amount" inputmode="numeric" />
-          <!-- Diamond balance moved here -->
           <div class="balance-pill text-yellow-300">
             <svg class="w-5 h-5 opacity-90" viewBox="0 0 64 64" aria-hidden="true">
               <defs>
@@ -313,12 +368,6 @@
           <button class="chip3d chip-black chip-outline text-sm bet-chip" data-val="500">₱500</button>
           <button class="chip3d chip-amber chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
         </div>
-        <!-- <div class="flex flex-wrap gap-1">
-          <button class="chip3d chip-emerald chip-outline text-sm bet-chip" data-val="100">₱100</button>
-          <button class="chip3d chip-blue chip-outline text-sm bet-chip" data-val="200">₱200</button>
-          <button class="chip3d chip-black chip-outline text-sm bet-chip" data-val="500">₱500</button>
-          <button class="chip3d chip-amber chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
-        </div> -->
       </div>
 
       <!-- Logrohan -->
@@ -405,7 +454,11 @@
       });
       strip.scrollLeft = strip.scrollWidth;
     }
-    function pushResult(side){ results.push(side === 'MERON' ? 'R' : 'B'); renderBigRoad(results); }
+    function pushResult(side){
+      results.push(side === 'MERON' ? 'R' : 'B');
+      renderBigRoad(results);
+      resolveLatestBet(side);
+    }
     function undoResult(){ results.pop(); renderBigRoad(results); }
     function clearResults(){ results = []; renderBigRoad(results); }
 
@@ -454,24 +507,45 @@
       currentBalance = next; renderBalance(); return true;
     }
 
-    function addToHistory(entry){ betHistory.unshift(entry); renderHeaderHistory();
-      document.getElementById('header-history-dot').classList.toggle('hidden', betHistory.length === 0); }
+    function addToHistory(entry){
+      betHistory.unshift(entry);
+      renderHeaderHistory();
+      document.getElementById('header-history-dot').classList.toggle('hidden', betHistory.length === 0);
+    }
+
+    /* ======= Bet History RENDER (MERON/WALA 3D + RESULT 3D) ======= */
+    function sideBadgeHTML(side){
+      const cls = side==='MERON' ? 'side-badge side-meron' : 'side-badge side-wala';
+      return `<span class="side-3d"><span class="${cls}">${side}</span></span>`;
+    }
+    function badgeClassByStatus(s){
+      if(s==='WIN') return 'badge-3d badge-win badge-pop';
+      if(s==='LOSE') return 'badge-3d badge-lose badge-pop';
+      return 'badge-3d badge-pending';
+    }
     function renderHeaderHistory(){
       const list = document.getElementById('header-history-list');
       const empty = document.getElementById('header-history-empty');
-      if(betHistory.length === 0){ empty.classList.remove('hidden'); list.classList.add('hidden'); list.innerHTML = ''; return; }
+      if(betHistory.length === 0){
+        empty.classList.remove('hidden');
+        list.classList.add('hidden'); list.innerHTML = ''; return;
+      }
       empty.classList.add('hidden'); list.classList.remove('hidden');
       const top = betHistory.slice(0,8);
       list.innerHTML = top.map(item=>{
-        const color = item.side==='MERON' ? 'text-red-400' : 'text-blue-400';
+        const sideChip = sideBadgeHTML(item.side);
+        const badge = `<span class="result-3d"><span class="${badgeClassByStatus(item.status)}">${item.status}</span></span>`;
         return `
           <div class="py-2 px-2 text-xs">
             <div class="flex items-center justify-between">
-              <div class="font-bold ${color}">${item.side}</div>
-              <div class="text-white/50">${item.time}</div>
+              <div class="flex items-center gap-2">${sideChip}</div>
+              <div class="flex items-center gap-2">
+                ${badge}
+                <div class="text-white/50">${item.time}</div>
+              </div>
             </div>
-            <div class="text-white/80">${item.player} • Match #${item.matchId}</div>
-            <div>
+            <div class="text-white/80 mt-1">${item.player} • Match #${item.matchId}</div>
+            <div class="mt-0.5">
               <span class="font-semibold">${Number(item.amount).toLocaleString()}</span>
               @ <span class="font-semibold">${item.odds}</span>
               = <span class="text-yellow-300 font-bold">${Number(item.payout).toLocaleString()}</span>
@@ -481,7 +555,23 @@
       }).join('');
     }
 
-    // Place bet using single input (NO LIMITS; only must be > 0 and within balance)
+    // Resolve latest pending bet
+    function resolveLatestBet(winSide){
+      const idx = betHistory.findIndex(b => b.status === 'PENDING');
+      if(idx === -1) return;
+      const bet = betHistory[idx];
+      if(bet.side === winSide){
+        bet.status = 'WIN';
+        adjustBalance(parseFloat(bet.payout));
+        bet.balanceAfter = currentBalance;
+      }else{
+        bet.status = 'LOSE';
+        bet.balanceAfter = currentBalance;
+      }
+      renderHeaderHistory();
+    }
+
+    // Place bet
     function placeBet(betType){
       const input = document.getElementById('bet-amount');
       let betAmount = parseFloat(input.value);
@@ -522,7 +612,8 @@
         payout: totalWinnings.toFixed(2),
         time,
         balanceBefore,
-        balanceAfter: currentBalance
+        balanceAfter: currentBalance,
+        status: 'PENDING'
       });
 
       alert(`You placed a bet of ${betAmount} on ${chosenPlayer}.\nPossible payout: ${totalWinnings.toFixed(2)}.\nNew Balance: ${currentBalance.toLocaleString()}.`);
@@ -564,9 +655,12 @@
       const hMenu = document.getElementById('header-history-menu');
       const hClear = document.getElementById('header-history-clear');
       hBtn.addEventListener('click', (e)=>{ e.stopPropagation(); hMenu.classList.toggle('hidden'); });
-      hClear.addEventListener('click', ()=>{ betHistory.length = 0; renderHeaderHistory(); document.getElementById('header-history-dot').classList.add('hidden'); });
+      hClear.addEventListener('click', ()=>{
+        betHistory.length = 0;
+        renderHeaderHistory();
+        document.getElementById('header-history-dot').classList.add('hidden');
+      });
 
-      // Quick chips -> single input (NO clamp)
       document.querySelectorAll('.bet-chip').forEach(btn=>{
         btn.addEventListener('click', ()=>{
           const raw = parseInt(btn.dataset.val || '0', 10);
@@ -575,7 +669,6 @@
         });
       });
 
-      // BET buttons on cards use the single input
       document.getElementById('bet-meron').addEventListener('click', ()=> placeBet('MERON'));
       document.getElementById('bet-wala').addEventListener('click',  ()=> placeBet('WALA'));
     };
