@@ -61,7 +61,7 @@
               <!-- Left: Burger (visible on mobile + tablet; hidden on lg+) -->
               <div class="flex items-center gap-2">
                 <button
-                  class="inline-flex items-center justify-center rounded-md h-8 w-8 md:h-10 md:w-10 hover:bg-emerald-800/40 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  class="inline-flex items-center justify-center rounded-md h-8 w-8 md:h-10 md:w-10 hover:bg-emerald-800/40 focus:outline-none focus:ring-2 focus:ring-emerald-400 lg:hidden"
                   @click="sidebarOpen = !sidebarOpen"
                   aria-label="Toggle sidebar"
                 >
@@ -184,7 +184,7 @@
           <div
             x-show="sidebarOpen"
             x-transition.opacity
-            class="fixed inset-0 z-40 bg-black/40"
+            class="fixed inset-0 z-40 bg-black/40 lg:hidden"
             @click="sidebarOpen=false"
             aria-hidden="true"
           ></div>
