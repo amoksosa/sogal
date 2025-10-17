@@ -80,14 +80,22 @@
                     />
                   </svg>
                 </button>
-                <img src="images/Avatar.png" class="w-8 lg:w-10 lg:mx-2" alt="">
+                <img
+                  src="images/Avatar.png"
+                  class="w-8 lg:w-10 lg:mx-2"
+                  alt=""
+                />
                 <div class="flex-col lg:space-y-1">
                   <h1 class="text-[9px] lg:text-lg">Player123321</h1>
                   <div class="flex items-center space-x-1 lg:space-x-2">
-                      <i class="fa-solid fa-gem text-blue-400 dark:text-blue-200" ></i>
-                      <span class="text-[8px] lg:text-sm text-yellow-500 dark:text-yellow-400">24 Points</span>
+                    <i
+                      class="fa-solid fa-gem text-blue-400 dark:text-blue-200"
+                    ></i>
+                    <span
+                      class="text-[8px] lg:text-sm text-yellow-500 dark:text-yellow-400"
+                      >24 Points</span
+                    >
                   </div>
-                  
                 </div>
               </div>
 
@@ -179,14 +187,7 @@
 
           <!-- ===== Sidebar ===== -->
           <aside
-            class="fixed left-0 top-14 md:top-[4rem] z-50
-                   h-[calc(100dvh-3.5rem)] md:h-[calc(105dvh-6rem)]
-                   w-60 lg:w-64 xl:w-72 md:w-80
-                   transform bg-white dark:bg-emerald-950 p-3 text-[0.625rem]
-                   text-emerald-950
-                   shadow-md transition-transform duration-300 overflow-y-auto
-                   dark:text-gray-100 shadow-lg shadow-emerald-500/50 border-r border-gray-200/70 dark:border-emerald-800
-                   lg:translate-x-0 lg:translate-y-0.6 lg:border-t lg:border-emerald-100"
+            class="fixed left-0 top-14 md:top-[4rem] z-50 h-[calc(100dvh-3.5rem)] md:h-[calc(105dvh-6rem)] w-60 lg:w-64 xl:w-72 md:w-80 transform bg-white dark:bg-emerald-950 p-3 text-[0.625rem] text-emerald-950 shadow-md transition-transform duration-300 overflow-y-auto dark:text-gray-100 shadow-lg shadow-emerald-500/50 border-r border-gray-200/70 dark:border-emerald-800 lg:translate-x-0 lg:translate-y-0.6 lg:border-t lg:border-emerald-100"
             :class="(window.innerWidth < 1024) ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : ''"
             @keydown.escape.window="sidebarOpen=false"
           >
@@ -290,7 +291,9 @@
                     ></span>
                   </span>
                 </button>
-                <p class="mt-1 text-[0.625rem] text-gray-500 dark:text-gray-400">
+                <p
+                  class="mt-1 text-[0.625rem] text-gray-500 dark:text-gray-400"
+                >
                   Toggles the entire site theme.
                 </p>
               </div>
@@ -303,22 +306,24 @@
             <section
               class="rounded-lg bg-emerald-50/80 dark:bg-emerald-100/80 p-5 shadow lg:p-8 dark:bg-gray-800/80 dark:text-emerald-50"
             >
-              <div class="grid items-center gap-8 md:grid-cols-2">
-                <div>
+              <div
+                class="grid items-center gap-8 md:grid-cols-2 text-center md:text-left"
+              >
+                <div class="flex flex-col items-center md:items-start">
                   <h1
                     class="text-3xl font-semibold text-emerald-900 sm:text-4xl lg:text-5xl md:text-6xl dark:text-emerald-100"
                   >
                     Bet. Break. Win Big!
                   </h1>
                   <p
-                    class="mt-3 text-sm text-gray-700 sm:text-base lg:text-lg md:text-2xl dark:text-gray-200"
+                    class="mt-3 text-sm text-gray-700 sm:text-base lg:text-lg md:text-2xl dark:text-gray-200 max-w-md"
                   >
                     Dive into the ultimate billiards betting experience — where
                     every shot counts and every match could make you a winner.
                   </p>
 
                   <div
-                    class="mt-5 flex flex-wrap gap-3 font-semibold text-black dark:text-gray-900"
+                    class="mt-5 flex flex-wrap justify-center md:justify-start gap-3 font-semibold text-black dark:text-gray-900"
                   >
                     <a
                       href="#"
@@ -338,10 +343,7 @@
                 <div class="flex justify-center md:justify-end">
                   <img
                     src="images/peoples.png"
-                    class="h-[11rem] w-[20rem] translate-y-[0.25rem] -translate-x-[0.25rem] object-contain
-                           sm:h-[14rem] sm:w-[14rem]
-                           lg:h-[18rem] lg:w-[24rem]
-                           md:h-[28rem] md:w-[36rem]"
+                    class="h-[11rem] w-[20rem] translate-y-[0.25rem] -translate-x-[0.25rem] object-contain sm:h-[14rem] sm:w-[14rem] lg:h-[18rem] lg:w-[24rem] md:h-[28rem] md:w-[36rem]"
                     alt="Players"
                   />
                 </div>
@@ -361,7 +363,9 @@
                   <div
                     class="absolute inset-0 bg-black/40 hover:bg-black/70 duration-300 transition-colors rounded-xl"
                   >
-                    <div class="relative text-white mt-24 p-2 2xl:mt-[18.75rem]">
+                    <div
+                      class="relative text-white mt-24 p-2 2xl:mt-[18.75rem]"
+                    >
                       <h1 class="font-semibold md:text-5xl">Billiards</h1>
                       <p class="text-[0.5rem] md:text-lg md:pl-2 py-2">
                         Aim for precision and predict the winners in every cue
