@@ -80,9 +80,14 @@
                     />
                   </svg>
                 </button>
-                <div class="flex-col">
-                  <h1>Aquino2323</h1>
-                  <span class="text-xs text-yellow-500 dark:text-yellow-400">24 Points</span>
+                <img src="images/Avatar.png" class="w-8 lg:w-10 lg:mx-2" alt="">
+                <div class="flex-col lg:space-y-1">
+                  <h1 class="text-[9px] lg:text-lg">Player123321</h1>
+                  <div class="flex items-center space-x-1 lg:space-x-2">
+                      <i class="fa-solid fa-gem text-blue-400 dark:text-blue-200" ></i>
+                      <span class="text-[8px] lg:text-sm text-yellow-500 dark:text-yellow-400">24 Points</span>
+                  </div>
+                  
                 </div>
               </div>
 
@@ -178,15 +183,16 @@
                    h-[calc(100dvh-3.5rem)] md:h-[calc(105dvh-6rem)]
                    w-60 lg:w-64 xl:w-72 md:w-80
                    transform bg-white dark:bg-emerald-950 p-3 text-[0.625rem]
+                   text-emerald-950
                    shadow-md transition-transform duration-300 overflow-y-auto
-                   dark:text-gray-100 border-r border-gray-200/70 dark:border-gray-800
-                   lg:translate-x-0"
+                   dark:text-gray-100 shadow-lg shadow-emerald-500/50 border-r border-gray-200/70 dark:border-emerald-800
+                   lg:translate-x-0 lg:translate-y-0.6 lg:border-t lg:border-emerald-100"
             :class="(window.innerWidth < 1024) ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : ''"
             @keydown.escape.window="sidebarOpen=false"
           >
             <div class="flex h-full flex-col">
               <div class="mb-2 flex items-center justify-between md:text-sm">
-                <span class="font-semibold">Menu</span>
+                <span class="font-semibold lg:text-lg">Menu</span>
                 <!-- Close (visible on mobile+tablet) -->
                 <button
                   class="rounded-md px-2 py-1 hover:bg-emerald-300/40 dark:hover:bg-emerald-300/40 lg:hidden"
