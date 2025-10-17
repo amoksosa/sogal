@@ -14,18 +14,17 @@
       --logro-step: 10px;
       --logro-rail-h: 48px;
 
-      /* mini bead road (sidebar) — compacted */
+      /* mini bead road (sidebar/center) — compacted */
       --bead-bubble: 12px;            /* was 14px */
       --bead-rail-h: 84px;            /* was 96px */
       --bead-gap-x: 6px;              /* space between columns */
       --bead-gap-y: 3px;              /* was 4px */
     }
-    body, html { margin:0; padding:0; height:100%; overflow-x:hidden; background:#000; }
-    .bg-animated{ position:fixed; top:0; left:0; width:112%; height:112%;
-      background:url('hhttps://i.postimg.cc/18YgQQ8s/22fe6a2d-5105-4016-bea9-c46021e917a0.png') center/cover no-repeat;
+    body, html { margin:0; padding:0; height:100%; overflow-x:hidden; }
+    .bg-animated{ position:fixed; top:0; left:0; width:110%; height:110%;
+      background:url('https://i.ibb.co/NdjyN48p/download.jpg') center/cover no-repeat;
       opacity:.85; z-index:-1; animation:moveBg 30s infinite alternate ease-in-out; will-change:transform;}
-    @keyframes moveBg{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-2%,-2%,0) scale(1.03)}100%{transform:translate3d(0,-1%,0) scale(1.01)}}
-
+    @keyframes moveBg{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-2%,-2%,0)}100%{transform:translate3d(0,-1%,0)}}
     @keyframes glow-border {
       0% { box-shadow: 0 0 10px -6px rgba(16,185,129,.9), 0 0 24px -10px rgba(239,68,68,.8), 0 0 28px -12px rgba(59,130,246,.8); }
       50% { box-shadow: 0 0 16px -4px rgba(16,185,129,1), 0 0 28px -9px rgba(239,68,68,.9), 0 0 34px -10px rgba(59,130,246,.9); }
@@ -205,7 +204,7 @@
     .side-red{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
     .side-blue{ background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
 
-    /* ======= MINI BEAD ROAD (sidebar under bet chips) – 3-color ======= */
+    /* ======= MINI BEAD ROAD (reusable) – 3-color ======= */
     .bead-rail{
       position:relative; padding:8px; border-radius:10px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -338,7 +337,7 @@
         </div>
       </div>
 
-      <!-- CENTER: Video + Logrohan -->
+      <!-- CENTER: Video + Logrohan + (MOVED) ROAD -->
       <div class="relative z-10 main-panel p-4 rounded-lg shadow-lg">
         <div class="grid grid-cols-3 items-center mb-3 text-sm text-gray-300">
           <div id="event-date" class="text-left"></div>
@@ -362,7 +361,7 @@
                 box-content bg-gradient-to-tr from-emerald-500/20 via-red-500/20 to-blue-500/20
                 mix-blend-overlay animate-[glow-border_2s_ease-in-out_infinite_alternate]"></div>
             </div>
-            <iframe id="youtube-video-main" class="w-full h-64 md:h-[420px] rounded-lg relative z-20 border-4 border-transparent"
+            <iframe id="youtube-video-main" class="w-full h-64 md:h-[250px] rounded-lg relative z-20 border-4 border-transparent"
               src="https://www.youtube.com/embed/rUC_nHCOUW4?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=0"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -394,6 +393,22 @@
           </div>
         </div>
         <!-- /Logrohan -->
+
+        <!-- ===== MOVED HERE: MINI BEAD ROAD (3-color) under Logrohan ===== -->
+        <div class="mt-3 bg-gray-900/50 border border-white/10 rounded-lg p-2">
+          <div class="flex items-center justify-between mb-1">
+            <div class="text-[11px] uppercase tracking-widest text-white/70">Road</div>
+            <div class="flex items-center gap-2 text-[10px]">
+              <div class="flex items-center gap-1"><span class="bead green inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Green</span></div>
+              <div class="flex items-center gap-1"><span class="bead red   inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Red</span></div>
+              <div class="flex items-center gap-1"><span class="bead blue  inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Blue</span></div>
+            </div>
+          </div>
+          <div class="bead-rail">
+            <div id="bead-strip" class="bead-strip"></div>
+          </div>
+        </div>
+        <!-- ===== /MOVED ===== -->
       </div>
 
       <!-- RIGHT: Bet cards + Bet Amount (sticky) -->
@@ -447,7 +462,7 @@
             </div>
           </div>
 
-          <!-- Bet Amount + MINI BEAD ROAD -->
+          <!-- Bet Amount (Road removed from here) -->
           <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-0">
             <div class="flex items-center justify-between mb-2">
               <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
@@ -470,7 +485,7 @@
                   <polyline points="6,24 32,60 58,24" fill="none" stroke="#a7ffd8" stroke-width="1" opacity=".7"/>
                   <circle cx="32" cy="30" r="16" fill="url(#gemGlow)" opacity=".35"/>
                 </svg>
-                <span class="text-[11px] opacity-80 tracking-widest">BAL</span>
+                <span class="text-[11px] opacity-80 tracking-widest"></span>
                 <span id="mid-balance" class="amount text-base">5,000</span>
               </div>
             </div>
@@ -480,22 +495,7 @@
               <button class="chip3d chip-black chip-outline text-sm bet-chip" data-val="500">₱500</button>
               <button class="chip3d chip-blue    chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
             </div>
-
-            <!-- MINI BEAD ROAD (3-color) -->
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <div class="text-[11px] uppercase tracking-widest text-white/70">Road</div>
-                <div class="flex items-center gap-2 text-[10px]">
-                  <div class="flex items-center gap-1"><span class="bead green inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Green</span></div>
-                  <div class="flex items-center gap-1"><span class="bead red   inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Red</span></div>
-                  <div class="flex items-center gap-1"><span class="bead blue  inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Blue</span></div>
-                </div>
-              </div>
-              <div class="bead-rail">
-                <div id="bead-strip" class="bead-strip"></div>
-              </div>
-            </div>
-            <!-- /MINI BEAD ROAD -->
+            <!-- (Road deleted here) -->
           </div>
         </div>
       </aside>
@@ -564,12 +564,12 @@
       "Blue Tempest","Azure Bolt","Sapphire Sprint","Golden Spur","Night Runner","Silver Streak"
     ];
     const slides = [
-      "https://i.ibb.co/3Y8nqBt/horse-emerald.jpg",
-      "https://i.ibb.co/0j6q5cB/horse-red.jpg",
-      "https://i.ibb.co/F3WnLJm/horse-blue.jpg",
-      "https://i.ibb.co/4t4D9qZ/horse-pack.jpg",
-      "https://i.ibb.co/zH7jcQ2/horse-gate.jpg",
-      "https://i.ibb.co/4NVgVtL/horse-race.jpg"
+      "https://i.ibb.co/GvKcMGqT/kabayo7.webp",
+      "https://i.ibb.co/20Gphj6d/kabayo2.jpg",
+      "https://i.ibb.co/nsHTHK3M/kabayo3.webp",
+      "https://i.ibb.co/KjN9SdS8/kabayo4.jpg",
+      "https://i.ibb.co/Gv99W94c/kabayo5.jpg",
+      "https://i.ibb.co/Xr943DJw/kabayo6.jpg"
     ];
     let slideIndex=0;
 
@@ -614,7 +614,7 @@
     }
 
     const BIGROAD_MAX_ROWS = 8; // ilalim ng video
-    const BEAD_MAX_ROWS    = 6; // sidebar mini road
+    const BEAD_MAX_ROWS    = 6; // mini road
 
     /* ========= Big Road (3-color) ========= */
     function buildBigRoadGrid(seq, maxRows = BIGROAD_MAX_ROWS){
@@ -732,7 +732,7 @@
     function renderAllRoads(seq){
       renderBigRoadToGrid(seq, 'logro-strip', BIGROAD_MAX_ROWS);     // desktop/video
       renderBigRoadToGrid(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS); // mobile
-      renderBeadRoad(seq, 'bead-strip');                             // sidebar mini road
+      renderBeadRoad(seq, 'bead-strip');                             // MOVED: now under video
     }
 
     /* ---------- Betting State ---------- */
@@ -755,7 +755,6 @@
     setInterval(setDateTime,1000);
 
     function computeOdds(){
-      // Slightly different spreads to look realistic; sum is irrelevant here since each is a separate win bet
       greenOdds = (Math.random()*(2.3-1.4)+1.4).toFixed(2);
       redOdds   = (Math.random()*(2.3-1.4)+1.4).toFixed(2);
       blueOdds  = (Math.random()*(2.3-1.4)+1.4).toFixed(2);
@@ -986,4 +985,3 @@
   </script>
 </body>
 </html>
-
