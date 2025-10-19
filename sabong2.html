@@ -179,7 +179,7 @@
     .side-meron{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
     .side-wala { background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
 
-    /* ======= MINI BEAD ROAD (sidebar) ======= */
+    /* ======= MINI BEAD ROAD (sidebar) — style stays HOLLOW ======= */
     .bead-rail{
       position:relative; padding:8px; border-radius:10px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -345,7 +345,7 @@
           </div>
         </div>
 
-        <!-- LOGROHAN -->
+        <!-- LOGROHAN (LOOK stays; EFFECT now Continuous/Bead-style with numbers) -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
@@ -398,7 +398,7 @@
             </div>
           </div>
 
-          <!-- Bet Amount + MINI BEAD ROAD -->
+          <!-- Bet Amount + MINI BEAD ROAD (STYLE hollow, EFFECT now L-shape) -->
           <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-0">
             <div class="flex items-center justify-between mb-2">
               <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
@@ -443,7 +443,7 @@
               <button class="chip3d chip-amber chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
             </div>
 
-            <!-- MINI BEAD ROAD (Baccarat-style) -->
+            <!-- MINI ROAD (HOLLOW LOOK kept, EFFECT now L-shape) -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <div class="text-[11px] uppercase tracking-widest text-white/70">Road</div>
@@ -456,7 +456,7 @@
                 <div id="bead-strip" class="bead-strip"></div>
               </div>
             </div>
-            <!-- /MINI BEAD ROAD -->
+            <!-- /MINI ROAD -->
           </div>
         </div>
       </aside>
@@ -493,7 +493,7 @@
           </div>
         </div>
 
-        <!-- logrohan (mobile) -->
+        <!-- logrohan (mobile) — LOOK same, EFFECT continuous -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
@@ -540,15 +540,13 @@
       const p2m = document.getElementById('player2-name-mob'); if(p2m) p2m.textContent = blue;
     }
 
-    /* ======= Big Road rules ======= */
+    /* ======= Big Road / Bead helpers ======= */
     const BIGROAD_MAX_ROWS = 8; // ilalim ng video (max straight na pababa)
     const BEAD_MAX_ROWS    = 6; // sidebar mini road
 
-    // Helper: check cell empty
     const isEmpty = (grid, c, r) => !(grid[c] && grid[c][r]);
     const ensureCol = (grid, c) => { if(!grid[c]) grid[c] = []; };
 
-    // Build runs (R/B streaks)
     function streakRuns(seq){
       const out = [];
       for(const t of seq){
@@ -558,13 +556,7 @@
       return out;
     }
 
-    /* ========= VARIABLE-CAP STRICT L =========
-       - Next color starts sa tabi ng unang bilog (headCol+1, row 0)
-       - Cap per run: 8,7,6,...,1 (stay 1 after)
-       - Vertical stop if blocked (no overlap)
-       - Overflow -> kanan on the SAME ROW of last placed (L-shape), skipping occupied cells
-       - Numbering per bubble
-    ========================================= */
+    /* ========= ORIGINAL L-shape builder (kept) ========= */
     function buildBigRoadGridVarCap(seq, maxRows = BIGROAD_MAX_ROWS){
       const runs = streakRuns(seq);
       const grid = [];
@@ -586,15 +578,14 @@
             placed++;
             lastRowPlaced = r;
           }else{
-            // blocked -> stop vertical (strict no overlap)
-            break;
+            break; // blocked
           }
         }
 
         // overflow to the right on SAME ROW as last placed (L shape)
         let remaining = run.n - placed;
         let c = headCol + 1;
-        const rowForOverflow = lastRowPlaced; // keep same row
+        const rowForOverflow = lastRowPlaced;
         while(remaining > 0){
           ensureCol(grid, c);
           if(isEmpty(grid, c, rowForOverflow)){
@@ -604,35 +595,55 @@
           c++;
         }
 
-        // next run starts beside the first bubble (head column + 1), at top row
+        // next run starts beside the first bubble
         headCol = headCol + 1;
       });
 
       return grid;
     }
 
-    function renderBigRoadToGrid(seq, stripId, maxRows=BIGROAD_MAX_ROWS){
-      const grid = buildBigRoadGridVarCap(seq, maxRows);
+    /* ========= NEW: Logrohan Continuous (Bead-like) with numbers =========
+       - Same LOOK (solid bubbles + numbers)
+       - EFFECT: tuloy-tuloy vertical, chunked per column up to maxRows, then next column, etc.
+    ======================================================== */
+    function renderLogroContinuous(seq, stripId, maxRows = BIGROAD_MAX_ROWS){
+      const runs = streakRuns(seq);
+      const cols = [];
+      let labelNo = 1;
+
+      for(const run of runs){
+        let left = run.n;
+        while(left > 0){
+          const take = Math.min(maxRows, left);
+          const col = [];
+          for(let i=0;i<take;i++){
+            col.push({ t: run.t, label: labelNo++ });
+          }
+          cols.push(col);
+          left -= take;
+        }
+      }
+
       const strip = document.getElementById(stripId);
       if(!strip) return;
       strip.innerHTML = '';
 
-      grid.forEach(col=>{
+      cols.forEach(col=>{
         const colDiv = document.createElement('div');
         colDiv.className = 'logro-col';
         colDiv.style.gridTemplateRows = `repeat(${maxRows}, var(--logro-bubble))`;
 
+        // place from top down
         for(let r=0;r<maxRows;r++){
-          const cell = col && col[r];
+          const cell = col[r];
           if(!cell) continue;
-
           const b = document.createElement('div');
           b.className = `logro-bubble ${cell.t==='R' ? 'logro-red' : 'logro-blue'}`;
           b.style.gridRow = `${r+1}`;
           const depth = Math.min(r, maxRows-1);
           b.style.setProperty('--z', `calc(var(--logro-step) * ${depth})`);
           b.style.transform = `translateZ(var(--z))`;
-          b.textContent = cell.label; // number label
+          b.textContent = cell.label; // keep number inside
           colDiv.appendChild(b);
         }
         strip.appendChild(colDiv);
@@ -641,45 +652,47 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    /* ======= MINI BEAD ROAD (unchanged) ======= */
-    function buildBeadColumns(seq, maxRows = BEAD_MAX_ROWS){
-      const cols = []; let i = 0;
-      while(i < seq.length){
-        const color = seq[i]; let j = i + 1;
-        while(j < seq.length && seq[j] === color) j++;
-        let left = j - i;
-        while(left > 0){
-          const take = Math.min(maxRows, left);
-          cols.push(Array.from({length: take}, () => ({ t: color })));
-          left -= take;
-        }
-        i = j;
-      }
-      return cols;
-    }
-    function renderBeadRoad(seq, stripId){
-      const data = buildBeadColumns(seq, BEAD_MAX_ROWS);
+    /* ========= NEW: Mini Road L-shape (HOLLOW dots) =========
+       - LOOK: butas na bilog (same CSS)
+       - EFFECT: L-shape using the BigRoad grid algorithm, but rendered as hollow dots
+    ======================================================== */
+    function renderRoadLShape(seq, stripId, maxRows = BEAD_MAX_ROWS){
+      const grid = buildBigRoadGridVarCap(seq, maxRows);
       const strip = document.getElementById(stripId);
       if(!strip) return;
       strip.innerHTML = '';
-      data.forEach(col=>{
-        const colDiv = document.createElement('div'); colDiv.className = 'bead-col';
-        for(let r=0;r<BEAD_MAX_ROWS;r++){
-          const cell = col[r];
+
+      grid.forEach(col=>{
+        const colDiv = document.createElement('div');
+        colDiv.className = 'bead-col';
+        colDiv.style.gridTemplateRows = `repeat(${maxRows}, var(--bead-bubble))`;
+
+        for(let r=0;r<maxRows;r++){
+          const cell = col && col[r];
           const dot = document.createElement('div');
-          if(cell){ dot.className = 'bead ' + (cell.t==='R' ? 'red' : 'blue'); }
-          else{ dot.className = 'bead'; dot.style.opacity = '0.12'; dot.style.border = '1px dashed rgba(255,255,255,.15)'; }
+          if(cell){
+            dot.className = 'bead ' + (cell.t==='R' ? 'red' : 'blue'); // hollow look preserved
+          }else{
+            dot.className = 'bead';
+            dot.style.opacity = '0.12';
+            dot.style.border = '1px dashed rgba(255,255,255,.15)';
+          }
           colDiv.appendChild(dot);
         }
         strip.appendChild(colDiv);
       });
+
       strip.scrollLeft = strip.scrollWidth;
     }
 
+    /* ======= Render dispatcher (SWAPPED effects) ======= */
     function renderAllRoads(seq){
-      renderBigRoadToGrid(seq, 'logro-strip', BIGROAD_MAX_ROWS);
-      renderBigRoadToGrid(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);
-      renderBeadRoad(seq, 'bead-strip');
+      // LOGROHAN: continuous bead-style (with numbers, solid bubbles)
+      renderLogroContinuous(seq, 'logro-strip', BIGROAD_MAX_ROWS);
+      renderLogroContinuous(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);
+
+      // MINI ROAD: L-shape effect (hollow style)
+      renderRoadLShape(seq, 'bead-strip', BEAD_MAX_ROWS);
     }
 
     /* ======= Betting state/helpers (working) ======= */
@@ -883,7 +896,7 @@ New Balance: ${currentBalance.toLocaleString()}.`);
       document.getElementById('btn-undo').addEventListener('click',  undoResult);
       document.getElementById('btn-clear').addEventListener('click', clearResults);
 
-      // seed para makita agad ang pattern (8→7→6 caps effect)
+      // seed para makita agad ang pattern
       results = ['R','R','R','R','R','R','R','R','R',  'B','B','B','B','B','B','B','B',  'R','R','R','R','R','R','R'];
       renderAllRoads(results);
 
