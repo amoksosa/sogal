@@ -84,7 +84,7 @@
       backdrop-filter: blur(2px) saturate(120%); transform: translateZ(24px);}
     .balance-pill .amount{ font-weight:900; letter-spacing:.5px; text-shadow:0 1px 0 rgba(0,0,0,.35), 0 8px 16px rgba(0,0,0,.35); }
 
-    /* ======= Big Logro (below video) ======= */
+    /* ======= Big Logro (below video) –– NOW HOLLOW RINGS (no number) ======= */
     .logro-zone{ perspective: 1100px; overflow: visible; }
     .logro-rail{ position: relative; transform-style: preserve-3d; transform-origin: bottom center;
       transition: transform .25s ease, box-shadow .25s ease; padding: 12px 10px 18px 10px;
@@ -101,7 +101,7 @@
       overflow-x: auto; overflow-y: visible; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent;}
     .logro-strip-3d::-webkit-scrollbar{ height:8px } .logro-strip-3d::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.25); border-radius:8px }
 
-    /* column as GRID para may row placement */
+    /* column as GRID */
     .logro-col{
       position: relative;
       display: grid;
@@ -114,19 +114,14 @@
     .logro-col::after{ content:""; position:absolute; bottom:-6px; width:80%; height:6px; border-radius: 999px;
       background: radial-gradient(100% 100% at 50% 50%, rgba(0,0,0,.55), rgba(0,0,0,0) 70%); transform: translateZ(-2px); pointer-events:none;}
 
-    .logro-bubble{ width:var(--logro-bubble); height:var(--logro-bubble); border-radius:9999px; display:flex; align-items:center; justify-content:center;
-      position:relative; transform-style: preserve-3d; box-shadow: inset 0 1px 2px rgba(0,0,0,.35), inset 0 -4px 6px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.45);
-      will-change: transform, filter; transition: transform .15s ease, filter .15s ease; font-size: 11px; font-weight: 900; color:#fff;
-      text-shadow: 0 1px 0 rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.6);}
-    .logro-bubble::before{ content:""; position:absolute; inset:-1px; border-radius:inherit;
-      background: radial-gradient(100% 100% at 30% 25%, rgba(255,255,255,.45), transparent 55%); mix-blend-mode: screen; pointer-events:none; transform: translateZ(2px);}
-    .logro-bubble::after{ content:""; position:absolute; inset:0; border-radius:inherit; border:1px solid rgba(255,255,255,.25);
-      box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.25); pointer-events:none; transform: translateZ(1px);}
-    .logro-red{ background: radial-gradient(100% 120% at 30% 20%, #ff7a7a, #ef4444 55%, #7f1d1d 100%); border:1px solid #7f1d1d;}
-    .logro-blue{ background: radial-gradient(100% 120% at 30% 20%, #7fb0ff, #3b82f6 55%, #1e3a8a 100%); border:1px solid #1e3a8a;}
-    .logro-bubble:hover{ filter: brightness(1.05) saturate(1.05); transform: translateZ(calc(var(--logro-step) * 1 + 3px)) scale(1.03); }
-    .logro-legend .logro-chip{ width: 16px; height:16px; border-radius:9999px; box-shadow: inset 0 1px 2px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.35); }
-    .logro-chip.red{ background:#ef4444; border:1px solid #7f1d1d; } .logro-chip.blue{ background:#3b82f6; border:1px solid #1e3a8a; }
+    /* NEW: hollow ring bubble (logro size) */
+    .ring-bubble{ width:var(--logro-bubble); height:var(--logro-bubble); border-radius:9999px; background:transparent;
+      position:relative; box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+      border:2px solid; }
+    .ring-bubble::before{ content:""; position:absolute; inset:0; border-radius:inherit; background: radial-gradient(100% 100% at 30% 25%, rgba(255,255,255,.35), transparent 55%); mix-blend-mode:screen; }
+    .ring-bubble::after{ content:""; position:absolute; inset:0; border-radius:inherit; border:1px solid rgba(255,255,255,.2); pointer-events:none; }
+    .ring-red{ border-color:#ef4444; }
+    .ring-blue{ border-color:#3b82f6; }
 
     .chip3d{ position:relative; display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:14px;
       font-weight:900; letter-spacing:.4px; user-select:none; border:1px solid rgba(255,255,255,.18);
@@ -179,7 +174,7 @@
     .side-meron{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
     .side-wala { background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
 
-    /* ======= MINI BEAD ROAD (sidebar) — style stays HOLLOW ======= */
+    /* ======= MINI BEAD ROAD (sidebar) –– LOOK NOW SOLID WITH NUMBER ======= */
     .bead-rail{
       position:relative; padding:8px; border-radius:10px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -202,11 +197,18 @@
       min-width: calc(var(--bead-bubble));
       justify-items:center;
     }
-    .bead{
-      width:var(--bead-bubble); height:var(--bead-bubble);
-      border-radius:9999px; background:transparent;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
-    }
+
+    /* NEW: solid bead with number (mini road) */
+    .bead-solid{ width:var(--bead-bubble); height:var(--bead-bubble); border-radius:9999px; display:flex; align-items:center; justify-content:center;
+      position:relative; font-size:9px; font-weight:900; color:#fff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.35), inset 0 -3px 5px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.45); }
+    .bead-solid::before{ content:""; position:absolute; inset:-1px; border-radius:inherit; background: radial-gradient(100% 100% at 30% 25%, rgba(255,255,255,.45), transparent 55%); mix-blend-mode:screen; }
+    .bead-solid::after{ content:""; position:absolute; inset:0; border-radius:inherit; border:1px solid rgba(255,255,255,.25); pointer-events:none; }
+    .bead-solid.red{ background: radial-gradient(100% 120% at 30% 20%, #ff7a7a, #ef4444 55%, #7f1d1d 100%); border:1px solid #7f1d1d; }
+    .bead-solid.blue{ background: radial-gradient(100% 120% at 30% 20%, #7fb0ff, #3b82f6 55%, #1e3a8a 100%); border:1px solid #1e3a8a; }
+
+    /* Old hollow bead look (kept for legend) */
+    .bead{ width:var(--bead-bubble); height:var(--bead-bubble); border-radius:9999px; background:transparent; box-shadow: inset 0 1px 2px rgba(0,0,0,.35); }
     .bead.red{ border:2px solid #ef4444; }
     .bead.blue{ border:2px solid #3b82f6; }
   </style>
@@ -235,9 +237,9 @@
           </div>
 
           <nav class="hidden md:flex items-center gap-4 text-sm text-gray-200">
-            <a href="index.html" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Home</a>
+            <a href="index.html" class="px-3 py-1.5 rounded-lg hover:bg:white/10 transition">Home</a>
             <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Matches</a>
-            <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Support</a>
+            <a href="#" class="px-3 py-1.5 rounded-lg hover:bg:white/10 transition">Support</a>
           </nav>
 
           <div class="flex items-center gap-2 relative">
@@ -292,7 +294,7 @@
                 <hr class="border-white/10 my-1" />
                 <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm"><span>Profile</span></a>
                 <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm"><span>Settings</span></a>
-                <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-red-300"><span>Logout</span></a>
+                <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg.white/10 text-sm text-red-300"><span>Logout</span></a>
               </div>
             </div>
           </div>
@@ -345,13 +347,13 @@
           </div>
         </div>
 
-        <!-- LOGROHAN (LOOK stays; EFFECT now Continuous/Bead-style with numbers) -->
+        <!-- LOGROHAN –– LOOK hollow rings, EFFECT continuous (unchanged logic) -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
             <div class="flex items-center gap-2 text-[10px]">
-              <div class="flex items-center gap-1"><span class="logro-chip red"></span><span class="opacity-70">Red</span></div>
-              <div class="flex items-center gap-1"><span class="logro-chip blue"></span><span class="opacity-70">Blue</span></div>
+              <div class="flex items-center gap-1"><span class="bead red inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Red</span></div>
+              <div class="flex items-center gap-1"><span class="bead blue inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Blue</span></div>
             </div>
           </div>
 
@@ -398,14 +400,14 @@
             </div>
           </div>
 
-          <!-- Bet Amount + MINI BEAD ROAD (STYLE hollow, EFFECT now L-shape) -->
+          <!-- Bet Amount + MINI ROAD (NOW SOLID w/ NUMBERS + L-shape effect) -->
           <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-0">
             <div class="flex items-center justify-between mb-2">
               <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
               <div class="text-[15px] text-white/60">min ₱100</div>
             </div>
             <div class="flex flex-wrap items-center gap-2 mb-2">
-              <input type="number" id="bet-amount" class="bet-input p-2 text-sm text-white bg-black/30 w-[160px]"
+              <input type="number" id="bet-amount" class="bet-input p-2 text-sm text:white bg-black/30 w-[160px]"
                 placeholder="Enter amount" inputmode="numeric" />
               <div class="balance-pill text-yellow-300">
                 <svg class="w-5 h-5 opacity-90" viewBox="0 0 64 64" aria-hidden="true">
@@ -443,7 +445,7 @@
               <button class="chip3d chip-amber chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
             </div>
 
-            <!-- MINI ROAD (HOLLOW LOOK kept, EFFECT now L-shape) -->
+            <!-- MINI ROAD –– SOLID with numbers (L-shape effect, logic unchanged) -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <div class="text-[11px] uppercase tracking-widest text-white/70">Road</div>
@@ -493,13 +495,13 @@
           </div>
         </div>
 
-        <!-- logrohan (mobile) — LOOK same, EFFECT continuous -->
+        <!-- logrohan (mobile) –– hollow rings look, continuous effect -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
             <div class="flex items-center gap-2 text-[10px]">
-              <div class="flex items-center gap-1"><span class="logro-chip red"></span><span class="opacity-70">Red</span></div>
-              <div class="flex items-center gap-1"><span class="logro-chip blue"></span><span class="opacity-70">Blue</span></div>
+              <div class="flex items-center gap-1"><span class="bead red inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Red</span></div>
+              <div class="flex items-center gap-1"><span class="bead blue inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Blue</span></div>
             </div>
           </div>
           <div id="logro-rail-mob" class="logro-rail">
@@ -556,7 +558,7 @@
       return out;
     }
 
-    /* ========= ORIGINAL L-shape builder (kept) ========= */
+    /* ========= ORIGINAL L-shape builder (kept as-is) ========= */
     function buildBigRoadGridVarCap(seq, maxRows = BIGROAD_MAX_ROWS){
       const runs = streakRuns(seq);
       const grid = [];
@@ -602,13 +604,11 @@
       return grid;
     }
 
-    /* ========= NEW: Logrohan Continuous (Bead-like) with numbers =========
-       - Same LOOK (solid bubbles + numbers)
-       - EFFECT: tuloy-tuloy vertical, chunked per column up to maxRows, then next column, etc.
-    ======================================================== */
+    /* ========= LOGROHAN Continuous renderer –– NOW HOLLOW RINGS (no numbers) ========= */
     function renderLogroContinuous(seq, stripId, maxRows = BIGROAD_MAX_ROWS){
       const runs = streakRuns(seq);
       const cols = [];
+      // labels still increment internally to keep logic parity, but we won't show text
       let labelNo = 1;
 
       for(const run of runs){
@@ -633,17 +633,15 @@
         colDiv.className = 'logro-col';
         colDiv.style.gridTemplateRows = `repeat(${maxRows}, var(--logro-bubble))`;
 
-        // place from top down
         for(let r=0;r<maxRows;r++){
           const cell = col[r];
           if(!cell) continue;
           const b = document.createElement('div');
-          b.className = `logro-bubble ${cell.t==='R' ? 'logro-red' : 'logro-blue'}`;
-          b.style.gridRow = `${r+1}`;
+          b.className = `ring-bubble ${cell.t==='R' ? 'ring-red' : 'ring-blue'}`;
           const depth = Math.min(r, maxRows-1);
           b.style.setProperty('--z', `calc(var(--logro-step) * ${depth})`);
           b.style.transform = `translateZ(var(--z))`;
-          b.textContent = cell.label; // keep number inside
+          // no text content for hollow ring
           colDiv.appendChild(b);
         }
         strip.appendChild(colDiv);
@@ -652,10 +650,7 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    /* ========= NEW: Mini Road L-shape (HOLLOW dots) =========
-       - LOOK: butas na bilog (same CSS)
-       - EFFECT: L-shape using the BigRoad grid algorithm, but rendered as hollow dots
-    ======================================================== */
+    /* ========= MINI ROAD L-shape renderer –– NOW SOLID w/ NUMBERS ========= */
     function renderRoadLShape(seq, stripId, maxRows = BEAD_MAX_ROWS){
       const grid = buildBigRoadGridVarCap(seq, maxRows);
       const strip = document.getElementById(stripId);
@@ -671,8 +666,11 @@
           const cell = col && col[r];
           const dot = document.createElement('div');
           if(cell){
-            dot.className = 'bead ' + (cell.t==='R' ? 'red' : 'blue'); // hollow look preserved
+            // solid with number now
+            dot.className = 'bead-solid ' + (cell.t==='R' ? 'red' : 'blue');
+            dot.textContent = cell.label; // show number inside
           }else{
+            // faint placeholder grid cell
             dot.className = 'bead';
             dot.style.opacity = '0.12';
             dot.style.border = '1px dashed rgba(255,255,255,.15)';
@@ -685,13 +683,13 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    /* ======= Render dispatcher (SWAPPED effects) ======= */
+    /* ======= Render dispatcher (designs swapped, logic unchanged) ======= */
     function renderAllRoads(seq){
-      // LOGROHAN: continuous bead-style (with numbers, solid bubbles)
+      // LOGROHAN: continuous effect, but HOLLOW rings (no numbers)
       renderLogroContinuous(seq, 'logro-strip', BIGROAD_MAX_ROWS);
       renderLogroContinuous(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);
 
-      // MINI ROAD: L-shape effect (hollow style)
+      // MINI ROAD: L-shape effect, SOLID bubbles w/ numbers
       renderRoadLShape(seq, 'bead-strip', BEAD_MAX_ROWS);
     }
 
