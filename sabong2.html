@@ -15,10 +15,10 @@
       --logro-rail-h: 48px;
 
       /* mini bead road (sidebar) */
-      --bead-bubble: 14px;            /* bead size */
-      --bead-rail-h: 96px;            /* rail visual height */
-      --bead-gap-x: 6px;              /* space between columns */
-      --bead-gap-y: 4px;              /* space between beads */
+      --bead-bubble: 14px;
+      --bead-rail-h: 96px;
+      --bead-gap-x: 6px;
+      --bead-gap-y: 4px;
     }
     body, html { margin:0; padding:0; height:100%; overflow-x:hidden; }
     .bg-animated{ position:fixed; top:0; left:0; width:110%; height:110%;
@@ -101,7 +101,7 @@
       overflow-x: auto; overflow-y: visible; padding-bottom: 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent;}
     .logro-strip-3d::-webkit-scrollbar{ height:8px } .logro-strip-3d::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.25); border-radius:8px }
 
-    /* column as GRID para may row placement gaya sa picture */
+    /* column as GRID para may row placement */
     .logro-col{
       position: relative;
       display: grid;
@@ -127,7 +127,7 @@
     .logro-bubble:hover{ filter: brightness(1.05) saturate(1.05); transform: translateZ(calc(var(--logro-step) * 1 + 3px)) scale(1.03); }
     .logro-legend .logro-chip{ width: 16px; height:16px; border-radius:9999px; box-shadow: inset 0 1px 2px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.35); }
     .logro-chip.red{ background:#ef4444; border:1px solid #7f1d1d; } .logro-chip.blue{ background:#3b82f6; border:1px solid #1e3a8a; }
-    .matches-pill{ white-space:nowrap; } .matches-pill.active{ outline:2px solid rgba(250,204,21,.9); background:rgba(250,204,21,.15); }
+
     .chip3d{ position:relative; display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:14px;
       font-weight:900; letter-spacing:.4px; user-select:none; border:1px solid rgba(255,255,255,.18);
       background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
@@ -159,8 +159,6 @@
     .badge-win{ background: linear-gradient(180deg,#16a34a,#065f46); color:#fff; }
     .badge-lose{ background: linear-gradient(180deg,#991b1b,#3f0d0d); color:#ffd0d0; }
     .badge-pending{ background: linear-gradient(180deg,#374151,#111827); color:#e5e7eb; }
-    @keyframes popFlip { 0% { transform: rotateX(-90deg) translateZ(0); opacity: 0; } 60% { transform: rotateX(18deg) translateZ(10px); opacity: 1; } 100% { transform: rotateX(0deg) translateZ(8px); } }
-    .badge-pop { animation: popFlip .5s cubic-bezier(.2,.8,.2,1); }
 
     .side-3d { perspective: 900px; display:inline-block; }
     .side-badge{
@@ -181,7 +179,7 @@
     .side-meron{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
     .side-wala { background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
 
-    /* ======= MINI BEAD ROAD (sidebar under bet chips) ======= */
+    /* ======= MINI BEAD ROAD (sidebar) ======= */
     .bead-rail{
       position:relative; padding:8px; border-radius:10px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -198,7 +196,7 @@
     .bead-col{
       display:grid;
       grid-auto-rows: var(--bead-bubble);
-      grid-template-rows: repeat(6, var(--bead-bubble)); /* 6 rows Big Road style */
+      grid-template-rows: repeat(6, var(--bead-bubble));
       align-content:start;
       gap: var(--bead-gap-y);
       min-width: calc(var(--bead-bubble));
@@ -339,7 +337,7 @@
                 box-content bg-gradient-to-tr from-red-500/20 via-yellow-500/20 to-blue-500/20
                 mix-blend-overlay animate-[glow-border_2s_ease-in-out_infinite_alternate]"></div>
             </div>
-            <iframe id="youtube-video-main" class="w-full h-64 md:h-[420px] rounded-lg relative z-20 border-4 border-transparent"
+            <iframe id="youtube-video-main" class="w-full h-64 md:h-[250px] rounded-lg relative z-20 border-4 border-transparent"
               src="https://www.youtube.com/embed/lefHUxQurhU?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=0"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -347,7 +345,7 @@
           </div>
         </div>
 
-        <!-- LOGROHAN (UPDATED RULES) -->
+        <!-- LOGROHAN -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
@@ -400,7 +398,7 @@
             </div>
           </div>
 
-          <!-- Bet Amount + MINI BEAD ROAD (UNCHANGED) -->
+          <!-- Bet Amount + MINI BEAD ROAD -->
           <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-0">
             <div class="flex items-center justify-between mb-2">
               <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
@@ -479,8 +477,6 @@
           <img id="right-slide-mobile" class="w-full h-full object-cover transition-all duration-700" src="" alt="slide R">
         </div>
 
-        <!-- video (simplified header removed) -->
-
         <!-- bet area -->
         <div class="bet-area grid grid-cols-2 gap-2">
           <div class="bet-card red text-center">
@@ -516,10 +512,10 @@
   </main>
 
   <script>
+    /* ======= Data / UI setup ======= */
     const players = ["Efren Reyes","Earl Strickland","Ronnie O'Sullivan","Shane Van Boening","Francisco Bustamante","Alex Pagulayan","Jeanette Lee","Karen Corr","Allison Fisher","Johnny Archer","Mika Immonen","Niels Feijen","Darren Appleton","Ko Pin-Yi","Wu Jiaqing"];
     const slides = ["https://i.ibb.co/jPjC9YqC/raga.jpg","https://i.ibb.co/fd26jLNQ/de-luna.webp","https://i.ibb.co/TBS7P8Cd/mika.jpg","https://i.ibb.co/4nMYxQFp/biado.jpg","https://i.ibb.co/7dSvjwRK/amoroto.jpg","https://i.ibb.co/Q7cQ30tS/efren.webp"];
     let slideIndex=0;
-
     function setSrcIf(el, src){ if(el) el.src = src; }
     function updateSlides(){
       const a = slides[slideIndex];
@@ -532,7 +528,6 @@
     }
     setInterval(updateSlides,3000);
 
-    // Match setup
     function getRandomPlayer(exclude){ let name; do{ name = players[Math.floor(Math.random()*players.length)]; } while(name===exclude); return name; }
     function setRandomMatch(){
       const red = getRandomPlayer();
@@ -545,64 +540,79 @@
       const p2m = document.getElementById('player2-name-mob'); if(p2m) p2m.textContent = blue;
     }
 
-    const BIGROAD_MAX_ROWS = 8; // ilalim ng video (gaya sa pic)
-    const BEAD_MAX_ROWS    = 6; // sidebar mini road (huwag galawin)
+    /* ======= Big Road rules ======= */
+    const BIGROAD_MAX_ROWS = 8; // ilalim ng video (max straight na pababa)
+    const BEAD_MAX_ROWS    = 6; // sidebar mini road
 
-    /* ========= Big Road (picture logic)
-       - same color: down; if bottom, move right (same row)
-       - color change: start at TOP of column to the RIGHT of the head/start column
-    =================================== */
-    function buildBigRoadGrid(seq, maxRows = BIGROAD_MAX_ROWS){
-      const cols = []; // cols[c][r] = {t:'R'|'B', overflow?:true}
-      const ensureCol = (c)=>{ if(!cols[c]) cols[c]=[]; };
+    // Helper: check cell empty
+    const isEmpty = (grid, c, r) => !(grid[c] && grid[c][r]);
+    const ensureCol = (grid, c) => { if(!grid[c]) grid[c] = []; };
 
-      let currColor = null;
-      let currCol = 0;
-      let currRow = 0;
-      let headCol = 0; // starting column of current run
-
-      const place = (c, r, t, overflow=false)=>{
-        ensureCol(c);
-        cols[c][r] = { t, bottom: overflow && r===maxRows-1 };
-      };
-
+    // Build runs (R/B streaks)
+    function streakRuns(seq){
+      const out = [];
       for(const t of seq){
-        if(currColor === null){
-          currColor = t;
-          currCol = 0; currRow = 0; headCol = 0;
-          place(currCol, currRow, t);
-          continue;
-        }
-
-        if(t === currColor){
-          // try go down
-          if(currRow + 1 < maxRows && !(cols[currCol] && cols[currCol][currRow+1])){
-            currRow += 1;
-            place(currCol, currRow, t);
-          }else{
-            // bottom or blocked -> move right, same row (overflow tail)
-            currCol += 1;
-            ensureCol(currCol);
-            place(currCol, currRow, t, true);
-          }
-        }else{
-          // color switch -> next column right of HEAD column, start at row 0
-          headCol = headCol + 1;
-          currCol = headCol;
-          currRow = 0;
-          currColor = t;
-          place(currCol, currRow, t);
-        }
+        if(!out.length || out[out.length-1].t!==t) out.push({t, n:1});
+        else out[out.length-1].n++;
       }
-
-      // compact: replace holes with undefined (we render by grid-row)
-      return cols;
+      return out;
     }
 
-    const bubbleClass = (t) => t==='R' ? 'logro-red' : 'logro-blue';
+    /* ========= VARIABLE-CAP STRICT L =========
+       - Next color starts sa tabi ng unang bilog (headCol+1, row 0)
+       - Cap per run: 8,7,6,...,1 (stay 1 after)
+       - Vertical stop if blocked (no overlap)
+       - Overflow -> kanan on the SAME ROW of last placed (L-shape), skipping occupied cells
+       - Numbering per bubble
+    ========================================= */
+    function buildBigRoadGridVarCap(seq, maxRows = BIGROAD_MAX_ROWS){
+      const runs = streakRuns(seq);
+      const grid = [];
+      let headCol = 0;
+      let labelNo = 1;
+
+      runs.forEach((run, idx)=>{
+        const t = run.t;
+        const cap = Math.max(1, maxRows - idx); // 8,7,6,...,1 then 1
+        ensureCol(grid, headCol);
+
+        // vertical placement from top
+        let placed = 0;
+        let lastRowPlaced = 0;
+
+        for(let r=0; r<cap && placed<run.n; r++){
+          if(isEmpty(grid, headCol, r)){
+            grid[headCol][r] = { t, label: labelNo++ };
+            placed++;
+            lastRowPlaced = r;
+          }else{
+            // blocked -> stop vertical (strict no overlap)
+            break;
+          }
+        }
+
+        // overflow to the right on SAME ROW as last placed (L shape)
+        let remaining = run.n - placed;
+        let c = headCol + 1;
+        const rowForOverflow = lastRowPlaced; // keep same row
+        while(remaining > 0){
+          ensureCol(grid, c);
+          if(isEmpty(grid, c, rowForOverflow)){
+            grid[c][rowForOverflow] = { t, label: labelNo++ };
+            remaining--;
+          }
+          c++;
+        }
+
+        // next run starts beside the first bubble (head column + 1), at top row
+        headCol = headCol + 1;
+      });
+
+      return grid;
+    }
 
     function renderBigRoadToGrid(seq, stripId, maxRows=BIGROAD_MAX_ROWS){
-      const grid = buildBigRoadGrid(seq, maxRows);
+      const grid = buildBigRoadGridVarCap(seq, maxRows);
       const strip = document.getElementById(stripId);
       if(!strip) return;
       strip.innerHTML = '';
@@ -617,12 +627,12 @@
           if(!cell) continue;
 
           const b = document.createElement('div');
-          b.className = `logro-bubble ${bubbleClass(cell.t)}`;
+          b.className = `logro-bubble ${cell.t==='R' ? 'logro-red' : 'logro-blue'}`;
           b.style.gridRow = `${r+1}`;
-          // z-depth just for nice pop
           const depth = Math.min(r, maxRows-1);
           b.style.setProperty('--z', `calc(var(--logro-step) * ${depth})`);
           b.style.transform = `translateZ(var(--z))`;
+          b.textContent = cell.label; // number label
           colDiv.appendChild(b);
         }
         strip.appendChild(colDiv);
@@ -631,7 +641,7 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    // MINI BEAD ROAD (unchanged, simple streak-to-columns)
+    /* ======= MINI BEAD ROAD (unchanged) ======= */
     function buildBeadColumns(seq, maxRows = BEAD_MAX_ROWS){
       const cols = []; let i = 0;
       while(i < seq.length){
@@ -657,13 +667,8 @@
         for(let r=0;r<BEAD_MAX_ROWS;r++){
           const cell = col[r];
           const dot = document.createElement('div');
-          if(cell){
-            dot.className = 'bead ' + (cell.t==='R' ? 'red' : 'blue');
-          }else{
-            dot.className = 'bead';
-            dot.style.opacity = '0.12';
-            dot.style.border = '1px dashed rgba(255,255,255,.15)';
-          }
+          if(cell){ dot.className = 'bead ' + (cell.t==='R' ? 'red' : 'blue'); }
+          else{ dot.className = 'bead'; dot.style.opacity = '0.12'; dot.style.border = '1px dashed rgba(255,255,255,.15)'; }
           colDiv.appendChild(dot);
         }
         strip.appendChild(colDiv);
@@ -672,26 +677,17 @@
     }
 
     function renderAllRoads(seq){
-      renderBigRoadToGrid(seq, 'logro-strip', BIGROAD_MAX_ROWS);   // video: new rules
-      renderBigRoadToGrid(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS); // mobile: same rules
-      renderBeadRoad(seq, 'bead-strip');                           // sidebar mini road (unchanged)
+      renderBigRoadToGrid(seq, 'logro-strip', BIGROAD_MAX_ROWS);
+      renderBigRoadToGrid(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);
+      renderBeadRoad(seq, 'bead-strip');
     }
 
-    // State & helpers (betting unchanged)
-    function pushResult(side){
-      results.push(side === 'MERON' ? 'R' : 'B');
-      renderAllRoads(results);
-      resolveLatestBet(side);
-    }
-    function undoResult(){ results.pop(); renderAllRoads(results); }
-    function clearResults(){ results = []; renderAllRoads(results); }
-
+    /* ======= Betting state/helpers (working) ======= */
     let results = [];
     let meronAmount, walaAmount, meronOdds, walaOdds;
     let currentBalance = 500000;
     const betHistory = [];
 
-    function getRandomAmount(){ return Math.floor(Math.random()*(50000-10000+1))+10000; }
     function setDateTime(){
       const now=new Date();
       const optionsDate={month:'2-digit', day:'2-digit', year:'numeric'};
@@ -733,21 +729,21 @@
       currentBalance = next; renderBalance(); return true;
     }
 
-    function addToHistory(entry){
-      betHistory.unshift(entry);
-      renderHeaderHistory();
-      const dot = document.getElementById('header-history-dot');
-      if(dot) dot.classList.toggle('hidden', betHistory.length === 0);
-    }
-
     function sideBadgeHTML(side){
       const cls = side==='MERON' ? 'side-badge side-meron' : 'side-badge side-wala';
       return `<span class="side-3d"><span class="${cls}">${side}</span></span>`;
     }
     function badgeClassByStatus(s){
-      if(s==='WIN') return 'badge-3d badge-win badge-pop';
-      if(s==='LOSE') return 'badge-3d badge-lose badge-pop';
+      if(s==='WIN') return 'badge-3d badge-win';
+      if(s==='LOSE') return 'badge-3d badge-lose';
       return 'badge-3d badge-pending';
+    }
+
+    function addToHistory(entry){
+      betHistory.unshift(entry);
+      renderHeaderHistory();
+      const dot = document.getElementById('header-history-dot');
+      if(dot) dot.classList.toggle('hidden', betHistory.length === 0);
     }
     function renderHeaderHistory(){
       const list = document.getElementById('header-history-list');
@@ -841,15 +837,27 @@
         status: 'PENDING'
       });
 
-      alert(`You placed a bet of ${betAmount} on ${chosenPlayer}.\nPossible payout: ${totalWinnings.toFixed(2)}.\nNew Balance: ${currentBalance.toLocaleString()}.`);
+      alert(`You placed a bet of ${betAmount} on ${chosenPlayer}.
+Possible payout: ${totalWinnings.toFixed(2)}.
+New Balance: ${currentBalance.toLocaleString()}.`);
     }
 
-    // Init
+    function pushResult(side){
+      results.push(side === 'MERON' ? 'R' : 'B');
+      renderAllRoads(results);
+      resolveLatestBet(side);
+    }
+    function undoResult(){ results.pop(); renderAllRoads(results); }
+    function clearResults(){ results = []; renderAllRoads(results); }
+
+    /* ======= Init ======= */
     window.onload=()=>{
       setDateTime();
       setRandomMatch();
 
-      meronAmount=getRandomAmount(); walaAmount=getRandomAmount();
+      // amounts + odds
+      meronAmount=Math.floor(Math.random()*(50000-10000+1))+10000;
+      walaAmount=Math.floor(Math.random()*(50000-10000+1))+10000;
       computeOdds(); renderOddsEverywhere();
       const ma = document.getElementById('meron-amount'); if(ma) ma.textContent=meronAmount.toLocaleString();
       const wa = document.getElementById('wala-amount');  if(wa) wa.textContent=walaAmount.toLocaleString();
@@ -870,13 +878,13 @@
         document.addEventListener('click',(e)=>{ if(!btn.contains(e.target)&&!menu.contains(e.target)) menu.classList.add('hidden'); });
       }
 
-      const wm = document.getElementById('btn-win-meron'); if(wm) wm.addEventListener('click', ()=> pushResult('MERON'));
-      const ww = document.getElementById('btn-win-wala');  if(ww) ww.addEventListener('click',  ()=> pushResult('WALA'));
-      const bu = document.getElementById('btn-undo');       if(bu) bu.addEventListener('click',  undoResult);
-      const bc = document.getElementById('btn-clear');      if(bc) bc.addEventListener('click',  clearResults);
+      document.getElementById('btn-win-meron').addEventListener('click', ()=> pushResult('MERON'));
+      document.getElementById('btn-win-wala').addEventListener('click',  ()=> pushResult('WALA'));
+      document.getElementById('btn-undo').addEventListener('click',  undoResult);
+      document.getElementById('btn-clear').addEventListener('click', clearResults);
 
-      // seed para makita agad ang pattern
-      results = ['R','R','R','R','R','R','R','R','R','B','B','R','R','B','B','B'];
+      // seed para makita agad ang pattern (8→7→6 caps effect)
+      results = ['R','R','R','R','R','R','R','R','R',  'B','B','B','B','B','B','B','B',  'R','R','R','R','R','R','R'];
       renderAllRoads(results);
 
       renderBalance();
@@ -884,17 +892,13 @@
       const hBtn = document.getElementById('header-history-btn');
       const hMenu = document.getElementById('header-history-menu');
       const hClear = document.getElementById('header-history-clear');
-      if(hBtn && hMenu){
-        hBtn.addEventListener('click', (e)=>{ e.stopPropagation(); hMenu.classList.toggle('hidden'); });
-      }
-      if(hClear){
-        hClear.addEventListener('click', ()=>{
-          betHistory.length = 0;
-          renderHeaderHistory();
-          const dot = document.getElementById('header-history-dot');
-          if(dot) dot.classList.add('hidden');
-        });
-      }
+      hBtn.addEventListener('click', (e)=>{ e.stopPropagation(); hMenu.classList.toggle('hidden'); });
+      hClear.addEventListener('click', ()=>{
+        betHistory.length = 0;
+        renderHeaderHistory();
+        const dot = document.getElementById('header-history-dot');
+        if(dot) dot.classList.add('hidden');
+      });
 
       document.querySelectorAll('.bet-chip').forEach(btn=>{
         btn.addEventListener('click', ()=>{
@@ -904,8 +908,8 @@
         });
       });
 
-      const bm = document.getElementById('bet-meron'); if(bm) bm.addEventListener('click', ()=> placeBet('MERON'));
-      const bw = document.getElementById('bet-wala');  if(bw) bw.addEventListener('click',  ()=> placeBet('WALA'));
+      document.getElementById('bet-meron').addEventListener('click', ()=> placeBet('MERON'));
+      document.getElementById('bet-wala').addEventListener('click',  ()=> placeBet('WALA'));
     };
   </script>
 </body>
