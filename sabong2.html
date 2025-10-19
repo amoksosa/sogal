@@ -174,7 +174,7 @@
     .side-meron{ background: linear-gradient(180deg,#ef4444,#7f1d1d); color:#fff; }
     .side-wala { background: linear-gradient(180deg,#3b82f6,#1e3a8a); color:#eaf2ff; }
 
-    /* ======= MINI BEAD ROAD (sidebar) –– LOOK NOW SOLID WITH NUMBER ======= */
+    /* ======= MINI BEAD ROAD (sidebar) –– SOLID WITH NUMBER ======= */
     .bead-rail{
       position:relative; padding:8px; border-radius:10px;
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -198,7 +198,7 @@
       justify-items:center;
     }
 
-    /* NEW: solid bead with number (mini road) */
+    /* solid bead with number (mini road) */
     .bead-solid{ width:var(--bead-bubble); height:var(--bead-bubble); border-radius:9999px; display:flex; align-items:center; justify-content:center;
       position:relative; font-size:9px; font-weight:900; color:#fff;
       box-shadow: inset 0 1px 2px rgba(0,0,0,.35), inset 0 -3px 5px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.45); }
@@ -207,7 +207,7 @@
     .bead-solid.red{ background: radial-gradient(100% 120% at 30% 20%, #ff7a7a, #ef4444 55%, #7f1d1d 100%); border:1px solid #7f1d1d; }
     .bead-solid.blue{ background: radial-gradient(100% 120% at 30% 20%, #7fb0ff, #3b82f6 55%, #1e3a8a 100%); border:1px solid #1e3a8a; }
 
-    /* Old hollow bead look (kept for legend) */
+    /* faint placeholder for empty grid cells */
     .bead{ width:var(--bead-bubble); height:var(--bead-bubble); border-radius:9999px; background:transparent; box-shadow: inset 0 1px 2px rgba(0,0,0,.35); }
     .bead.red{ border:2px solid #ef4444; }
     .bead.blue{ border:2px solid #3b82f6; }
@@ -237,9 +237,9 @@
           </div>
 
           <nav class="hidden md:flex items-center gap-4 text-sm text-gray-200">
-            <a href="index.html" class="px-3 py-1.5 rounded-lg hover:bg:white/10 transition">Home</a>
+            <a href="index.html" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Home</a>
             <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Matches</a>
-            <a href="#" class="px-3 py-1.5 rounded-lg hover:bg:white/10 transition">Support</a>
+            <a href="#" class="px-3 py-1.5 rounded-lg hover:bg-white/10 transition">Support</a>
           </nav>
 
           <div class="flex items-center gap-2 relative">
@@ -294,7 +294,7 @@
                 <hr class="border-white/10 my-1" />
                 <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm"><span>Profile</span></a>
                 <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm"><span>Settings</span></a>
-                <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg.white/10 text-sm text-red-300"><span>Logout</span></a>
+                <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 text-sm text-red-300"><span>Logout</span></a>
               </div>
             </div>
           </div>
@@ -347,7 +347,7 @@
           </div>
         </div>
 
-        <!-- LOGROHAN –– LOOK hollow rings, EFFECT continuous (unchanged logic) -->
+        <!-- LOGROHAN –– hollow rings -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
@@ -400,14 +400,14 @@
             </div>
           </div>
 
-          <!-- Bet Amount + MINI ROAD (NOW SOLID w/ NUMBERS + L-shape effect) -->
+          <!-- Bet Amount + MINI ROAD -->
           <div class="bg-gray-900/60 border border-white/10 rounded-xl p-2 mb-0">
             <div class="flex items-center justify-between mb-2">
               <div class="text-[15px] uppercase tracking-widest text-white/70">Bet Amount</div>
               <div class="text-[15px] text-white/60">min ₱100</div>
             </div>
             <div class="flex flex-wrap items-center gap-2 mb-2">
-              <input type="number" id="bet-amount" class="bet-input p-2 text-sm text:white bg-black/30 w-[160px]"
+              <input type="number" id="bet-amount" class="bet-input p-2 text-sm text-white bg-black/30 w-[160px]"
                 placeholder="Enter amount" inputmode="numeric" />
               <div class="balance-pill text-yellow-300">
                 <svg class="w-5 h-5 opacity-90" viewBox="0 0 64 64" aria-hidden="true">
@@ -445,7 +445,7 @@
               <button class="chip3d chip-amber chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
             </div>
 
-            <!-- MINI ROAD –– SOLID with numbers (L-shape effect, logic unchanged) -->
+            <!-- MINI ROAD –– strict L-only -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <div class="text-[11px] uppercase tracking-widest text-white/70">Road</div>
@@ -495,7 +495,7 @@
           </div>
         </div>
 
-        <!-- logrohan (mobile) –– hollow rings look, continuous effect -->
+        <!-- logrohan (mobile) –– hollow rings -->
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
@@ -542,8 +542,8 @@
       const p2m = document.getElementById('player2-name-mob'); if(p2m) p2m.textContent = blue;
     }
 
-    /* ======= Big Road / Bead helpers ======= */
-    const BIGROAD_MAX_ROWS = 8; // ilalim ng video (max straight na pababa)
+    /* ======= Road helpers ======= */
+    const BIGROAD_MAX_ROWS = 8; // ilalim ng video
     const BEAD_MAX_ROWS    = 6; // sidebar mini road
 
     const isEmpty = (grid, c, r) => !(grid[c] && grid[c][r]);
@@ -558,67 +558,70 @@
       return out;
     }
 
-    /* ========= ORIGINAL L-shape builder (kept as-is) ========= */
-    function buildBigRoadGridVarCap(seq, maxRows = BIGROAD_MAX_ROWS){
-      const runs = streakRuns(seq);
+    /* ========= STRICT L-ONLY builder for the MINI ROAD =========
+       - New color starts to the RIGHT of the TOP bubble of the previous run (row 0).
+       - Within a run: go DOWN while free; on first block/bottom, turn RIGHT and keep going
+         on that same row for the rest of the run (never go down again).
+    */
+    function buildBigRoadStrictL(seq, maxRows = BEAD_MAX_ROWS){
+      const runs = streakRuns(seq);         // [{t:'R'|'B', n:int}, ...]
       const grid = [];
-      let headCol = 0;
       let labelNo = 1;
 
-      runs.forEach((run, idx)=>{
+      let prevRunStartCol = -1;             // column index where previous run started (its top bubble)
+
+      for(const run of runs){
         const t = run.t;
-        const cap = Math.max(1, maxRows - idx); // 8,7,6,...,1 then 1
-        ensureCol(grid, headCol);
+        // Compute starting position for this run
+        let col, row;
+        if(prevRunStartCol < 0){
+          col = 0; row = 0;                 // very first run
+        }else{
+          col = prevRunStartCol + 1; row = 0;   // beside the top bubble of previous run
+          while(!isEmpty(grid, col, row)){ col++; ensureCol(grid, col); } // stay on row 0 only
+        }
+        const thisRunStartCol = col;
 
-        // vertical placement from top
+        // Phase 1: go DOWN while free
         let placed = 0;
-        let lastRowPlaced = 0;
-
-        for(let r=0; r<cap && placed<run.n; r++){
-          if(isEmpty(grid, headCol, r)){
-            grid[headCol][r] = { t, label: labelNo++ };
-            placed++;
-            lastRowPlaced = r;
-          }else{
-            break; // blocked
-          }
+        while(placed < run.n && row < maxRows && isEmpty(grid, col, row)){
+          ensureCol(grid, col);
+          grid[col][row] = { t, label: labelNo++ };
+          placed++; row++;
         }
 
-        // overflow to the right on SAME ROW as last placed (L shape)
-        let remaining = run.n - placed;
-        let c = headCol + 1;
-        const rowForOverflow = lastRowPlaced;
-        while(remaining > 0){
+        // Lock the row where we last placed (row-1), then Phase 2: go RIGHT only
+        const lockRow = Math.max(0, row - 1);
+        let remain = run.n - placed;
+        let c = col + 1;
+        while(remain > 0){
           ensureCol(grid, c);
-          if(isEmpty(grid, c, rowForOverflow)){
-            grid[c][rowForOverflow] = { t, label: labelNo++ };
-            remaining--;
+          if(isEmpty(grid, c, lockRow)){
+            grid[c][lockRow] = { t, label: labelNo++ };
+            remain--;
           }
           c++;
         }
 
-        // next run starts beside the first bubble
-        headCol = headCol + 1;
-      });
+        // next run will start beside this run's TOP bubble
+        prevRunStartCol = thisRunStartCol;
+      }
 
       return grid;
     }
 
-    /* ========= LOGROHAN Continuous renderer –– NOW HOLLOW RINGS (no numbers) ========= */
+    /* ========= LOGROHAN Continuous renderer –– HOLLOW RINGS (unchanged) ========= */
     function renderLogroContinuous(seq, stripId, maxRows = BIGROAD_MAX_ROWS){
       const runs = streakRuns(seq);
       const cols = [];
-      // labels still increment internally to keep logic parity, but we won't show text
       let labelNo = 1;
 
-      for(const run of runs){
+      for (const run of runs) {
         let left = run.n;
-        while(left > 0){
+        while (left > 0) {
           const take = Math.min(maxRows, left);
           const col = [];
-          for(let i=0;i<take;i++){
-            col.push({ t: run.t, label: labelNo++ });
-          }
+          for (let i=0;i<take;i++) col.push({ t: run.t, label: labelNo++ });
           cols.push(col);
           left -= take;
         }
@@ -641,7 +644,6 @@
           const depth = Math.min(r, maxRows-1);
           b.style.setProperty('--z', `calc(var(--logro-step) * ${depth})`);
           b.style.transform = `translateZ(var(--z))`;
-          // no text content for hollow ring
           colDiv.appendChild(b);
         }
         strip.appendChild(colDiv);
@@ -650,9 +652,9 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    /* ========= MINI ROAD L-shape renderer –– NOW SOLID w/ NUMBERS ========= */
-    function renderRoadLShape(seq, stripId, maxRows = BEAD_MAX_ROWS){
-      const grid = buildBigRoadGridVarCap(seq, maxRows);
+    /* ========= MINI ROAD renderer –– SOLID w/ NUMBERS using STRICT L ========= */
+    function renderRoadStrictL(seq, stripId, maxRows = BEAD_MAX_ROWS){
+      const grid = buildBigRoadStrictL(seq, maxRows);
       const strip = document.getElementById(stripId);
       if(!strip) return;
       strip.innerHTML = '';
@@ -666,11 +668,9 @@
           const cell = col && col[r];
           const dot = document.createElement('div');
           if(cell){
-            // solid with number now
             dot.className = 'bead-solid ' + (cell.t==='R' ? 'red' : 'blue');
-            dot.textContent = cell.label; // show number inside
+            dot.textContent = cell.label; // show sequence number
           }else{
-            // faint placeholder grid cell
             dot.className = 'bead';
             dot.style.opacity = '0.12';
             dot.style.border = '1px dashed rgba(255,255,255,.15)';
@@ -683,14 +683,14 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    /* ======= Render dispatcher (designs swapped, logic unchanged) ======= */
+    /* ======= Render dispatcher ======= */
     function renderAllRoads(seq){
-      // LOGROHAN: continuous effect, but HOLLOW rings (no numbers)
+      // LOGROHAN: continuous (hollow)
       renderLogroContinuous(seq, 'logro-strip', BIGROAD_MAX_ROWS);
       renderLogroContinuous(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);
 
-      // MINI ROAD: L-shape effect, SOLID bubbles w/ numbers
-      renderRoadLShape(seq, 'bead-strip', BEAD_MAX_ROWS);
+      // MINI ROAD: STRICT L-ONLY
+      renderRoadStrictL(seq, 'bead-strip', BEAD_MAX_ROWS);
     }
 
     /* ======= Betting state/helpers (working) ======= */
@@ -867,8 +867,11 @@ New Balance: ${currentBalance.toLocaleString()}.`);
       setRandomMatch();
 
       // amounts + odds
-      meronAmount=Math.floor(Math.random()*(50000-10000+1))+10000;
-      walaAmount=Math.floor(Math.random()*(50000-10000+1))+10000;
+      let meronAmountInit=Math.floor(Math.random()*(50000-10000+1))+10000;
+      let walaAmountInit=Math.floor(Math.random()*(50000-10000+1))+10000;
+      meronAmount = meronAmountInit;
+      walaAmount  = walaAmountInit;
+
       computeOdds(); renderOddsEverywhere();
       const ma = document.getElementById('meron-amount'); if(ma) ma.textContent=meronAmount.toLocaleString();
       const wa = document.getElementById('wala-amount');  if(wa) wa.textContent=walaAmount.toLocaleString();
