@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      crossorigin="anonymous"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+</head>
+<body>
+  
+<div class="min-h-dvh bg-[url('images/loginVisual.png')] bg-cover bg-center bg-no-repeat">
+  <div class="min-h-dvh grid place-items-center bg-black/70"> <!-- dim overlay -->
+    <div class="w-[90%] max-w-md rounded-2xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur p-6 shadow-xl dark:text-white border border-emerald-700">
+  <div class="flex-col my-6">
+    <h1 class="flex text-2xl my-2 justify-center font-bold">Welcome Back</h1>
+    <h2 class="flex text-sm font-semibold my-2 justify-center">Sign in with your username</h2>
+  </div>
+
+  <form action="#" method="post" class="space-y-4">
+    <label class="block">
+      <span class="sr-only">Username</span>
+      <input
+        type="text"
+        name="username"
+        class="w-full p-3 rounded-lg bg-gray-400/30 dark:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        placeholder="Username"
+        required
+      />
+    </label>
+
+    <label class="block">
+      <span class="sr-only">Password</span>
+      <input
+        type="password"
+        name="password"
+        class="w-full p-3 rounded-lg bg-gray-400/30 dark:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+        placeholder="Password"
+        required
+      />
+    </label>
+
+    <div class="flex items-center justify-between text-xs font-semibold">
+      <label class="inline-flex items-center gap-2 select-none">
+        <input
+          type="checkbox"
+          name="remember"
+          class="size-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+        />
+        <span class="text-gray-700 dark:text-gray-200">Stay signed in</span>
+      </label>
+
+      <a href="/forgot-password" class="text-emerald-700 hover:underline dark:text-emerald-300">
+        Forgot password?
+      </a>
+    </div>
+
+    <button
+      type="submit"
+      class="w-full p-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 transition font-semibold text-white"
+    >
+      Sign In
+    </button>
+    <span class="flex justify-center gap-2">Don't have an account? <a href="" class="font-semibold text-emerald-400 hover:text-emerald-600 hover:underline underline-offset-2">Sign up</a></span>
+  </form>
+</div>
+
+  </div>
+</div>
+
+</body>
+</html>
