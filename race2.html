@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Drag Race Dashboard • Totalizator Style</title>
+<style>
+/* ================= THEME / TOKENS ================= */
+:root{
+  --radius:18px; --speed:260ms; --e:cubic-bezier(.2,.8,.2,1);
+  --emboss-hi:rgba(255,255,255,.10); --emboss-lo:rgba(0,0,0,.46); --emboss-edge:rgba(255,255,255,.06);
+  --red:#ff3b30; --blue:#2f7cff; --accent:#00ffba;
+  --stroke-1:#15203a; --stroke-2:#1a2746; --stroke-3:#203155; --stroke-4:#263963; --stroke-5:#2f477a;
+
+  --h:44px; --fs-12:12px; --fs-14:13px; --fs-24:20px;
+}
+@media (max-width:1100px){ :root{ --h:46px; --fs-24:19px; --fs-14:14px; } }
+
+/* themes */
+[data-theme="dark"]{
+  --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
+  --dark:#070a10; --card:#0e1426; --glass:#0b1222da; --muted:#b8c3d8; --text:#e8f0ff; --text-muted:#bcd1ff;
+  --panel:#0b1326; --panel-2:#0d1529; --panel-3:#0f1a33;
+  --glare:radial-gradient(900px 320px at 10% -20%, rgba(255,255,255,.06), transparent 70%),
+          radial-gradient(900px 320px at 90% -30%, rgba(255,255,255,.05), transparent 70%);
+  --blur-bg:brightness(.45) saturate(1.0);
+}
+[data-theme="light"]{
+  --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
+  --dark:#eef3ff; --card:#ffffff; --glass:#ffffffcc; --muted:#51607e; --text:#0b1222; --text-muted:#40507a;
+  --panel:#ffffff; --panel-2:#f7f9ff; --panel-3:#f2f6ff;
+  --glare:radial-gradient(900px 320px at 10% -20%, rgba(0,0,0,.03), transparent 70%),
+          radial-gradient(900px 320px at 90% -30%, rgba(0,0,0,.03), transparent 70%);
+  --blur-bg:brightness(.9) saturate(1.05);
+  --stroke-1:#d9e2ff; --stroke-2:#d0dbff; --stroke-3:#c8d6ff; --stroke-4:#c0d0ff; --stroke-5:#b6caff;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:var(--dark); color:var(--text); font-size:var(--fs-14)}
+.bg::before{content:""; position:fixed; inset:0; z-index:-3; background-image:var(--bg); background-size:cover; background-position:center; filter:blur(2px) var(--blur-bg); transform:scale(1.03)}
+.bg::after{content:""; position:fixed; inset:0; z-index:-2; background:
+  linear-gradient( rgba(6,8,12,.40), rgba(6,8,12,.40) ),
+  radial-gradient(1200px 1200px at 80% -10%, #141a2b77, transparent 70%),
+  radial-gradient( 800px  800px at -10% 110%, #0b0f1c66, transparent 60%),
+  var(--glare)}
+
+.wrap{max-width:1180px; margin:auto; padding:18px; display:grid; gap:16px}
+
+.emboss{box-shadow: inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo), 0 12px 30px rgba(0,0,0,.35); border-color:var(--emboss-edge)!important}
+.pulse{animation:pulse 2200ms ease-in-out infinite} @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(64,185,255,.0)}50%{box-shadow:0 0 0 6px rgba(64,185,255,.08)}}
+.shine{position:relative; overflow:hidden} .shine::after{content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.12),transparent); transform:translateX(-120%); animation:shine 4s linear infinite}
+
+header{display:flex; align-items:center; gap:12px; flex-wrap:wrap; position:sticky; top:0; z-index:1000; backdrop-filter:saturate(1.1) blur(6px); background:linear-gradient(180deg, rgba(7,10,16,.58), rgba(7,10,16,.18)); border-bottom:1px solid var(--stroke-2)}
+.brand{display:flex; align-items:center; gap:10px}
+.brand h1{margin:0; font-size:clamp(18px,3vw,26px)}
+.chip{padding:6px 10px; border-radius:999px; background:#0e1730; color:#b8c3d8; font-size:12px; border:1px solid var(--stroke-1)}
+.topbar{display:flex; gap:8px; flex-wrap:wrap}
+.pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#0e1934; border:1px solid var(--stroke-2); font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%}.dot.red{background:#ff3b30}.dot.blue{background:#2f7cff}
+.user{margin-left:auto; display:flex; align-items:center; gap:8px; position:relative}
+.iconbtn{height:38px; min-width:38px; border-radius:12px; display:grid; place-items:center; cursor:pointer; background:linear-gradient(180deg,#1a2848,#0f1b37); border:1px solid #263a66; color:#e6f0ff}
+.avatar{width:38px;height:38px;border-radius:12px;border:2px solid #1f2b50;background-size:cover;background-position:center}
+
+.menu,.notifpanel{position:absolute; top:46px; right:0; width:300px; padding:12px; border-radius:14px; background:var(--glass); border:1px solid var(--stroke-1); backdrop-filter:blur(14px); z-index:1200; opacity:0; transform:translateY(-8px) scale(.98); pointer-events:none; transition:all var(--speed) var(--e)}
+.menu.show,.notifpanel.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+.menu .row{display:flex; align-items:center; gap:10px; padding:10px 12px; margin:8px 0; border-radius:12px; text-decoration:none; color:var(--text); background:var(--panel-2); border:1px solid var(--stroke-3)}
+.notiflist{max-height:320px; overflow:auto; display:grid; gap:8px}
+.notif{display:grid; gap:4px; padding:10px 12px; border-radius:12px; background:var(--panel-2); border:1px solid var(--stroke-3)} .notif.unread{outline:2px solid rgba(64,185,255,.35)}
+.badge-dot{position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 5px; border-radius:999px; background:#ff3b30; color:#fff; font-size:10px; display:grid; place-items:center; border:2px solid #0c152a}
+
+/* PANELS / TABS */
+.panel{background:var(--glass); border:1px solid var(--stroke-1); border-radius:var(--radius); backdrop-filter:blur(10px)}
+.tabs{display:flex; gap:6px; padding:6px 10px; border-bottom:1px solid var(--stroke-2); overflow:auto}
+.tab{cursor:pointer; padding:8px 12px; border-radius:12px; font-weight:900; letter-spacing:.3px; color:var(--text); background:#0e1934; border:1px solid var(--stroke-3); white-space:nowrap}
+.tab.active{background:linear-gradient(90deg,#1e3a8a 0%, #7c0a0a 100%); color:#fff}
+.frame{position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000; border:1px solid #222f52}
+iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+
+/* GRID: video + kiosk side */
+.videogrid{display:grid; grid-template-columns:minmax(0,1fr) clamp(300px, 30vw, 380px); gap:12px; align-items:start}
+@media (max-width:980px){.videogrid{grid-template-columns:1fr}}
+/* Side kiosk */
+.kiosk-side{display:flex; flex-direction:column; gap:10px; padding:8px; background:var(--panel-2); border:1px solid var(--stroke-2); border-radius:14px; overflow:auto}
+.mini{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+.box{position:relative; padding:8px 10px; border-radius:14px; border:1px solid var(--stroke-3); background:var(--panel-3)}
+.box .label{font-size:var(--fs-12); color:var(--text-muted)} .box .value{font-size:var(--fs-24); font-weight:900; letter-spacing:.5px}
+.pad{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:8px; display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+.chipbtn{height:var(--h); display:flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35); font-size:13px}
+.chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#8b1515,#4b0a0a)}
+.chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#1a489b,#0d2b66)}
+
+.slip{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:10px; display:grid; gap:8px}
+.slip input{width:100%; height:calc(var(--h) - 4px); background:#0a1122; color:#e9f3ff; border:1px solid var(--stroke-4); padding:0 12px; border-radius:12px; font-weight:800}
+.actions{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.btn{height:var(--h); display:inline-flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25); font-size:13px}
+.btn.red{background:linear-gradient(180deg,#9a1616,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
+.btn.blue{background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
+.btn.ghost{background:#0c1630; border:1px solid var(--stroke-5); color:var(--text)}
+
+/* Totals widget */
+.totbox{background:#0e1426; border:1px solid var(--stroke-3); border-radius:14px; padding:10px; display:grid; gap:8px}
+.totbox .row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed var(--stroke-5)}
+.totbox .row:last-child{border-bottom:0}
+.meter{height:10px; background:#0c1220; border:1px solid #263553; border-radius:999px; overflow:hidden}
+.meter>span{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--blue))}
+
+/* Results / Roadmap */
+.results{background:var(--panel); border:1px solid var(--stroke-1); border-radius:14px; padding:12px; display:grid; gap:12px}
+.rhead{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap}
+.rhead .bar{display:flex; gap:8px; flex-wrap:nowrap; overflow:auto; padding-bottom:4px}
+.rhead .bar::-webkit-scrollbar{height:6px}
+.roadwrap{display:grid; gap:12px}
+.roadgrid{display:grid; grid-template-rows:repeat(6, 26px); grid-auto-columns:26px; grid-auto-flow:column; padding:10px; border:1px solid var(--stroke-3); border-radius:12px; background:var(--panel-3); overflow:auto}
+.cell{width:24px; height:24px; border-radius:50%; border:2px solid var(--stroke-5); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:900}
+.cell.red{background:radial-gradient(circle at 30% 30%, #ff7a70, #b71c1c)} .cell.blue{background:radial-gradient(circle at 30% 30%, #8fb6ff, #0b3ca8)}
+.table{width:100%; border-collapse:separate; border-spacing:0 8px; overflow:auto}
+.table thead th{font-size:12px; color:var(--text-muted); text-align:left; padding:0 10px; white-space:nowrap}
+.table tbody tr{background:var(--panel-3); border:1px solid var(--stroke-3)}
+.table td{padding:10px; font-weight:700; white-space:nowrap}
+.badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--stroke-5)}
+.b-red{background:#3b1212; color:#ffecec} .b-blue{background:#11244d; color:#e6f0ff}
+
+/* Roads layout */
+.roadsRow{ display:grid; grid-template-columns:1fr 280px; gap:12px; }
+.roadgrid.small{ grid-template-rows:repeat(6, 18px); grid-auto-columns:18px; }
+.cell.small{ width:16px; height:16px; border-width:2px; font-size:0; }
+.cell.hollow{ background:transparent !important; }
+.cell.red.hollow{ border-color:#ff7a70; } .cell.blue.hollow{ border-color:#8fb6ff; }
+@media (max-width:900px){ .roadsRow{ grid-template-columns:1fr; } }
+
+/* SETTINGS DRAWER */
+.drawer{
+  position:fixed; top:0; left:0; width:300px; height:100dvh;
+  background:linear-gradient(180deg, rgba(10,15,28,.94), rgba(10,15,28,.86));
+  border-right:1px solid var(--stroke-2); padding:14px; z-index:1300;
+  transform:translateX(-102%); transition:transform var(--speed) var(--e);
+}
+.drawer.show{ transform:none; }
+.drawer h3{margin:0 0 10px}
+.drow{background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:10px; display:flex; align-items:center; justify-content:space-between; margin:10px 0}
+.switch{position:relative; width:54px; height:30px; border-radius:999px; border:1px solid var(--stroke-4); background:#18223c; cursor:pointer}
+.switch .knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.35); transition:left var(--speed) var(--e)}
+.switch.on{background:linear-gradient(90deg,var(--blue),var(--red))} .switch.on .knob{left:27px}
+.drawer .close{position:absolute; top:10px; right:10px}
+
+/* ======= MOBILE POLISH ======= */
+@media (max-width:680px){
+  .wrap{padding:12px}
+  header{gap:8px}
+  .brand h1{font-size:20px}
+  .topbar{order:3; width:100%; overflow:auto}
+  .pill{padding:6px 10px}
+  /* cap the video height para di kain lahat ng screen */
+  .frame{border-radius:10px; max-height:42vh}
+  .kiosk-side{padding:8px; gap:10px}
+  .mini{grid-template-columns:1fr 1fr}
+  .pad{grid-template-columns:1fr 1fr}
+  .chipbtn,.btn{height:52px; font-size:15px}
+  .slip input{height:50px; font-size:15px}
+  .totbox .row{font-size:13px}
+  .rhead{align-items:flex-start}
+  .rhead .bar{width:100%}
+  .roadsRow{gap:10px}
+  .table{display:block; overflow:auto}
+}
+@media (max-width:430px){
+  .mini{grid-template-columns:1fr 1fr}
+  .pad{grid-template-columns:1fr 1fr}
+  .actions{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="wrap">
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="pulse" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#7c0a0a"/></linearGradient></defs>
+        <path d="M4 17h4l2 3 4-6 2 3h4" stroke="url(#g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="5" cy="17" r="2" fill="var(--accent)"/><circle cx="19" cy="17" r="2" fill="var(--accent)"/></svg>
+      <h1 class="shine">Drag Race Dashboard</h1>
+      <span class="chip">inbose • mobile-first</span>
+    </div>
+
+    <div class="topbar">
+      <div class="pill emboss"><strong>TOTAL POT:</strong> <span id="pot">0</span></div>
+      <div class="pill emboss"><span class="dot red"></span> Rider Red: <strong id="tR">0</strong></div>
+      <div class="pill emboss"><span class="dot blue"></span> Rider Blue: <strong id="tB">0</strong></div>
+      <div class="pill emboss"><span>⏱️ Round:</span> <strong id="timer">—</strong></div>
+    </div>
+
+    <div class="user">
+      <!-- Settings Drawer Button -->
+      <button id="drawerOpen" class="iconbtn emboss" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.03.03a2 2 0 1 1-2.83 2.83l-.03-.03A1.8 1.8 0 0 0 15 19.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+
+      <!-- Notifications -->
+      <button id="notifBtn" class="iconbtn emboss" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0v5l1.5 2.5a1 1 0 0 1-.86 1.5H5.36a1 1 0 0 1-.86-1.5L6 13V8Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span id="notifBadge" class="badge-dot" style="display:none">0</span>
+      </button>
+      <!-- Notifications PANEL (needed for click) -->
+      <div id="notifPanel" class="notifpanel emboss" role="menu" aria-hidden="true" style="right:52px">
+        <div class="title" style="font-size:12px;color:var(--text-muted);margin:4px 6px 8px">Notifications</div>
+        <div class="notiflist" id="notifList"></div>
+        <div class="divider" style="height:1px;background:linear-gradient(90deg,transparent,var(--stroke-3),transparent);margin:6px 4px"></div>
+        <div style="display:flex; gap:8px; justify-content:flex-end">
+          <button id="markAllRead" class="btn ghost emboss" style="height:36px">Mark all read</button>
+          <button id="clearNotif" class="btn emboss" style="height:36px">Clear</button>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div style="position:relative">
+        <button id="profileBtn" class="iconbtn emboss" title="Profile"><div class="avatar" style="background-image:url('https://i.pravatar.cc/96?img=67')"></div></button>
+        <div id="profileMenu" class="menu emboss" aria-hidden="true">
+          <div class="row emboss" style="cursor:default; gap:12px">
+            <div class="avatar" style="width:32px;height:32px;border-radius:8px;background-image:url('https://i.pravatar.cc/96?img=67')"></div>
+            <div style="display:grid"><strong>Wilyonaryo</strong><small style="color:var(--text-muted)">Pro Member</small></div>
+          </div>
+          <a href="#" class="row emboss" id="cashInBtn">Cash In</a>
+          <a href="#" class="row emboss" id="withdrawBtn">Withdraw</a>
+          <a href="#" class="row emboss" id="editProfile">Edit Profile</a>
+          <a href="index.html" class="row emboss" style="background:linear-gradient(180deg,#9a1616,#4b0a0a); color:#ffecec; border-color:#3a1a1f">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SETTINGS DRAWER -->
+  <aside id="drawer" class="drawer emboss" aria-label="Settings">
+    <button class="iconbtn emboss close" id="drawerClose" title="Close">✕</button>
+    <h3>Settings</h3>
+    <div class="drow emboss"><div><strong>Dark Mode</strong><br><small style="color:var(--text-muted)">Switch theme</small></div><div id="sw-dark" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>Fancy Animations</strong><br><small style="color:var(--text-muted)">Glow, pulse, float</small></div><div id="sw-fancy" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>Sound Effects</strong><br><small style="color:var(--text-muted)">Clicks & beeps</small></div><div id="sw-sound" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>Compact Mode</strong><br><small style="color:var(--text-muted)">Tighter paddings</small></div><div id="sw-compact" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>High Contrast</strong><br><small style="color:var(--text-muted)">Stronger borders/text</small></div><div id="sw-contrast" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>Haptic Feedback</strong><br><small style="color:var(--text-muted)">Vibrate on actions</small></div><div id="sw-haptic" class="switch"><div class="knob"></div></div></div>
+    <div class="drow emboss"><div><strong>Desktop Notifications</strong><br><small style="color:var(--text-muted)">Allow browser alerts</small></div><div id="sw-deskn" class="switch"><div class="knob"></div></div></div>
+  </aside>
+
+  <!-- VIDEO + SIDE KIOSK -->
+  <section class="panel emboss">
+    <div class="tabs">
+      <button class="tab emboss active" data-tab="odds">ODDS</button>
+      <button class="tab emboss" data-tab="total">TOTAL</button>
+    </div>
+
+    <div class="videogrid">
+      <div class="frame emboss"><iframe id="yt" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+
+      <div class="kiosk-side emboss" id="kioskSide">
+        <div id="oddsView">
+          <div class="mini">
+            <div class="box emboss"><div class="label">ODDS — Rider Red</div><div class="value" id="oddsRed">2.00</div></div>
+            <div class="box emboss"><div class="label">ODDS — Rider Blue</div><div class="value" id="oddsBlue">1.90</div></div>
+          </div>
+
+          <div class="pad emboss" id="chips">
+            <button class="chipbtn red emboss">₱50</button>
+            <button class="chipbtn red emboss">₱100</button>
+            <button class="chipbtn blue emboss">₱200</button>
+            <button class="chipbtn blue emboss">₱500</button>
+          </div>
+
+          <div class="slip emboss">
+            <input id="amount" type="number" min="1" placeholder="Enter amount" class="emboss"/>
+            <div class="actions">
+              <button class="btn red emboss" data-bet="red">BET</button>
+              <button class="btn blue emboss" data-bet="blue">BET</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+              <button class="btn ghost emboss" id="reset">Reset</button>
+              <button class="btn ghost emboss" id="maxAmt">Max</button>
+            </div>
+          </div>
+
+          <div class="totbox emboss" id="totalsWidget">
+            <div class="row"><strong>POT</strong><strong id="pot2">0</strong></div>
+            <div class="row"><span>Bets (Rider Red / Rider Blue)</span><strong><span id="tR2">0</span> / <span id="tB2">0</span></strong></div>
+            <div class="row"><span>Est. Payout (x)</span><strong><span style="color:var(--text-muted)">Rider Red</span> <span id="payoutR">× 1.88</span> • <span style="color:var(--text-muted)">Rider Blue</span> <span id="payoutB">× 2.08</span></strong></div>
+            <div class="meter emboss"><span id="bar" style="width:0%"></span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+              <button id="resetTotals" class="btn ghost emboss" style="height:36px">Reset Totals</button>
+              <button id="demoBets" class="btn ghost emboss" style="height:36px">Simulate</button>
+            </div>
+          </div>
+
+          <div class="totbox emboss">
+            <div class="row" style="border:0; padding:0 0 4px; justify-content:center; color:var(--text-muted)">Links</div>
+            <a class="btn ghost emboss" href="https://www.nba.com" target="_blank" rel="noopener" style="height:36px">NBA</a>
+            <a class="btn ghost emboss" href="https://www.pokerstars.com" target="_blank" rel="noopener" style="height:36px">Poker</a>
+            <a class="btn ghost emboss" href="https://www.mobilelegends.com" target="_blank" rel="noopener" style="height:36px">Mobile Legends</a>
+            <a class="btn ghost emboss" href="https://en.wikipedia.org/wiki/Drag_racing" target="_blank" rel="noopener" style="height:36px">What is Drag Racing?</a>
+          </div>
+        </div>
+
+        <div id="totalView" hidden>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Total Bets — Red</div><div class="value" id="totalRed">0</div></div>
+            <div class="box emboss"><div class="label">Total Bets — Blue</div><div class="value" id="totalBlue">0</div></div>
+          </div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Pool Share — Red</div><div class="value" id="shareRed">0%</div></div>
+            <div class="box emboss"><div class="label">Pool Share — Blue</div><div class="value" id="shareBlue">0%</div></div>
+          </div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Odds (x) — Red</div><div class="value" id="txRed">1.88</div></div>
+            <div class="box emboss"><div class="label">Odds (x) — Blue</div><div class="value" id="txBlue">2.08</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS / ROADMAP -->
+  <section class="panel emboss">
+    <div class="results emboss">
+      <div class="rhead">
+        <h3 style="margin:0">Roadmap • Results</h3>
+        <div class="bar">
+          <button class="btn red emboss" id="winRed">Record: Red Wins</button>
+          <button class="btn blue emboss" id="winBlue">Record: Blue Wins</button>
+          <button class="btn ghost emboss" id="undo">Undo</button>
+          <button class="btn ghost emboss" id="startRound">Start Round</button>
+          <button class="btn ghost emboss" id="resetRound">Reset Round</button>
+          <button class="btn emboss" id="clearLog">Clear Log</button>
+          <button class="btn ghost emboss" id="exportCsv">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="center" style="margin-top:-4px"><div class="roadodds emboss" id="roadOdds" style="padding:6px 10px; border-radius:10px; text-align:center">Red × 1.88 • Blue × 2.08</div></div>
+
+      <div class="roadsRow">
+        <div>
+          <div class="roadhead">Bead Road</div>
+          <div id="bead" class="roadgrid emboss"></div>
+        </div>
+        <div>
+          <div class="roadhead">Big Road</div>
+          <div id="big" class="roadgrid small emboss"></div>
+        </div>
+      </div>
+
+      <div style="overflow:auto">
+        <table class="table">
+          <thead><tr><th>Time</th><th>Winner</th><th>Pot</th><th>Odds</th><th>Payout per ₱100</th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;right:16px;bottom:16px;z-index:1500;display:grid;gap:8px"></div>
+
+<!-- Simple modals -->
+<div id="modal-edit" class="menu modal emboss" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)">
+  <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px">
+    <h2 style="margin:0 0 8px">Edit Profile</h2>
+    <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+      <label>Display Name <input id="prof-name" type="text" placeholder="Your name" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+      <label>Avatar URL <input id="prof-avatar" type="url" placeholder="https://..." style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px">
+      <button class="btn ghost emboss" data-close style="height:40px">Back</button>
+      <button class="btn blue emboss" id="saveProfile" style="height:40px">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-cash" class="menu modal emboss" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)">
+  <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px">
+    <h2 style="margin:0 0 8px">Cash In</h2>
+    <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+      <label>Amount <input id="cash-amt" type="number" min="1" placeholder="₱0" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+      <label>Method
+        <select id="cash-method" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px">
+          <option>GCash</option><option>PayMaya</option><option>Bank Transfer</option>
+        </select>
+      </label>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px">
+      <button class="btn ghost emboss" data-close style="height:40px">Back</button>
+      <button class="btn red emboss" id="cashSubmit" style="height:40px">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-withdraw" class="menu modal emboss" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)">
+  <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px">
+    <h2 style="margin:0 0 8px">Withdraw</h2>
+    <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
+      <label>Amount <input id="wd-amt" type="number" min="1" placeholder="₱0" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
+      <label>Destination
+        <select id="wd-method" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px">
+          <option>GCash</option><option>PayMaya</option><option>Bank Transfer</option>
+        </select>
+      </label>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px">
+      <button class="btn ghost emboss" data-close style="height:40px">Back</button>
+      <button class="btn blue emboss" id="wdSubmit" style="height:40px">Request</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ YouTube embed ============ */
+(function(){
+  const url='https://youtu.be/mzBv3fUDxRA?si=0X903bZ6UrB-v6UF';
+  const embed=url.replace('https://youtu.be/','https://www.youtube.com/embed/').replace('watch?v=','embed/');
+  const iframe=document.getElementById('yt');
+  iframe.src=embed+(embed.includes('?')?'&':'?')+'rel=0&modestbranding=1';
+  iframe.addEventListener('load', syncSideHeight);
+})();
+
+/* ============ App State ============ */
+const state={ red:0, blue:0, oddsRed:1.88, oddsBlue:2.08, market:'—' };
+const el=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString('en-PH',{maximumFractionDigits:0});
+
+/* Sound / Haptics */
+let SOUND_ON=true, HAPTIC_ON=false;
+function beep(type='click', dur=80, freq=440, vol=0.05){
+  if(!SOUND_ON || typeof AudioContext==='undefined') return;
+  const ctx = beep.ctx || (beep.ctx = new (window.AudioContext||window.webkitAudioContext)());
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type=(type==='low'?'square':'sine'); o.frequency.value=freq; g.gain.value=vol;
+  o.connect(g); g.connect(ctx.destination); o.start();
+  setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.02); o.stop(ctx.currentTime+0.03); }, dur);
+}
+function vibe(ms=10){ if(HAPTIC_ON && navigator.vibrate) navigator.vibrate(ms); }
+
+/* Notifications */
+let DESK_NOTIF=false;
+const notifs=[]; let unread=0;
+const notifUI={btn:el('notifBtn'),panel:el('notifPanel'),list:el('notifList'),badge:el('notifBadge')};
+function renderNotifs(){
+  notifUI.list.innerHTML='';
+  if(!notifs.length){
+    const d=document.createElement('div'); d.className='notif emboss'; d.innerHTML='<div class="title">No notifications</div><div class="meta">You are all caught up.</div>'; notifUI.list.appendChild(d);
+  }else{
+    notifs.slice().reverse().forEach(n=>{
+      const d=document.createElement('div'); d.className='notif emboss '+(n.read?'':'unread');
+      d.innerHTML=`<div class="title">${n.title}</div><div class="body">${n.body||''}</div><div class="meta">${new Date(n.ts).toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'})}</div>`;
+      notifUI.list.appendChild(d);
+    });
+  }
+  notifUI.badge.style.display=unread>0?'grid':'none';
+  notifUI.badge.textContent=unread>99?'99+':String(unread);
+  localStorage.setItem('dr_notifs', JSON.stringify(notifs));
+  localStorage.setItem('dr_unread', String(unread));
+}
+function addNotif(title, body='', type='info', deskTry=true){
+  const n={id:crypto.randomUUID?.()||Math.random().toString(36).slice(2), title, body, type, ts:Date.now(), read:false};
+  notifs.push(n); unread++; renderNotifs(); toast(title + (body?` • ${body}`:''), 2400);
+  beep(type==='win'?'click':'low', 90, type==='win'?820:520, 0.06); vibe(10);
+
+  if(deskTry && DESK_NOTIF && 'Notification' in window){
+    if(Notification.permission==='granted'){ new Notification(title,{body,silent:true}); }
+    else if(Notification.permission!=='denied'){
+      Notification.requestPermission().then(p=>{ DESK_NOTIF=(p==='granted'); localStorage.setItem('deskn', DESK_NOTIF?'1':'0'); if(p==='granted') addNotif(title, body, type, false); });
+    }
+  }
+}
+(function(){
+  notifUI.btn.addEventListener('click', (e)=>{ e.stopPropagation(); const show=!notifUI.panel.classList.contains('show'); notifUI.panel.classList.toggle('show', show); if(show){ notifs.forEach(n=>n.read=true); unread=0; renderNotifs(); }});
+  document.addEventListener('click', (e)=>{ if(!notifUI.panel.contains(e.target) && !notifUI.btn.contains(e.target)) notifUI.panel.classList.remove('show'); });
+  document.getElementById('markAllRead')?.addEventListener('click',()=>{ notifs.forEach(n=>n.read=true); unread=0; renderNotifs(); });
+  document.getElementById('clearNotif')?.addEventListener('click',()=>{ notifs.length=0; unread=0; renderNotifs(); });
+  try{ const s=JSON.parse(localStorage.getItem('dr_notifs')||'[]'); const u=Number(localStorage.getItem('dr_unread')||'0'); if(Array.isArray(s)) notifs.push(...s); unread=u||0; renderNotifs(); }catch{}
+})();
+
+/* UI Sync / Persist */
+function sync(){
+  const pot=state.red+state.blue;
+  const r = pot? state.red/pot*100 : 0; const b=100-r;
+
+  el('tR').textContent=fmt(state.red); el('tB').textContent=fmt(state.blue); el('pot').textContent=fmt(pot);
+  el('oddsRed').textContent=state.oddsRed.toFixed(2); el('oddsBlue').textContent=state.oddsBlue.toFixed(2);
+  const ro=document.getElementById('roadOdds'); if(ro) ro.textContent=`Red × ${state.oddsRed.toFixed(2)} • Blue × ${state.oddsBlue.toFixed(2)}`;
+
+  el('pot2').textContent=fmt(pot); el('tR2').textContent=fmt(state.red); el('tB2').textContent=fmt(state.blue);
+  el('bar').style.width=(100-r)+'%'; el('payoutR').textContent='× '+state.oddsRed.toFixed(2); el('payoutB').textContent='× '+state.oddsBlue.toFixed(2);
+
+  el('shareRed').textContent=(r||0).toFixed(1)+'%'; el('shareBlue').textContent=(b||0).toFixed(1)+'%';
+  el('txRed').textContent=state.oddsRed.toFixed(2); el('txBlue').textContent=state.oddsBlue.toFixed(2);
+  el('totalRed').textContent=fmt(state.red); el('totalBlue').textContent=fmt(state.blue);
+
+  checkMilestones(pot); syncSideHeight(); saveAll();
+}
+function saveAll(){ localStorage.setItem('dr_state', JSON.stringify(state)); localStorage.setItem('dr_seq', JSON.stringify(seq)); }
+(function restore(){ try{ const s=JSON.parse(localStorage.getItem('dr_state')||'null'); const q=JSON.parse(localStorage.getItem('dr_seq')||'null'); const dn=localStorage.getItem('deskn')==='1'; if(s) Object.assign(state,s); if(Array.isArray(q)) seq.push(...q); DESK_NOTIF=dn; }catch{} })();
+
+/* Chips / Odds */
+document.querySelectorAll('#chips .chipbtn').forEach(b=>{
+  b.addEventListener('click',()=>{ const amt=Number(b.textContent.replace(/[^\d]/g,''))||0; const input=el('amount'); input.value=Number(input.value||0)+amt; beep('click',70,660,0.05); vibe(6); });
+});
+function smoothOdds(targetR,targetB,rate=0.25){
+  state.oddsRed=+(state.oddsRed+(targetR-state.oddsRed)*rate).toFixed(2);
+  state.oddsBlue=+(state.oddsBlue+(targetB-state.oddsBlue)*rate).toFixed(2);
+}
+function recalcOdds(){
+  const pot=state.red+state.blue; if(!pot) return;
+  const rshare=state.red/pot, bshare=state.blue/pot;
+  const base=1.2,floor=1.10,cap=3.50;
+  const tR=Math.min(cap,Math.max(floor,1+bshare*base));
+  const tB=Math.min(cap,Math.max(floor,1+rshare*base));
+  smoothOdds(tR,tB);
+}
+
+/* Bets */
+document.querySelectorAll('[data-bet]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const side=btn.getAttribute('data-bet');
+    const val=Math.max(0,Number(el('amount').value||0)); if(!val) return;
+    if(val<10){ toast('Minimum bet is ₱10'); return; }
+    state[side]+=val; el('amount').value='';
+    recalcOdds(); sync(); beep('click',90,760,0.06); vibe(10);
+    addNotif('Bet placed', `${side.toUpperCase()} • ₱${fmt(val)}`, 'bet');
+  });
+});
+el('reset').addEventListener('click',()=>{ el('amount').value=''; beep('low',60,220,0.05); vibe(6); });
+el('maxAmt').addEventListener('click',()=>{ const v=Number(el('amount').value||0); if(v<1) el('amount').value=100; beep('click',70,560,0.05); vibe(6); });
+
+/* Totals */
+el('resetTotals').addEventListener('click', ()=>{ state.red=0; state.blue=0; recalcOdds(); sync(); addNotif('Totals reset','All bet totals cleared','alert'); });
+el('demoBets').addEventListener('click', ()=>{ const inc=Math.floor(Math.random()*5+1)*50; if(Math.random()>0.5) state.red+=inc; else state.blue+=inc; recalcOdds(); sync(); toast('Simulated bet: ₱'+fmt(inc)); });
+
+/* Milestones */
+let lastMilestone=0; function checkMilestones(pot){ const step=1000; const m=Math.floor(pot/step); if(m>lastMilestone){ lastMilestone=m; addNotif('Pot milestone', `Total pot hit ₱${fmt(m*step)}`, 'alert'); } }
+
+/* Roads / Results */
+const seq=[]; const ROWS=6, COLS=36;
+function addLog(winner){
+  const pot=state.red+state.blue, odds=(winner==='Red'?state.oddsRed:state.oddsBlue).toFixed(2), payout=(100*odds).toFixed(0);
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'})}</td>
+    <td><span class="badge ${winner==='Red'?'b-red':'b-blue'}">${winner}</span></td>
+    <td>₱${fmt(pot)}</td><td>× ${odds}</td><td>₱${fmt(payout)}</td>`;
+  document.getElementById('logBody').prepend(tr); saveAll();
+}
+function renderBead(){
+  const bead=el('bead'); bead.innerHTML='';
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+    const d=document.createElement('div'); d.style.gridRow=(r+1); d.className='cell'; bead.appendChild(d);
+  }
+  seq.forEach((v,i)=>{
+    const col=Math.floor(i/ROWS), row=i%ROWS; const idx=col*ROWS+row;
+    const cell=bead.children[idx]; if(cell){ cell.classList.add(v==='R'?'red':'blue'); cell.textContent=String(i+1); }
+  });
+}
+function renderBig(){
+  const big=el('big'); big.innerHTML='';
+  for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
+    const slot=document.createElement('div');
+    slot.style.gridRow=(r+1);
+    slot.className='cell small hollow';
+    big.appendChild(slot);
+  }
+  let col=0,row=0,last=null;
+  const place=(v)=>{ 
+    if(last===null){ last=v; col=0; row=0; }
+    else if(v===last){ row++; if(row>=ROWS){ col++; row=ROWS-1; } }
+    else { last=v; col++; row=0; }
+    const idx = col*ROWS + row;
+    const cell = big.children[idx];
+    if(cell){ cell.classList.add(v==='R'?'red':'blue'); }
+  };
+  seq.forEach(v=>place(v));
+}
+function mark(v){ seq.push(v); renderBead(); renderBig(); addLog(v==='R'?'Red':'Blue'); beep('click',80,640,0.05); vibe(8); addNotif('Round result', `${v==='R'?'Red':'Blue'} wins`, 'win'); }
+function undo(){ if(!seq.length) return; seq.pop(); renderBead(); renderBig(); saveAll(); beep('low',70,260,0.05); vibe(8); }
+document.getElementById('winRed').addEventListener('click',()=>mark('R'));
+document.getElementById('winBlue').addEventListener('click',()=>mark('B'));
+document.getElementById('undo').addEventListener('click', undo);
+
+/* Round Timer */
+let tHandle=null, tLeft=0;
+function formatSecs(s){ const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
+function setTimerText(txt){ el('timer').textContent=txt; }
+function startRound(seconds=60){
+  clearInterval(tHandle); tLeft=seconds; setTimerText(formatSecs(tLeft));
+  addNotif('Round started','60 seconds','alert');
+  tHandle=setInterval(()=>{ tLeft--; setTimerText(formatSecs(Math.max(tLeft,0))); if(tLeft<=0){ clearInterval(tHandle); tHandle=null; setTimerText('00:00'); addNotif('Round ended','Place bets closed','alert'); } },1000);
+}
+function resetRound(){ clearInterval(tHandle); tHandle=null; tLeft=0; setTimerText('—'); addNotif('Timer reset','Round timer cleared','info'); }
+document.getElementById('startRound').addEventListener('click', ()=>startRound(60));
+document.getElementById('resetRound').addEventListener('click', resetRound);
+
+/* Tabs */
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===name));
+  el('oddsView').hidden = name!=='odds';
+  el('totalView').hidden = name!=='total';
+  beep('click',60,520,0.045); syncSideHeight();
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+
+/* Profile & Drawer */
+const profileBtn=el('profileBtn'), profileMenu=el('profileMenu');
+function toggleMenu(force){ const show=typeof force==='boolean'?force:!profileMenu.classList.contains('show'); profileMenu.classList.toggle('show', show); }
+profileBtn.addEventListener('click', e=>{ e.stopPropagation(); toggleMenu(); });
+document.addEventListener('click', e=>{ if(!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) toggleMenu(false); });
+
+const drawer=el('drawer');
+el('drawerOpen').addEventListener('click', ()=>drawer.classList.add('show'));
+el('drawerClose').addEventListener('click', ()=>drawer.classList.remove('show'));
+
+/* Settings (persistent) */
+const switches={ dark:el('sw-dark'), fancy:el('sw-fancy'), sound:el('sw-sound'), compact:el('sw-compact'), contrast:el('sw-contrast'), haptic:el('sw-haptic'), deskn:el('sw-deskn') };
+function setSwitch(elem,on){ elem.classList.toggle('on', !!on); elem.setAttribute('aria-checked', on?'true':'false'); }
+function applyFromStorage(){
+  const theme=localStorage.getItem('theme')||'dark'; document.documentElement.setAttribute('data-theme', theme); setSwitch(switches.dark, theme==='dark');
+  const fancy=localStorage.getItem('fancy')!=='0'; document.body.classList.toggle('no-fancy', !fancy); setSwitch(switches.fancy, fancy);
+  SOUND_ON=localStorage.getItem('sound')!=='0'; setSwitch(switches.sound, SOUND_ON);
+  const compact=localStorage.getItem('compact')==='1'; document.body.classList.toggle('compact', compact); setSwitch(switches.compact, compact);
+  const contrast=localStorage.getItem('contrast')==='1'; document.body.classList.toggle('high-contrast', contrast); setSwitch(switches.contrast, contrast);
+  HAPTIC_ON=localStorage.getItem('haptic')==='1'; setSwitch(switches.haptic, HAPTIC_ON);
+  DESK_NOTIF=localStorage.getItem('deskn')==='1'; setSwitch(switches.deskn, DESK_NOTIF);
+} applyFromStorage();
+
+Object.entries(switches).forEach(([key, elem])=>{
+  elem.addEventListener('click', async ()=>{
+    const isOn=!elem.classList.contains('on'); setSwitch(elem, isOn);
+    switch(key){
+      case 'dark': document.documentElement.setAttribute('data-theme', isOn?'dark':'light'); localStorage.setItem('theme', isOn?'dark':'light'); break;
+      case 'fancy': document.body.classList.toggle('no-fancy', !isOn); localStorage.setItem('fancy', isOn?'1':'0'); break;
+      case 'sound': SOUND_ON=isOn; localStorage.setItem('sound', isOn?'1':'0'); break;
+      case 'compact': document.body.classList.toggle('compact', isOn); localStorage.setItem('compact', isOn?'1':'0'); break;
+      case 'contrast': document.body.classList.toggle('high-contrast', isOn); localStorage.setItem('contrast', isOn?'1':'0'); break;
+      case 'haptic': HAPTIC_ON=isOn; localStorage.setItem('haptic', isOn?'1':'0'); break;
+      case 'deskn':
+        if(isOn && 'Notification' in window){
+          let perm=Notification.permission; if(perm!=='granted'){ perm=await Notification.requestPermission(); }
+          DESK_NOTIF=(perm==='granted'); localStorage.setItem('deskn', DESK_NOTIF?'1':'0');
+          setSwitch(elem, DESK_NOTIF);
+          addNotif(DESK_NOTIF?'Desktop notifications ON':'Desktop notifications OFF','', 'info', false);
+        } else { DESK_NOTIF=false; localStorage.setItem('deskn','0'); addNotif('Desktop notifications OFF','', 'info', false); }
+        break;
+    }
+    beep('click',60,540,0.045); vibe(5);
+  });
+});
+
+/* Popups */
+function show(id){ el(id).style.display='grid'; }
+el('editProfile').addEventListener('click', e=>{ e.preventDefault(); show('modal-edit'); toggleMenu(false); });
+el('cashInBtn').addEventListener('click', e=>{ e.preventDefault(); show('modal-cash'); toggleMenu(false); });
+el('withdrawBtn').addEventListener('click', e=>{ e.preventDefault(); show('modal-withdraw'); toggleMenu(false); });
+document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click', ()=>document.querySelectorAll('.modal').forEach(m=>m.style.display='none')));
+document.getElementById('saveProfile').addEventListener('click', ()=>{ const name=(el('prof-name').value||'').trim(); const avatar=(el('prof-avatar').value||'').trim(); if(name) document.querySelector('#profileMenu .row strong').textContent=name; if(avatar) document.querySelectorAll('.avatar').forEach(a=>a.style.backgroundImage=`url('${avatar}')`); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); toast('Profile updated'); addNotif('Profile updated', name?`Hello, ${name}!`: 'Avatar changed', 'info'); });
+el('cashSubmit').addEventListener('click', ()=>{ const amt=Number(el('cash-amt').value||0); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); if(amt){ toast(`Cash In submitted: ₱${fmt(amt)}`); addNotif('Cash In submitted', `₱${fmt(amt)}`, 'bet'); } else toast('Please enter an amount.'); });
+el('wdSubmit').addEventListener('click', ()=>{ const amt=Number(el('wd-amt').value||0); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); if(amt){ toast(`Withdraw requested: ₱${fmt(amt)}`); addNotif('Withdraw requested', `₱${fmt(amt)}`, 'alert'); } else toast('Please enter an amount.'); });
+
+/* CSV / Clear */
+el('exportCsv').addEventListener('click', ()=>{
+  const rows=[['Time','Winner','Pot','Odds','Payout per 100']];
+  [...document.querySelectorAll('#logBody tr')].forEach(tr=>rows.push([...tr.children].map(td=>td.textContent.trim())));
+  const csv=rows.map(r=>r.map(v=>`"${v.replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='drag-race-results.csv'; a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV exported'); addNotif('CSV exported','Results saved locally','info');
+});
+el('clearLog').addEventListener('click', ()=>{ el('logBody').innerHTML=''; toast('Logs cleared'); addNotif('Logs cleared','History table emptied','alert'); });
+
+/* Layout sync */
+function syncSideHeight(){
+  const frame=document.querySelector('.videogrid .frame');
+  const side=el('kioskSide');
+  if(frame && side){ side.style.maxHeight = frame.clientHeight + 'px'; }
+}
+window.addEventListener('resize', syncSideHeight);
+window.addEventListener('load', syncSideHeight);
+
+/* Shortcuts */
+document.addEventListener('keydown', (e)=>{
+  if (e.target.matches('input, textarea')) return;
+  const k=e.key.toLowerCase();
+  if (k==='r') mark('R');
+  if (k==='b') mark('B');
+  if (k==='u') undo();
+  if (k==='t') { const active=document.querySelector('.tab.active')?.dataset.tab; showTab(active==='odds'?'total':'odds'); }
+  if (k==='n') el('notifBtn').click();
+});
+
+/* Init */
+function toast(msg,ms=2200){
+  const t=document.createElement('div'); t.className='emboss';
+  t.style.cssText='background:var(--glass);border:1px solid var(--stroke-2);padding:10px 12px;border-radius:12px;backdrop-filter:blur(8px);transform:translateY(10px);opacity:.0;transition:all 220ms cubic-bezier(.2,.8,.2,1)';
+  t.textContent=msg; el('toast').appendChild(t);
+  requestAnimationFrame(()=>{ t.style.opacity='1'; t.style.transform='none'; });
+  setTimeout(()=>{ t.style.opacity='.0'; t.style.transform='translateY(6px)'; setTimeout(()=>t.remove(),220); }, ms);
+}
+function init(){ renderBead(); renderBig(); sync(); }
+init();
+</script>
+</body>
+</html>
