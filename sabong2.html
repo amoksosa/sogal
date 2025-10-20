@@ -448,7 +448,7 @@
         <div class="bg-gray-900/50 border border-white/10 rounded-lg p-2 logro-zone">
           <div class="flex items-center justify-between mb-1">
             <div class="text-[11px] uppercase tracking-widest text-white/70">Logrohan</div>
-            <div class="flex items-center gap-2 text-[10px]">
+            <div class="flex items-center gap-2 text:[10px] text-[10px]">
               <div class="flex items-center gap-1"><span class="bead red inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Red</span></div>
               <div class="flex items-center gap-1"><span class="bead blue inline-block" style="width:12px;height:12px;border-width:2px"></span><span class="opacity-70">Blue</span></div>
             </div>
@@ -542,7 +542,7 @@
     }
 
     // ----------------------------------------------------------
-    // D) ROAD HELPERS / ALGORITHMS (unchanged)
+    // D) ROAD HELPERS / ALGORITHMS
     // ----------------------------------------------------------
     const isEmpty = (grid, c, r) => !(grid[c] && grid[c][r]);
     const ensureCol = (grid, c) => { if(!grid[c]) grid[c] = []; };
@@ -551,7 +551,7 @@
       for(const t of seq){ if(!out.length || out[out.length-1].t!==t) out.push({t, n:1}); else out[out.length-1].n++; }
       return out;
     }
-    // Strict L-only builder (Road logic)
+    // Strict L-only builder (for Logrohan under video)
     function buildBigRoadStrictL(seq, maxRows = BEAD_MAX_ROWS){
       const runs = streakRuns(seq);
       const grid = [];
@@ -573,20 +573,29 @@
       }
       return grid;
     }
-    // Continuous column splitter (Logrohan’s old logic; used now for mini road)
+    // (OLD) Continuous column splitter by runs — kept for reference
     function computeColumnsContinuous(seq, maxRows){
       const runs = streakRuns(seq); const cols=[]; let labelNo=1;
       for(const run of runs){ let left=run.n; while(left>0){ const take=Math.min(maxRows,left); const col=[]; for(let i=0;i<take;i++) col.push({t:run.t,label:labelNo++}); cols.push(col); left-=take; } }
       return cols;
     }
+    // ⭐ NEW: Pure sequential chunking (fills top→bottom to maxRows, then next column)
+    function computeColumnsSequential(seq, maxRows){
+      const cols=[]; let col=[]; let labelNo=1;
+      for(const t of seq){
+        col.push({ t, label: labelNo++ });
+        if(col.length === maxRows){ cols.push(col); col=[]; }
+      }
+      if(col.length) cols.push(col);
+      return cols;
+    }
 
     // ----------------------------------------------------------
-    // E) RENDERERS (LOGIC SWAP ensuring “gaya na gaya ang road”)
+    // E) RENDERERS
     // ----------------------------------------------------------
-    // 1) LOGROHAN (under video): EXACT same placement logic as ROAD (Strict-L),
-    //    but keeps ring visuals. We also render invisible gaps to mirror row slots 1:1.
+    // 1) LOGROHAN (under video): keep Strict-L logic, rings visual
     function renderLogroContinuous(seq, stripId, maxRows = BIGROAD_MAX_ROWS){
-      const grid = buildBigRoadStrictL(seq, maxRows); // <-- same logic as Road
+      const grid = buildBigRoadStrictL(seq, maxRows);
       const strip = document.getElementById(stripId); if(!strip) return;
       strip.innerHTML='';
       grid.forEach(col=>{
@@ -613,10 +622,10 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    // 2) MINI ROAD (under Bet Amount): uses continuous/split columns,
-    //    same bead visuals as before (design unchanged).
+    // 2) MINI ROAD (under Bet Amount): ⭐ now uses sequential filling (not runs)
     function renderRoadStrictL(seq, stripId, maxRows = BEAD_MAX_ROWS){
-      const cols = computeColumnsContinuous(seq, maxRows);
+      // const cols = computeColumnsContinuous(seq, maxRows); // OLD
+      const cols = computeColumnsSequential(seq, maxRows);   // NEW: tuloy-tuloy pababa
       const strip = document.getElementById(stripId); if(!strip) return; strip.innerHTML='';
       cols.forEach(col=>{
         const colDiv=document.createElement('div'); colDiv.className='bead-col';
@@ -633,11 +642,11 @@
       strip.scrollLeft = strip.scrollWidth;
     }
 
-    // Master render (calls stay the same; internals swapped as above)
+    // Master render
     function renderAllRoads(seq){
       renderLogroContinuous(seq, 'logro-strip', BIGROAD_MAX_ROWS);       // video area
       renderLogroContinuous(seq, 'logro-strip-mob', BIGROAD_MAX_ROWS);   // mobile video area
-      renderRoadStrictL(seq, 'bead-strip', BEAD_MAX_ROWS);               // mini road beside bet amount
+      renderRoadStrictL(seq, 'bead-strip', BEAD_MAX_ROWS);               // mini road beside bet amount (sequential)
     }
 
     // ----------------------------------------------------------
