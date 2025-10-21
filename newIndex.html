@@ -17,7 +17,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BK Landing Page</title>
+    <title>BK2025</title>
     @vite(['resources/css/app.css','resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
@@ -39,6 +39,8 @@
       html { font-size: clamp(0.9375rem, 0.5vw + 0.875rem, 1.125rem); }
     </style>
     -->
+
+    <style>[x-cloak]{display:none!important}</style>
   </head>
 
   <body
@@ -48,20 +50,20 @@
       class="overflow-x-hidden bg-[url('images/table.png')] bg-cover bg-center bg-no-repeat"
     >
       <div
-        class="overflow-x-hidden bg-gradient-to-b dark:from-emerald-950/70 dark:via-emerald-800/70 dark:to-emerald-700/30 from-emerald-200/50 via-emerald-300/70 to-emerald-400/30 dark:from-emerald-950/80 dark:via-emerald-900/70 dark:to-emerald-800/40"
+        class="overflow-x-hidden bg-gradient-to-b dark:from-slate-950/70 dark:via-slate-800/70 dark:to-slate-700/30 from-slate-200/50 via-slate-300/70 to-slate-400/30 dark:from-slate-950/80 dark:via-slate-900/70 dark:to-slate-800/40"
       >
         <!-- ===== Fixed Top Navbar ===== -->
         <nav
-          class="fixed inset-x-0 top-0 z-50 bg-white dark:bg-emerald-950 shadow-lg shadow-emerald-800/50"
+          class="fixed inset-x-0 top-0 z-50 bg-white dark:bg-slate-950 shadow-lg shadow-slate-800/50"
         >
           <div class="mx-auto max-w-screen-2xl">
             <div
-              class="flex h-14 md:h-16 items-center justify-between px-3 md:px-8 text-[0.625rem] font-semibold text-emerald-950 dark:text-emerald-50 md:text-lg"
+              class="flex h-14 md:h-16 items-center justify-between px-3 md:px-8 text-[0.625rem] font-semibold text-slate-950 dark:text-slate-50 md:text-lg"
             >
               <!-- Left: Burger (visible on mobile + tablet; hidden on lg+) -->
               <div class="flex items-center gap-2">
                 <button
-                  class="inline-flex items-center justify-center rounded-md h-8 w-8 md:h-10 md:w-10 hover:bg-emerald-800/40 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  class="inline-flex items-center justify-center rounded-md h-8 w-8 md:h-10 md:w-10 hover:bg-slate-800/40 focus:outline-none focus:ring-2 focus:ring-slate-400"
                   @click="sidebarOpen = !sidebarOpen"
                   aria-label="Toggle sidebar"
                 >
@@ -101,22 +103,22 @@
 
               <!-- Primary Nav -->
               <ul
-                class="flex items-center space-x-3 md:space-x-12 xl:space-x-16 relative"
+                class="flex items-center space-x-3 md:space-x-12 xl:space-x-16 relative mr-4 md:mr-10 xl:mr-16"
               >
-                <li><a href="#" class="hover:text-emerald-300">Home</a></li>
+                <li><a href="#" class="hover:text-slate-300">Home</a></li>
                 <li>
-                  <a href="preMatch.html" class="hover:text-emerald-300"
+                  <a href="preMatch.html" class="hover:text-slate-300"
                     >Pre-Match</a
                   >
                 </li>
-                <li><a href="#" class="hover:text-emerald-300">Event</a></li>
+                <li><a href="#" class="hover:text-slate-300">Event</a></li>
 
                 <!-- Sports dropdown -->
                 <li class="relative" x-data="{ open:false }">
                   <button
                     @click="open = !open"
                     @keydown.escape.window="open=false"
-                    class="inline-flex items-center hover:text-emerald-300"
+                    class="inline-flex items-center hover:text-slate-300"
                     aria-haspopup="true"
                     :aria-expanded="open"
                   >
@@ -137,32 +139,36 @@
                     </svg>
                   </button>
 
+                 
                   <ul
                     x-show="open"
                     x-transition
                     @click.outside="open=false"
-                    class="absolute left-0 mt-2 w-48 rounded-lg dark:bg-emerald-900 bg-white text-emerald-950 shadow-lg z-50"
+                    class="absolute right-0 left-auto mt-2 w-22 lg:w-35 rounded-xl bg-slate-900 text-slate-50 shadow-xl ring-1 ring-white/10 z-[9999] p-1 overflow-hidden text-end translate-x-4 lg:translate-x-1"
                   >
                     <li>
                       <a
                         href="sabong.html"
-                        class="block px-4 py-2 dark:hover:bg-emerald-500 dark:hover:bg-emerald-600 hover:bg-emerald-200"
-                        >Billiards</a
+                        class="block w-full px-2 lg:px-4 py-2 whitespace-nowrap rounded-md hover:bg-slate-800"
                       >
+                        Billiards
+                      </a>
                     </li>
                     <li>
                       <a
                         href="#"
-                        class="block px-4 py-2 dark:hover:bg-emerald-500 dark:hover:bg-emerald-600 hover:bg-emerald-200"
-                        >Horse Racing</a
+                        class="block w-full px-2 lg:px-4 py-2 whitespace-nowrap rounded-md hover:bg-slate-800"
                       >
+                        Horse Racing
+                      </a>
                     </li>
                     <li>
                       <a
                         href="race.html"
-                        class="block px-4 py-2 dark:hover:bg-emerald-500 dark:hover:bg-emerald-600 hover:bg-emerald-200 rounded-b-lg"
-                        >Motor Racing</a
+                        class="block w-full px-2 lg:px-4 py-2 whitespace-nowrap rounded-md hover:bg-slate-800"
                       >
+                        Motor Racing
+                      </a>
                     </li>
                   </ul>
                 </li>
@@ -191,7 +197,7 @@
 
           <!-- ===== Sidebar ===== -->
           <aside
-            class="fixed left-0 top-14 md:top-[4rem] z-50 h-[calc(100dvh-3.5rem)] md:h-[calc(105dvh-6rem)] w-60 lg:w-64 xl:w-72 md:w-80 transform bg-white dark:bg-emerald-950 p-3 text-[0.625rem] text-emerald-950 shadow-md transition-transform duration-300 overflow-y-auto dark:text-gray-100 shadow-lg shadow-emerald-500/50 border-r border-gray-200/70 dark:border-emerald-800 lg:border-t lg:border-emerald-100"
+            class="fixed left-0 top-14 md:top-[4rem] z-50 h-[calc(100dvh-3.5rem)] md:h-[calc(105dvh-6rem)] w-60 lg:w-64 xl:w-72 md:w-80 transform bg-white dark:bg-slate-950 p-3 text-[0.625rem] text-slate-950 shadow-md transition-transform duration-300 overflow-y-auto dark:text-gray-100 shadow-lg shadow-slate-500/50 border-r border-gray-200/70 dark:border-slate-800 lg:border-t lg:border-slate-100"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             @keydown.escape.window="sidebarOpen=false"
           >
@@ -200,7 +206,7 @@
                 <span class="font-semibold lg:text-lg">Menu</span>
                 <!-- Close (visible on mobile+tablet) -->
                 <button
-                  class="rounded-md px-2 py-1 hover:bg-emerald-300/40 dark:hover:bg-emerald-300/40 lg:hidden"
+                  class="rounded-md px-2 py-1 hover:bg-slate-300/40 dark:hover:bg-slate-300/40 lg:hidden"
                   @click="sidebarOpen=false"
                 >
                   Close
@@ -212,17 +218,17 @@
                   <li>
                     <a
                       href="#"
-                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-emerald-300/40 hover:text-emerald-600 border-b border-gray-200 dark:border-emerald-800 dark:hover:bg-emerald-300/40 dark:hover:text-emerald-300"
+                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-slate-300/40 hover:text-slate-600 border-b border-gray-200 dark:border-slate-800 dark:hover:bg-slate-300/40 dark:hover:text-slate-300"
                     >
                       <i class="fa-solid fa-tv"></i>
-                      <span>Live Betsz</span>
+                      <span>Live Bets</span>
                     </a>
                   </li>
 
                   <li>
                     <a
                       href="#"
-                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-emerald-300/40 hover:text-emerald-600 border-b border-gray-200 dark:border-emerald-800 dark:hover:bg-emerald-300/40 dark:hover:text-emerald-300"
+                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-slate-300/40 hover:text-slate-600 border-b border-gray-200 dark:border-slate-800 dark:hover:bg-slate-300/40 dark:hover:text-slate-300"
                     >
                       <i class="fa-solid fa-coins"></i>
                       <span>My Bets</span>
@@ -232,7 +238,7 @@
                   <li>
                     <a
                       href="#"
-                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-emerald-300/40 hover:text-emerald-600 border-b border-gray-200 dark:border-emerald-800 dark:hover:bg-emerald-300/40 dark:hover:text-emerald-300"
+                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-slate-300/40 hover:text-slate-600 border-b border-gray-200 dark:border-slate-800 dark:hover:bg-slate-300/40 dark:hover:text-slate-300"
                     >
                       <i class="fa-solid fa-wallet"></i>
                       <span>My Wallet</span>
@@ -242,7 +248,7 @@
                   <li>
                     <a
                       href="#"
-                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-emerald-300/40 hover:text-emerald-600 border-b border-gray-200 dark:border-emerald-800 dark:hover:bg-emerald-300/40 dark:hover:text-emerald-300"
+                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-slate-300/40 hover:text-slate-600 border-b border-gray-200 dark:border-slate-800 dark:hover:bg-slate-300/40 dark:hover:text-slate-300"
                     >
                       <i class="fa-solid fa-ranking-star"></i>
                       <span>Leaderboards</span>
@@ -252,7 +258,7 @@
                   <li>
                     <a
                       href="#"
-                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-emerald-300/40 hover:text-emerald-600 border-b border-gray-200 dark:border-emerald-800 dark:hover:bg-emerald-300/40 dark:hover:text-emerald-300"
+                      class="flex w-full items-center gap-2 rounded px-2 py-2 hover:bg-slate-300/40 hover:text-slate-600 border-b border-gray-200 dark:border-slate-800 dark:hover:bg-slate-300/40 dark:hover:text-slate-300"
                     >
                       <i class="fa-regular fa-clock"></i>
                       <span>Upcoming Matches</span>
@@ -261,13 +267,13 @@
                 </ul>
               </nav>
 
-              <!-- Night Mode Toggle -->
+              <!-- Night Mode Toggle
               <div
                 class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800"
               >
                 <button
                   type="button"
-                  class="w-full flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-emerald-900 dark:hover:bg-emerald-800"
+                  class="w-full flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-slate-900 dark:hover:bg-slate-800"
                   @click="theme = (theme === 'dark' ? 'light' : 'dark')"
                   :aria-pressed="theme === 'dark'"
                 >
@@ -301,6 +307,7 @@
                   Toggles the entire site theme.
                 </p>
               </div>
+              -->
             </div>
           </aside>
 
@@ -308,7 +315,7 @@
           <main class="mt-0 lg:ml-5">
             <!-- Hero -->
             <section
-              class="relative overflow-hidden rounded-lg p-5 bg-[url('images/snookerplayer.jpg')] bg-cover bg-center bg-no-repeat dark:text-emerald-50 lg:py-20"
+              class="relative overflow-hidden rounded-lg p-5 bg-[url('images/snookerplayer.jpg')] bg-cover bg-center bg-no-repeat dark:text-slate-50 lg:py-20"
             >
               <!-- Dark overlay -->
               <div
@@ -336,7 +343,7 @@
                   >
                     <a
                       href="#"
-                      class="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-4 py-2 text-[0.75rem] hover:bg-emerald-500 transition-colors duration-200 sm:text-sm lg:text-base md:px-6 md:py-3 md:text-lg"
+                      class="inline-flex items-center gap-2 rounded-full bg-slate-400 px-4 py-2 text-[0.75rem] hover:bg-slate-500 transition-colors duration-200 sm:text-sm lg:text-base md:px-6 md:py-3 md:text-lg"
                     >
                       <i class="fa-solid fa-star"></i> Join now
                     </a>
@@ -351,16 +358,23 @@
               </div>
             </section>
 
-            <!-- ===== Live Streaming Section (place right after the Hero section) ===== -->
-
+            <div class="flex flex-col mt-17 lg:mt-20 mx-8">
+              <h1 class="text-lg lg:text-3xl text-center font-semibold">
+                Featured Games
+              </h1>
+              <h1 class="text-sm lg:text-lg text-center">
+                Bet live on Horse Racing, Motor Racing, and Billiards—your odds,
+                your call.
+              </h1>
+            </div>
             <div data-aos="fade-down" data-aos-once="true">
               <!-- Cards Container -->
               <div
-                class="flex justify-center items-center gap-4 scale-90 lg:scale-90 lg:gap-6 md:scale-100 my-12 md:my-40"
+                class="flex justify-center items-center gap-4 scale-90 lg:scale-90 lg:gap-6 md:scale-100 my-4 lg:my-20"
               >
                 <!-- Card 1 -->
                 <div
-                  class="relative rounded-xl bg-emerald-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
+                  class="relative rounded-xl bg-slate-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
                   style="background-image: url('images/BilliardVisual.png')"
                 >
                   <div
@@ -386,7 +400,7 @@
 
                 <!-- Card 2 -->
                 <div
-                  class="relative rounded-xl bg-emerald-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
+                  class="relative rounded-xl bg-slate-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
                   style="background-image: url('images/MotorVisual.png')"
                 >
                   <div
@@ -414,7 +428,7 @@
 
                 <!-- Card 3 -->
                 <div
-                  class="relative rounded-xl bg-emerald-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
+                  class="relative rounded-xl bg-slate-100 w-1/3 h-[12.5rem] bg-cover bg-center md:h-[30rem] md:w-[25rem] hover:scale-105 transform transition duration-300 hover:shadow-[0_0_20px_3px_rgba(16,185,129,0.8)] dark:bg-gray-800"
                   style="background-image: url('images/HorseVisual.png')"
                 >
                   <div
@@ -445,19 +459,19 @@
             <section
               id="live"
               x-data="{ showChat: false }"
-              class="mt-6 md:mt-10 w-full rounded-lg bg-white/80 dark:bg-emerald-950/60 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-emerald-950/50 shadow-md ring-1 ring-black/5 dark:ring-white/10 lg:scale-90"
+              class="mt-6 md:mt-10 w-full rounded-lg bg-white/80 dark:bg-slate-950/60 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-slate-950/50 shadow-md ring-1 ring-black/5 dark:ring-white/10 lg:scale-90 scale-90"
             >
               <!-- Header -->
               <div class="flex items-center justify-between px-4 py-3 md:px-6">
                 <h2
-                  class="text-lg md:text-2xl font-semibold text-emerald-950 dark:text-emerald-50"
+                  class="text-lg md:text-2xl font-semibold text-slate-950 dark:text-slate-50"
                 >
                   Live Stream
                 </h2>
 
                 <!-- Mobile chat toggle -->
                 <button
-                  class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs md:hidden border-emerald-300/60 text-emerald-800 dark:border-emerald-700 dark:text-emerald-200"
+                  class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs md:hidden border-slate-300/60 text-slate-800 dark:border-slate-700 dark:text-slate-200"
                   @click="showChat = !showChat"
                 >
                   <i class="fa-solid fa-comments"></i>
@@ -494,7 +508,7 @@
                     />
                     <div class="absolute inset-0 grid place-items-center">
                       <button
-                        class="inline-flex items-center gap-2 rounded-full bg-emerald-500/90 hover:bg-emerald-500 px-5 py-2 text-white font-semibold transition"
+                        class="inline-flex items-center gap-2 rounded-full bg-slate-500/90 hover:bg-slate-500 px-5 py-2 text-white font-semibold transition"
                       >
                         <i class="fa-solid fa-play"></i> Watch Live
                       </button>
@@ -508,7 +522,7 @@
                   >
                     <div class="space-y-0.5">
                       <p
-                        class="text-sm text-emerald-900/80 dark:text-emerald-100/80"
+                        class="text-sm text-slate-900/80 dark:text-slate-100/80"
                       >
                         🔴 <span class="font-semibold">LIVE</span> · Billiards —
                         Quarterfinal
@@ -546,9 +560,9 @@
                   <div
                     class="flex flex-col rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden h-[28rem]"
                   >
-                    <div class="px-3 py-2 bg-gray-100 dark:bg-emerald-900/60">
+                    <div class="px-3 py-2 bg-gray-100 dark:bg-slate-900/60">
                       <p
-                        class="text-sm font-semibold text-emerald-900 dark:text-emerald-50"
+                        class="text-sm font-semibold text-slate-900 dark:text-slate-50"
                       >
                         Live Chat
                       </p>
@@ -556,11 +570,11 @@
 
                     <!-- Messages -->
                     <div
-                      class="flex-1 overflow-y-auto p-3 space-y-3 bg-white/70 dark:bg-emerald-950/30"
+                      class="flex-1 overflow-y-auto p-3 space-y-3 bg-white/70 dark:bg-slate-950/30"
                     >
                       <div class="text-xs">
                         <span
-                          class="font-semibold text-emerald-800 dark:text-emerald-200"
+                          class="font-semibold text-slate-800 dark:text-slate-200"
                           >CueMaster42</span
                         >
                         <span class="text-gray-600 dark:text-gray-300"
@@ -569,7 +583,7 @@
                       </div>
                       <div class="text-xs">
                         <span
-                          class="font-semibold text-emerald-800 dark:text-emerald-200"
+                          class="font-semibold text-slate-800 dark:text-slate-200"
                           >RackAttack</span
                         >
                         <span class="text-gray-600 dark:text-gray-300"
@@ -578,7 +592,7 @@
                       </div>
                       <div class="text-xs">
                         <span
-                          class="font-semibold text-emerald-800 dark:text-emerald-200"
+                          class="font-semibold text-slate-800 dark:text-slate-200"
                           >SpinDoctor</span
                         >
                         <span class="text-gray-600 dark:text-gray-300"
@@ -590,18 +604,18 @@
 
                     <!-- Composer -->
                     <form
-                      class="p-2 bg-gray-50 dark:bg-emerald-900/50 border-t border-gray-200 dark:border-gray-700"
+                      class="p-2 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-200 dark:border-gray-700"
                       @submit.prevent
                     >
                       <div class="flex items-center gap-2">
                         <input
                           type="text"
                           placeholder="Send a message"
-                          class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-emerald-950/60 px-3 py-2 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                          class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-slate-950/60 px-3 py-2 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-400"
                         />
                         <button
                           type="submit"
-                          class="rounded-md bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-3 py-2"
+                          class="rounded-md bg-slate-500 hover:bg-slate-600 text-white text-sm px-3 py-2"
                         >
                           Send
                         </button>
@@ -613,7 +627,7 @@
             </section>
 
             <h1
-              class="font-semibold text-emerald-100 my-2 ml-4 md:text-3xl md:ml-[8.75rem] md:mb-6"
+              class="font-semibold text-slate-100 my-2 ml-4 md:text-3xl md:ml-[8.75rem] md:mb-6"
               data-aos="fade-up"
               data-aos-once="true"
             >
@@ -624,7 +638,7 @@
               <div class="flex space-x-3 justify-center lg:justify-center">
                 <!-- News Card -->
                 <div
-                  class="flex-col bg-emerald-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[18.9rem] dark:bg-gray-800"
+                  class="flex-col bg-slate-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[19.5rem] dark:bg-gray-800"
                 >
                   <img
                     src="images/news1.jpg"
@@ -632,26 +646,26 @@
                     alt=""
                   />
                   <h1
-                    class="font-semibold text-[0.5625rem] px-1 text-emerald-950 md:text-xl dark:text-emerald-50 lg:px-2"
+                    class="font-semibold text-[0.5625rem] px-1 text-slate-950 md:text-xl dark:text-slate-50 lg:px-2"
                   >
                     What is the best way to play Billiards?
                   </h1>
                   <p
-                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-emerald-900 md:text-sm dark:text-gray-300 lg:px-2"
+                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-slate-900 md:text-sm dark:text-gray-300 lg:px-2"
                   >
                     The best way to play Super Ace is to start with small
                     bets...
                   </p>
                   <a
                     href="#"
-                    class="block text-center text-[0.5625rem] text-emerald-700 md:text-sm md:my-2 dark:text-emerald-300"
+                    class="block text-center text-[0.5625rem] text-slate-700 md:text-sm md:my-2 dark:text-slate-300"
                   >
                     Read More
                   </a>
                 </div>
 
                 <div
-                  class="flex-col bg-emerald-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[18.9rem] dark:bg-gray-800"
+                  class="flex-col bg-slate-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[19.5rem] dark:bg-gray-800"
                 >
                   <img
                     src="images/horsenews.jpg"
@@ -659,26 +673,26 @@
                     alt=""
                   />
                   <h1
-                    class="font-semibold text-[0.5625rem] px-1 text-emerald-950 md:text-xl dark:text-emerald-50 lg:px-2"
+                    class="font-semibold text-[0.5625rem] px-1 text-slate-950 md:text-xl dark:text-slate-50 lg:px-2"
                   >
                     What is the best way to play Billiards?
                   </h1>
                   <p
-                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-emerald-900 md:text-sm dark:text-gray-300 lg:px-2"
+                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-slate-900 md:text-sm dark:text-gray-300 lg:px-2"
                   >
                     The best way to play Super Ace is to start with small
                     bets...
                   </p>
                   <a
                     href="#"
-                    class="block text-center text-[0.5625rem] text-emerald-700 md:text-sm md:my-2 dark:text-emerald-300"
+                    class="block text-center text-[0.5625rem] text-slate-700 md:text-sm md:my-2 dark:text-slate-300"
                   >
                     Read More
                   </a>
                 </div>
 
                 <div
-                  class="flex-col bg-emerald-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[18.9rem] dark:bg-gray-800"
+                  class="flex-col bg-slate-100 rounded-xl w-[7.25rem] overflow-hidden h-[7.90rem] text-xs md:w-1/4 lg:h-[19.5rem] dark:bg-gray-800"
                 >
                   <img
                     src="images/motornews.jpg"
@@ -686,19 +700,19 @@
                     alt=""
                   />
                   <h1
-                    class="font-semibold text-[0.5625rem] px-1 text-emerald-950 md:text-xl dark:text-emerald-50 lg:px-2"
+                    class="font-semibold text-[0.5625rem] px-1 text-slate-950 md:text-xl dark:text-slate-50 lg:px-2"
                   >
                     What is the best way to play Billiards?
                   </h1>
                   <p
-                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-emerald-900 md:text-sm dark:text-gray-300 lg:px-2"
+                    class="line-clamp-3 text-[0.4375rem] mt-1 px-1 text-slate-900 md:text-sm dark:text-gray-300 lg:px-2"
                   >
                     The best way to play Super Ace is to start with small
                     bets...
                   </p>
                   <a
                     href="#"
-                    class="block text-center text-[0.5625rem] text-emerald-700 md:text-sm md:my-2 dark:text-emerald-300"
+                    class="block text-center text-[0.5625rem] text-slate-700 md:text-sm md:my-2 dark:text-slate-300"
                   >
                     Read More
                   </a>
@@ -707,36 +721,65 @@
             </div>
 
             <!--Footer-->
-            <footer class="flex bg-white/80 text-emerald-950 dark:bg-emerald-950/80 dark:text-emerald-50 my-4 p-4 gap-3 rounded-lg lg:h-70 lg:gap-5">
+            <footer
+              class="flex bg-white/80 text-slate-950 dark:bg-slate-950/80 dark:text-slate-50 my-4 p-4 gap-3 rounded-lg lg:h-70 lg:gap-5"
+            >
               <div class="flex flex-col gap-1 w-1/2 lg:gap-2">
                 <!--Left-->
                 <h1 class="font-bold text-sm lg:text-xl">
                   We make betting easy, try all our games and bet now!
                 </h1>
-                <h1 class="text-xs lg:text-sm">For our latest news, sign up to our newsletter.</h1>
-                <input type="text" class=" p-1 border-b border-emerald-900 dark:border-emerald-200 " placeholder="Email Address">
+                <h1 class="text-xs lg:text-sm">
+                  For our latest news, sign up to our newsletter.
+                </h1>
+                <input
+                  type="text"
+                  class="p-1 border-b border-slate-900 dark:border-slate-200"
+                  placeholder="Email Address"
+                />
                 <div class="flex gap-2">
-                    <a href=""><i class="fa-brands fa-facebook "></i></a>
-                    <a href=""><i class="fa-brands fa-instagram "></i></a>
-                    <a href=""><i class="fa-brands fa-square-x-twitter "></i></a>
-                    <a href=""><i class="fa-brands fa-youtube "></i></a>
+                  <a href=""><i class="fa-brands fa-facebook"></i></a>
+                  <a href=""><i class="fa-brands fa-instagram"></i></a>
+                  <a href=""><i class="fa-brands fa-square-x-twitter"></i></a>
+                  <a href=""><i class="fa-brands fa-youtube"></i></a>
                 </div>
-                <h1 class="text-[10px]">BK Sports. All rights reserved, 2025</h1>  
+                <h1 class="text-[10px]">BK2025. All rights reserved, 2025</h1>
               </div>
-              <div class="flex flex-col w-1/3 text-[12px] gap-2 lg:gap-4 lg:mt-4 font-semibold ">
+              <div
+                class="flex flex-col w-1/3 text-[12px] gap-2 lg:gap-4 lg:mt-4 font-semibold"
+              >
                 <!--Right-->
-                <a href="" class="hover:underline underline-offset-2">Get in touch</a>
-                <a href="" class="hover:underline underline-offset-2">Join our team</a>
+                <a href="" class="hover:underline underline-offset-2"
+                  >Get in touch</a
+                >
+                <a href="" class="hover:underline underline-offset-2"
+                  >Join our team</a
+                >
                 <a href="" class="hover:underline underline-offset-2">About</a>
                 <a href="" class="hover:underline underline-offset-2">FAQ</a>
-                <a href="" class="hover:underline underline-offset-2">Terms of Use</a>
-                <a href="" class="hover:underline underline-offset-2">Privacy</a>
+                <a href="" class="hover:underline underline-offset-2"
+                  >Terms of Use</a
+                >
+                <a href="" class="hover:underline underline-offset-2"
+                  >Privacy</a
+                >
               </div>
-              <div class="flex flex-col w-1/3 text-[12px] gap-2 lg:gap-4 lg:mt-4 font-semibold "><!--Right-->
-                <a href="" class="hover:underline underline-offset-2">Billiard Club</a>
-                <a href="" class="hover:underline underline-offset-2">Promotions</a>
-                <a href="" class="hover:underline underline-offset-2">Betting</a>
-                <a href="" class="hover:underline underline-offset-2">Terms of Service</a>
+              <div
+                class="flex flex-col w-1/3 text-[12px] gap-2 lg:gap-4 lg:mt-4 font-semibold"
+              >
+                <!--Right-->
+                <a href="" class="hover:underline underline-offset-2"
+                  >Billiard Club</a
+                >
+                <a href="" class="hover:underline underline-offset-2"
+                  >Promotions</a
+                >
+                <a href="" class="hover:underline underline-offset-2"
+                  >Betting</a
+                >
+                <a href="" class="hover:underline underline-offset-2"
+                  >Terms of Service</a
+                >
               </div>
             </footer>
           </main>
