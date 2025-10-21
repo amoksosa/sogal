@@ -120,9 +120,17 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 .chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#8b1515,#4b0a0a)}
 .chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#1a489b,#0d2b66)}
 
+/* >>> NEW CHIP STYLES & LAYOUT (4 amounts / 3rd pic design) */
+#chips{ grid-template-columns:repeat(2,1fr); }
+.chipbtn{ height:var(--h); border-radius:14px; font-weight:900; letter-spacing:.3px; cursor:pointer; border:1px solid transparent; font-size:14px; }
+.chipbtn.chip-green{ background:linear-gradient(180deg,#2a9d55,#187d3e); border-color:#0f5c30; }
+.chipbtn.chip-blue2{ background:linear-gradient(180deg,#2f7cff,#1a4fb5); border-color:#163f8f; }
+.chipbtn.chip-black{ background:linear-gradient(180deg,#2c2f35,#15171b); border-color:#0b0c0f; }
+.chipbtn.chip-orange{ background:linear-gradient(180deg,#ffb23a,#d48112); border-color:#a76407; color:#1b1203; text-shadow:none; }
+
 .slip{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:10px; display:grid; gap:8px}
 .slip input{width:100%; height:calc(var(--h) - 4px); background:#0a1122; color:#e9f3ff; border:1px solid var(--stroke-4); padding:0 12px; border-radius:12px; font-weight:800}
-.actions{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+/* .actions removed as requested */
 .btn{height:var(--h); display:inline-flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25); font-size:13px}
 .btn.red{background:linear-gradient(180deg,#9a1616,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
 .btn.blue{background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
@@ -184,7 +192,7 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 
   .cards{grid-template-columns:1fr; gap:10px}
 
-  #chips{grid-auto-flow:column; grid-auto-columns:minmax(78px,1fr); overflow-x:auto; padding:6px; scroll-snap-type:x mandatory}
+  #chips{grid-auto-flow:column; grid-auto-columns:minmax(110px,1fr); overflow-x:auto; padding:6px; scroll-snap-type:x mandatory}
   #chips .chipbtn{scroll-snap-align:center; height:44px; font-size:14px}
   #chips::-webkit-scrollbar{height:5px}
 
@@ -212,7 +220,7 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
   .mb-rail input{height:40px; border-radius:10px; border:1px solid var(--stroke-4); background:#0a1122; color:#e9f3ff; padding:0 10px; font-weight:800}
   .mb-rail .bet{height:40px; border-radius:10px; background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff; font-weight:900}
 }
-@media (max-width:430px){ #chips{grid-auto-columns:minmax(74px,1fr)} .actions{grid-template-columns:1fr 1fr} }
+@media (max-width:430px){ #chips{grid-auto-columns:minmax(110px,1fr)} .actions{grid-template-columns:1fr 1fr} }
 
 /* ===== polish ===== */
 .panel, .kiosk-side, .totbox, .results, .menu, .notifpanel, .drawer, .emboss {
@@ -308,7 +316,8 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
             <div class="betcard red">
               <div class="top">
                 <div class="badge">R</div>
-                              </div>
+                <div class="name" id="nameRed">Rider Red</div>
+              </div>
               <div class="big" id="amtRed">0</div>
               <div class="pill">PAYOUT = <span id="oddsRed">1.88</span></div>
               <div class="cta">
@@ -331,22 +340,17 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
             </div>
           </div>
 
-          <!-- CHIPS + AMOUNT + ACTIONS -->
+          <!-- CHIPS (new design + amounts) -->
           <div class="pad emboss" id="chips">
-            <button class="chipbtn red emboss">₱50</button>
-            <button class="chipbtn red emboss">₱100</button>
-            <button class="chipbtn blue emboss">₱200</button>
-            <button class="chipbtn blue emboss">₱500</button>
-            <button class="chipbtn red emboss">₱1000</button>
-            <button class="chipbtn blue emboss">₱2000</button>
+            <button class="chipbtn chip-green emboss">♦100</button>
+            <button class="chipbtn chip-blue2 emboss">♦200</button>
+            <button class="chipbtn chip-black emboss">♦500</button>
+            <button class="chipbtn chip-orange emboss">♦1000</button>
           </div>
 
           <div class="slip emboss">
             <input id="amount" type="number" min="1" placeholder="Enter amount" class="emboss"/>
-            <div class="actions">
-              <button class="btn red emboss" data-bet="red">BET</button>
-              <button class="btn blue emboss" data-bet="blue">BET</button>
-            </div>
+            <!-- removed the two BET buttons here as requested -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
               <button class="btn ghost emboss" id="reset">Reset</button>
               <button class="btn ghost emboss" id="maxAmt">Max</button>
@@ -613,7 +617,7 @@ function recalcOdds(){
   smoothOdds(tR,tB);
 }
 
-/* Bets (card + slip share same handler) */
+/* Bets (card buttons only) */
 document.querySelectorAll('[data-bet]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const side=btn.getAttribute('data-bet');
