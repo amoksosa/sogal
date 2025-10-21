@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Drag Race Dashboard • Totalizator Style</title>
 <style>
-/* ============== TOKENS / THEME ============== */
+/* ================= THEME / TOKENS ================= */
 :root{
   --radius:18px; --speed:260ms; --e:cubic-bezier(.2,.8,.2,1);
   --emboss-hi:rgba(255,255,255,.10); --emboss-lo:rgba(0,0,0,.46); --emboss-edge:rgba(255,255,255,.06);
   --red:#ff3b30; --blue:#2f7cff; --accent:#00ffba;
   --stroke-1:#15203a; --stroke-2:#1a2746; --stroke-3:#203155; --stroke-4:#263963; --stroke-5:#2f477a;
+
   --h:44px; --fs-12:12px; --fs-14:13px; --fs-24:20px;
 }
 @media (max-width:1100px){ :root{ --h:46px; --fs-24:19px; --fs-14:14px; } }
 
+/* themes */
 [data-theme="dark"]{
   --bg:url('https://i.ibb.co/mCnFZSCv/Chat-GPT-Image-Oct-7-2025-03-54-39-PM.png');
   --dark:#070a10; --card:#0e1426; --glass:#0b1222da; --muted:#b8c3d8; --text:#e8f0ff; --text-muted:#bcd1ff;
@@ -34,7 +36,7 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%; overflow-x:hidden}
+html,body{height:100%}
 body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:var(--dark); color:var(--text); font-size:var(--fs-14)}
 .bg::before{content:""; position:fixed; inset:0; z-index:-3; background-image:var(--bg); background-size:cover; background-position:center; filter:blur(2px) var(--blur-bg); transform:scale(1.03)}
 .bg::after{content:""; position:fixed; inset:0; z-index:-2; background:
@@ -44,13 +46,11 @@ body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helveti
   var(--glare)}
 
 .wrap{max-width:1180px; margin:auto; padding:18px; display:grid; gap:16px}
-.emboss{box-shadow: inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo), 0 12px 30px rgba(0,0,0,.35); border-color:var(--emboss-edge)!important}
-.pulse{animation:pulse 2200ms ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(64,185,255,.0)}50%{box-shadow:0 0 0 6px rgba(64,185,255,.08)}}
-.shine{position:relative; overflow:hidden}
-.shine::after{content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.12),transparent); transform:translateX(-120%); animation:shine 4s linear infinite}
 
-/* ======= HEADER ======= */
+.emboss{box-shadow: inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo), 0 12px 30px rgba(0,0,0,.35); border-color:var(--emboss-edge)!important}
+.pulse{animation:pulse 2200ms ease-in-out infinite} @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(64,185,255,.0)}50%{box-shadow:0 0 0 6px rgba(64,185,255,.08)}}
+.shine{position:relative; overflow:hidden} .shine::after{content:""; position:absolute; inset:0; background:linear-gradient(120deg,transparent,rgba(255,255,255,.12),transparent); transform:translateX(-120%); animation:shine 4s linear infinite}
+
 header{display:flex; align-items:center; gap:12px; flex-wrap:wrap; position:sticky; top:0; z-index:1000; backdrop-filter:saturate(1.1) blur(6px); background:linear-gradient(180deg, rgba(7,10,16,.58), rgba(7,10,16,.18)); border-bottom:1px solid var(--stroke-2)}
 .brand{display:flex; align-items:center; gap:10px}
 .brand h1{margin:0; font-size:clamp(18px,3vw,26px)}
@@ -61,6 +61,7 @@ header{display:flex; align-items:center; gap:12px; flex-wrap:wrap; position:stic
 .user{margin-left:auto; display:flex; align-items:center; gap:8px; position:relative}
 .iconbtn{height:38px; min-width:38px; border-radius:12px; display:grid; place-items:center; cursor:pointer; background:linear-gradient(180deg,#1a2848,#0f1b37); border:1px solid #263a66; color:#e6f0ff}
 .avatar{width:38px;height:38px;border-radius:12px;border:2px solid #1f2b50;background-size:cover;background-position:center}
+
 .menu,.notifpanel{position:absolute; top:46px; right:0; width:300px; padding:12px; border-radius:14px; background:var(--glass); border:1px solid var(--stroke-1); backdrop-filter:blur(14px); z-index:1200; opacity:0; transform:translateY(-8px) scale(.98); pointer-events:none; transition:all var(--speed) var(--e)}
 .menu.show,.notifpanel.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
 .menu .row{display:flex; align-items:center; gap:10px; padding:10px 12px; margin:8px 0; border-radius:12px; text-decoration:none; color:var(--text); background:var(--panel-2); border:1px solid var(--stroke-3)}
@@ -68,84 +69,48 @@ header{display:flex; align-items:center; gap:12px; flex-wrap:wrap; position:stic
 .notif{display:grid; gap:4px; padding:10px 12px; border-radius:12px; background:var(--panel-2); border:1px solid var(--stroke-3)} .notif.unread{outline:2px solid rgba(64,185,255,.35)}
 .badge-dot{position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 5px; border-radius:999px; background:#ff3b30; color:#fff; font-size:10px; display:grid; place-items:center; border:2px solid #0c152a}
 
-/* ======= PANELS / TABS ======= */
+/* PANELS / TABS */
 .panel{background:var(--glass); border:1px solid var(--stroke-1); border-radius:var(--radius); backdrop-filter:blur(10px)}
-.tabs{display:flex; gap:6px; padding:6px 10px; border-bottom:1px solid var(--stroke-2); overflow:auto; scroll-snap-type:x mandatory}
-.tab{cursor:pointer; padding:8px 12px; border-radius:12px; font-weight:900; letter-spacing:.3px; color:var(--text); background:#0e1934; border:1px solid var(--stroke-3); white-space:nowrap; scroll-snap-align:start}
+.tabs{display:flex; gap:6px; padding:6px 10px; border-bottom:1px solid var(--stroke-2); overflow:auto}
+.tab{cursor:pointer; padding:8px 12px; border-radius:12px; font-weight:900; letter-spacing:.3px; color:var(--text); background:#0e1934; border:1px solid var(--stroke-3); white-space:nowrap}
 .tab.active{background:linear-gradient(90deg,#1e3a8a 0%, #7c0a0a 100%); color:#fff}
-
 .frame{position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000; border:1px solid #222f52}
 iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 
-/* ======= GRID: video + kiosk ======= */
+/* GRID: video + kiosk side */
 .videogrid{display:grid; grid-template-columns:minmax(0,1fr) clamp(300px, 30vw, 380px); gap:12px; align-items:start}
 @media (max-width:980px){.videogrid{grid-template-columns:1fr}}
+/* Side kiosk */
 .kiosk-side{display:flex; flex-direction:column; gap:10px; padding:8px; background:var(--panel-2); border:1px solid var(--stroke-2); border-radius:14px; overflow:auto}
-
-/* ======= CARD LOOK FOR ODDS ======= */
-.cards{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.betcard{
-  position:relative; border-radius:22px; padding:14px; color:#fff;
-  box-shadow:0 10px 30px rgba(0,0,0,.35), inset 1px 1px 0 var(--emboss-hi), inset -3px -3px 0 var(--emboss-lo);
-  border:1px solid rgba(255,255,255,.06);
-}
-.betcard .top{display:flex; align-items:center; justify-content:space-between}
-.badge{
-  width:34px;height:34px;border-radius:50%;
-  display:grid;place-items:center;font-weight:900;background:#00000033;border:2px solid #ffffff55
-}
-.name{font-size:13px; opacity:.9}
-.big{font-size:clamp(28px,6.8vw,38px); font-weight:900; letter-spacing:.5px; line-height:1.05; margin:6px 0 10px}
-.pill{
-  display:flex; align-items:center; justify-content:center;
-  font-weight:900; border-radius:14px; padding:6px 10px; font-size:13px;
-  background:#0000002e; border:1px solid #ffffff30; text-shadow:0 1px 0 rgba(0,0,0,.35)
-}
-.betcard .cta{margin-top:10px; display:grid; gap:8px}
-.betcard .cta .betbtn{
-  height:42px; border-radius:12px; font-weight:900; border:1px solid #ffffff40;
-  background:#00000026; color:#fff; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.3)
-}
-.sub{font-size:12px; opacity:.85}
-
-.betcard.red{ background:linear-gradient(180deg,#f04e41 0%, #a02121 100%); }
-.betcard.blue{ background:linear-gradient(180deg,#4f89ff 0%, #153b90 100%); }
-
-/* legacy mini odds (kept for desktop if needed) */
-.mini{display:none}
-
-/* ======= CONTROLS, TOTALS, RESULTS ======= */
+.mini{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+.box{position:relative; padding:8px 10px; border-radius:14px; border:1px solid var(--stroke-3); background:var(--panel-3)}
+.box .label{font-size:var(--fs-12); color:var(--text-muted)} .box .value{font-size:var(--fs-24); font-weight:900; letter-spacing:.5px}
 .pad{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:8px; display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
-.chipbtn{height:var(--h); display:flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35); font-size:13px; white-space:nowrap}
+.chipbtn{height:var(--h); display:flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; color:#eef5ff; text-shadow:0 1px 0 rgba(0,0,0,.35); font-size:13px}
 .chipbtn.red{border:1px solid #3a1a1f; background:linear-gradient(180deg,#8b1515,#4b0a0a)}
 .chipbtn.blue{border:1px solid #1f2b50; background:linear-gradient(180deg,#1a489b,#0d2b66)}
 
-/* >>> NEW CHIP STYLES & LAYOUT (4 amounts / 3rd pic design) */
-#chips{ grid-template-columns:repeat(2,1fr); }
-.chipbtn{ height:var(--h); border-radius:14px; font-weight:900; letter-spacing:.3px; cursor:pointer; border:1px solid transparent; font-size:14px; }
-.chipbtn.chip-green{ background:linear-gradient(180deg,#2a9d55,#187d3e); border-color:#0f5c30; }
-.chipbtn.chip-blue2{ background:linear-gradient(180deg,#2f7cff,#1a4fb5); border-color:#163f8f; }
-.chipbtn.chip-black{ background:linear-gradient(180deg,#2c2f35,#15171b); border-color:#0b0c0f; }
-.chipbtn.chip-orange{ background:linear-gradient(180deg,#ffb23a,#d48112); border-color:#a76407; color:#1b1203; text-shadow:none; }
-
 .slip{background:var(--panel-2); border:1px solid var(--stroke-4); border-radius:14px; padding:10px; display:grid; gap:8px}
 .slip input{width:100%; height:calc(var(--h) - 4px); background:#0a1122; color:#e9f3ff; border:1px solid var(--stroke-4); padding:0 12px; border-radius:12px; font-weight:800}
-/* .actions removed as requested */
+.actions{display:grid; grid-template-columns:1fr 1fr; gap:8px}
 .btn{height:var(--h); display:inline-flex; align-items:center; justify-content:center; border-radius:12px; font-weight:900; letter-spacing:.3px; cursor:pointer; text-shadow:0 1px 0 rgba(0,0,0,.25); font-size:13px}
 .btn.red{background:linear-gradient(180deg,#9a1616,#4b0a0a); border:1px solid #3a1a1f; color:#ffecec}
 .btn.blue{background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff}
 .btn.ghost{background:#0c1630; border:1px solid var(--stroke-5); color:var(--text)}
 
+/* Totals widget */
 .totbox{background:#0e1426; border:1px solid var(--stroke-3); border-radius:14px; padding:10px; display:grid; gap:8px}
 .totbox .row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed var(--stroke-5)}
 .totbox .row:last-child{border-bottom:0}
 .meter{height:10px; background:#0c1220; border:1px solid #263553; border-radius:999px; overflow:hidden}
 .meter>span{display:block; height:100%; background:linear-gradient(90deg,var(--red),var(--blue))}
 
+/* Results / Roadmap */
 .results{background:var(--panel); border:1px solid var(--stroke-1); border-radius:14px; padding:12px; display:grid; gap:12px}
 .rhead{display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap}
 .rhead .bar{display:flex; gap:8px; flex-wrap:nowrap; overflow:auto; padding-bottom:4px}
 .rhead .bar::-webkit-scrollbar{height:6px}
+.roadwrap{display:grid; gap:12px}
 .roadgrid{display:grid; grid-template-rows:repeat(6, 26px); grid-auto-columns:26px; grid-auto-flow:column; padding:10px; border:1px solid var(--stroke-3); border-radius:12px; background:var(--panel-3); overflow:auto}
 .cell{width:24px; height:24px; border-radius:50%; border:2px solid var(--stroke-5); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:900}
 .cell.red{background:radial-gradient(circle at 30% 30%, #ff7a70, #b71c1c)} .cell.blue{background:radial-gradient(circle at 30% 30%, #8fb6ff, #0b3ca8)}
@@ -153,14 +118,18 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 .table thead th{font-size:12px; color:var(--text-muted); text-align:left; padding:0 10px; white-space:nowrap}
 .table tbody tr{background:var(--panel-3); border:1px solid var(--stroke-3)}
 .table td{padding:10px; font-weight:700; white-space:nowrap}
+.badge{padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--stroke-5)}
 .b-red{background:#3b1212; color:#ffecec} .b-blue{background:#11244d; color:#e6f0ff}
+
+/* Roads layout */
 .roadsRow{ display:grid; grid-template-columns:1fr 280px; gap:12px; }
 .roadgrid.small{ grid-template-rows:repeat(6, 18px); grid-auto-columns:18px; }
 .cell.small{ width:16px; height:16px; border-width:2px; font-size:0; }
 .cell.hollow{ background:transparent !important; }
 .cell.red.hollow{ border-color:#ff7a70; } .cell.blue.hollow{ border-color:#8fb6ff; }
+@media (max-width:900px){ .roadsRow{ grid-template-columns:1fr; } }
 
-/* ======= SETTINGS DRAWER ======= */
+/* SETTINGS DRAWER */
 .drawer{
   position:fixed; top:0; left:0; width:300px; height:100dvh;
   background:linear-gradient(180deg, rgba(10,15,28,.94), rgba(10,15,28,.86));
@@ -175,64 +144,31 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 .switch.on{background:linear-gradient(90deg,var(--blue),var(--red))} .switch.on .knob{left:27px}
 .drawer .close{position:absolute; top:10px; right:10px}
 
-/* ========== MOBILE (≤680px) ========== */
+/* ======= MOBILE POLISH ======= */
 @media (max-width:680px){
-  body{padding-bottom:64px; padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right)}
-  .wrap{padding:10px; gap:10px}
-  header{gap:6px; padding:8px 10px}
-  .brand h1{font-size:17px}
-  .chip{display:none}
-  .topbar{order:3; width:100%; overflow:auto; padding-bottom:1px; margin-top:2px}
-  .pill{padding:5px 10px; font-size:11.5px; border-color:var(--stroke-3)}
-  .tabs{position:sticky; top:64px; z-index:900; background:linear-gradient(180deg, rgba(7,10,16,.78), rgba(7,10,16,.28)); backdrop-filter:blur(6px)}
-  .tab{padding:8px 12px; border-radius:999px; font-size:12.5px}
-
-  .frame{border-radius:12px; max-height:none}
-  .videogrid{gap:8px}
-
-  .cards{grid-template-columns:1fr; gap:10px}
-
-  #chips{grid-auto-flow:column; grid-auto-columns:minmax(110px,1fr); overflow-x:auto; padding:6px; scroll-snap-type:x mandatory}
-  #chips .chipbtn{scroll-snap-align:center; height:44px; font-size:14px}
-  #chips::-webkit-scrollbar{height:5px}
-
-  :root{ --h:42px; }
-  .slip input{height:44px; font-size:15px}
-  .chipbtn,.btn{height:44px; font-size:14px}
-
-  .rhead .bar{width:100%; gap:6px}
-  .rhead .bar .btn{height:40px; padding:0 10px; white-space:nowrap; font-size:12.5px}
-
-  .roadsRow{grid-template-columns:1fr; gap:8px}
-  .roadgrid{grid-template-rows:repeat(6,16px); grid-auto-columns:16px; padding:6px}
-  .cell{width:14px; height:14px; font-size:0; border-width:2px}
-  .roadgrid.small{grid-template-rows:repeat(6,14px); grid-auto-columns:14px}
-  .cell.small{width:12px; height:12px}
-
-  .table{border-spacing:0}
-  .table thead{display:none}
-  .table tbody tr{display:grid; gap:4px; border-radius:10px; padding:8px}
-  .table td{display:flex; justify-content:space-between; align-items:center; padding:4px 6px; font-size:12.5px}
-
-  .mb-rail{position:fixed; left:0; right:0; bottom:0; z-index:1200;
-    background:linear-gradient(180deg,#0f1833,#0b1226); border-top:1px solid var(--stroke-3);
-    display:grid; grid-template-columns:1fr 92px; gap:8px; padding:8px 10px}
-  .mb-rail input{height:40px; border-radius:10px; border:1px solid var(--stroke-4); background:#0a1122; color:#e9f3ff; padding:0 10px; font-weight:800}
-  .mb-rail .bet{height:40px; border-radius:10px; background:linear-gradient(180deg,#1a4a9e,#0d2b66); border:1px solid #1f2b50; color:#e6f0ff; font-weight:900}
+  .wrap{padding:12px}
+  header{gap:8px}
+  .brand h1{font-size:20px}
+  .topbar{order:3; width:100%; overflow:auto}
+  .pill{padding:6px 10px}
+  /* cap the video height para di kain lahat ng screen */
+  .frame{border-radius:10px; max-height:42vh}
+  .kiosk-side{padding:8px; gap:10px}
+  .mini{grid-template-columns:1fr 1fr}
+  .pad{grid-template-columns:1fr 1fr}
+  .chipbtn,.btn{height:52px; font-size:15px}
+  .slip input{height:50px; font-size:15px}
+  .totbox .row{font-size:13px}
+  .rhead{align-items:flex-start}
+  .rhead .bar{width:100%}
+  .roadsRow{gap:10px}
+  .table{display:block; overflow:auto}
 }
-@media (max-width:430px){ #chips{grid-auto-columns:minmax(110px,1fr)} .actions{grid-template-columns:1fr 1fr} }
-
-/* ===== polish ===== */
-.panel, .kiosk-side, .totbox, .results, .menu, .notifpanel, .drawer, .emboss {
-  box-shadow:
-    inset 1px 1px 0 var(--emboss-hi),
-    inset -3px -3px 0 var(--emboss-lo),
-    0 10px 30px rgba(0,0,0,.25),
-    0 0 0 1px var(--emboss-edge);
+@media (max-width:430px){
+  .mini{grid-template-columns:1fr 1fr}
+  .pad{grid-template-columns:1fr 1fr}
+  .actions{grid-template-columns:1fr 1fr}
 }
-.tab.active { filter: drop-shadow(0 6px 14px rgba(64,120,255,.25)); }
-#oddsRed, #oddsBlue, #txRed, #txBlue { transition: color .2s ease, text-shadow .2s ease; }
-.flash{ color:#fff !important; text-shadow:0 0 10px rgba(47,124,255,.55); }
 </style>
 </head>
 <body>
@@ -258,8 +194,17 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
     </div>
 
     <div class="user">
-      <button id="drawerOpen" class="iconbtn emboss" title="Settings">⚙️</button>
-      <button id="notifBtn" class="iconbtn emboss" title="Notifications">🔔<span id="notifBadge" class="badge-dot" style="display:none">0</span></button>
+      <!-- Settings Drawer Button -->
+      <button id="drawerOpen" class="iconbtn emboss" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.03.03a2 2 0 1 1-2.83 2.83l-.03-.03A1.8 1.8 0 0 0 15 19.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+
+      <!-- Notifications -->
+      <button id="notifBtn" class="iconbtn emboss" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0v5l1.5 2.5a1 1 0 0 1-.86 1.5H5.36a1 1 0 0 1-.86-1.5L6 13V8Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span id="notifBadge" class="badge-dot" style="display:none">0</span>
+      </button>
+      <!-- Notifications PANEL (needed for click) -->
       <div id="notifPanel" class="notifpanel emboss" role="menu" aria-hidden="true" style="right:52px">
         <div class="title" style="font-size:12px;color:var(--text-muted);margin:4px 6px 8px">Notifications</div>
         <div class="notiflist" id="notifList"></div>
@@ -270,6 +215,7 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
         </div>
       </div>
 
+      <!-- Profile -->
       <div style="position:relative">
         <button id="profileBtn" class="iconbtn emboss" title="Profile"><div class="avatar" style="background-image:url('https://i.pravatar.cc/96?img=67')"></div></button>
         <div id="profileMenu" class="menu emboss" aria-hidden="true">
@@ -311,53 +257,30 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 
       <div class="kiosk-side emboss" id="kioskSide">
         <div id="oddsView">
-          <!-- CARD UI -->
-          <div class="cards">
-            <div class="betcard red">
-              <div class="top">
-                <div class="badge">R</div>
-                <div class="name" id="nameRed">Rider Red</div>
-              </div>
-              <div class="big" id="amtRed">0</div>
-              <div class="pill">PAYOUT = <span id="oddsRed">1.88</span></div>
-              <div class="cta">
-                <button class="betbtn" data-bet="red">BET</button>
-                <div class="sub">Winnings per ₱100: ₱<span id="payR100">188</span></div>
-              </div>
-            </div>
-
-            <div class="betcard blue">
-              <div class="top">
-                <div class="badge">B</div>
-                <div class="name" id="nameBlue">Rider Blue</div>
-              </div>
-              <div class="big" id="amtBlue">0</div>
-              <div class="pill">PAYOUT = <span id="oddsBlue">2.08</span></div>
-              <div class="cta">
-                <button class="betbtn" data-bet="blue">BET</button>
-                <div class="sub">Winnings per ₱100: ₱<span id="payB100">208</span></div>
-              </div>
-            </div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">ODDS — Rider Red</div><div class="value" id="oddsRed">2.00</div></div>
+            <div class="box emboss"><div class="label">ODDS — Rider Blue</div><div class="value" id="oddsBlue">1.90</div></div>
           </div>
 
-          <!-- CHIPS (new design + amounts) -->
           <div class="pad emboss" id="chips">
-            <button class="chipbtn chip-green emboss">♦100</button>
-            <button class="chipbtn chip-blue2 emboss">♦200</button>
-            <button class="chipbtn chip-black emboss">♦500</button>
-            <button class="chipbtn chip-orange emboss">♦1000</button>
+            <button class="chipbtn red emboss">₱50</button>
+            <button class="chipbtn red emboss">₱100</button>
+            <button class="chipbtn blue emboss">₱200</button>
+            <button class="chipbtn blue emboss">₱500</button>
           </div>
 
           <div class="slip emboss">
             <input id="amount" type="number" min="1" placeholder="Enter amount" class="emboss"/>
-            <!-- removed the two BET buttons here as requested -->
+            <div class="actions">
+              <button class="btn red emboss" data-bet="red">BET</button>
+              <button class="btn blue emboss" data-bet="blue">BET</button>
+            </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
               <button class="btn ghost emboss" id="reset">Reset</button>
               <button class="btn ghost emboss" id="maxAmt">Max</button>
             </div>
           </div>
 
-          <!-- TOTALS -->
           <div class="totbox emboss" id="totalsWidget">
             <div class="row"><strong>POT</strong><strong id="pot2">0</strong></div>
             <div class="row"><span>Bets (Rider Red / Rider Blue)</span><strong><span id="tR2">0</span> / <span id="tB2">0</span></strong></div>
@@ -369,7 +292,6 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
             </div>
           </div>
 
-          <!-- LINKS -->
           <div class="totbox emboss">
             <div class="row" style="border:0; padding:0 0 4px; justify-content:center; color:var(--text-muted)">Links</div>
             <a class="btn ghost emboss" href="https://www.nba.com" target="_blank" rel="noopener" style="height:36px">NBA</a>
@@ -379,23 +301,18 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
           </div>
         </div>
 
-        <!-- TOTAL TAB -->
         <div id="totalView" hidden>
-          <div class="cards">
-            <div class="betcard red">
-              <div class="name">Total Bets — Red</div>
-              <div class="big" id="totalRed">0</div>
-              <div class="pill">Pool Share — <span id="shareRed">0%</span></div>
-            </div>
-            <div class="betcard blue">
-              <div class="name">Total Bets — Blue</div>
-              <div class="big" id="totalBlue">0</div>
-              <div class="pill">Pool Share — <span id="shareBlue">0%</span></div>
-            </div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Total Bets — Red</div><div class="value" id="totalRed">0</div></div>
+            <div class="box emboss"><div class="label">Total Bets — Blue</div><div class="value" id="totalBlue">0</div></div>
           </div>
-          <div class="cards" style="margin-top:8px">
-            <div class="betcard red"><div class="name">Odds (x) — Red</div><div class="big" id="txRed">1.88</div></div>
-            <div class="betcard blue"><div class="name">Odds (x) — Blue</div><div class="big" id="txBlue">2.08</div></div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Pool Share — Red</div><div class="value" id="shareRed">0%</div></div>
+            <div class="box emboss"><div class="label">Pool Share — Blue</div><div class="value" id="shareBlue">0%</div></div>
+          </div>
+          <div class="mini">
+            <div class="box emboss"><div class="label">Odds (x) — Red</div><div class="value" id="txRed">1.88</div></div>
+            <div class="box emboss"><div class="label">Odds (x) — Blue</div><div class="value" id="txBlue">2.08</div></div>
           </div>
         </div>
       </div>
@@ -433,9 +350,7 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 
       <div style="overflow:auto">
         <table class="table">
-          <thead>
-            <tr><th>Time</th><th>Winner</th><th>Pot</th><th>Odds</th><th>Payout/₱100</th></tr>
-          </thead>
+          <thead><tr><th>Time</th><th>Winner</th><th>Pot</th><th>Odds</th><th>Payout per ₱100</th></tr></thead>
           <tbody id="logBody"></tbody>
         </table>
       </div>
@@ -443,16 +358,10 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
   </section>
 </div>
 
-<!-- Sticky mobile quick-bet rail -->
-<div class="mb-rail" id="mbRail" hidden>
-  <input id="mbAmount" type="number" min="1" placeholder="₱ Amount"/>
-  <button class="bet" id="mbBet">BET</button>
-</div>
-
 <!-- Toast -->
 <div id="toast" style="position:fixed;right:16px;bottom:16px;z-index:1500;display:grid;gap:8px"></div>
 
-<!-- Modals -->
+<!-- Simple modals -->
 <div id="modal-edit" class="menu modal emboss" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)">
   <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px">
     <h2 style="margin:0 0 8px">Edit Profile</h2>
@@ -486,9 +395,9 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
 </div>
 
 <div id="modal-withdraw" class="menu modal emboss" role="dialog" aria-hidden="true" style="position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.45)">
-  <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px">
-    <h2 style="margin:16px 16px 8px">Withdraw</h2>
-    <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px; margin:0 16px 16px">
+  <div class="emboss" style="width:min(520px, calc(100% - 24px)); background:var(--glass); border:1px solid var(--stroke-1); border-radius:16px; padding:16px">
+    <h2 style="margin:0 0 8px">Withdraw</h2>
+    <div class="emboss" style="background:var(--panel-2); border:1px solid var(--stroke-3); border-radius:12px; padding:12px; display:grid; gap:10px">
       <label>Amount <input id="wd-amt" type="number" min="1" placeholder="₱0" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px"/></label>
       <label>Destination
         <select id="wd-method" style="width:100%; height:44px; border-radius:10px; border:1px solid var(--stroke-4); background:var(--panel-3); color:var(--text); padding:0 10px">
@@ -496,7 +405,7 @@ iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
         </select>
       </label>
     </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin:0 16px 16px">
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px">
       <button class="btn ghost emboss" data-close style="height:40px">Back</button>
       <button class="btn blue emboss" id="wdSubmit" style="height:40px">Request</button>
     </div>
@@ -554,6 +463,7 @@ function addNotif(title, body='', type='info', deskTry=true){
   const n={id:crypto.randomUUID?.()||Math.random().toString(36).slice(2), title, body, type, ts:Date.now(), read:false};
   notifs.push(n); unread++; renderNotifs(); toast(title + (body?` • ${body}`:''), 2400);
   beep(type==='win'?'click':'low', 90, type==='win'?820:520, 0.06); vibe(10);
+
   if(deskTry && DESK_NOTIF && 'Notification' in window){
     if(Notification.permission==='granted'){ new Notification(title,{body,silent:true}); }
     else if(Notification.permission!=='denied'){
@@ -574,23 +484,13 @@ function sync(){
   const pot=state.red+state.blue;
   const r = pot? state.red/pot*100 : 0; const b=100-r;
 
-  // top counters
   el('tR').textContent=fmt(state.red); el('tB').textContent=fmt(state.blue); el('pot').textContent=fmt(pot);
-
-  // card values
-  el('amtRed').textContent=fmt(state.red);
-  el('amtBlue').textContent=fmt(state.blue);
-  el('oddsRed').textContent=state.oddsRed.toFixed(2);
-  el('oddsBlue').textContent=state.oddsBlue.toFixed(2);
-  el('payR100').textContent=(100*state.oddsRed).toFixed(0);
-  el('payB100').textContent=(100*state.oddsBlue).toFixed(0);
+  el('oddsRed').textContent=state.oddsRed.toFixed(2); el('oddsBlue').textContent=state.oddsBlue.toFixed(2);
   const ro=document.getElementById('roadOdds'); if(ro) ro.textContent=`Red × ${state.oddsRed.toFixed(2)} • Blue × ${state.oddsBlue.toFixed(2)}`;
 
-  // totals widget
   el('pot2').textContent=fmt(pot); el('tR2').textContent=fmt(state.red); el('tB2').textContent=fmt(state.blue);
   el('bar').style.width=(100-r)+'%'; el('payoutR').textContent='× '+state.oddsRed.toFixed(2); el('payoutB').textContent='× '+state.oddsBlue.toFixed(2);
 
-  // total tab
   el('shareRed').textContent=(r||0).toFixed(1)+'%'; el('shareBlue').textContent=(b||0).toFixed(1)+'%';
   el('txRed').textContent=state.oddsRed.toFixed(2); el('txBlue').textContent=state.oddsBlue.toFixed(2);
   el('totalRed').textContent=fmt(state.red); el('totalBlue').textContent=fmt(state.blue);
@@ -604,9 +504,9 @@ function saveAll(){ localStorage.setItem('dr_state', JSON.stringify(state)); loc
 document.querySelectorAll('#chips .chipbtn').forEach(b=>{
   b.addEventListener('click',()=>{ const amt=Number(b.textContent.replace(/[^\d]/g,''))||0; const input=el('amount'); input.value=Number(input.value||0)+amt; beep('click',70,660,0.05); vibe(6); });
 });
-function smoothOdds(tR,tB,rate=0.25){
-  state.oddsRed=+(state.oddsRed+(tR-state.oddsRed)*rate).toFixed(2);
-  state.oddsBlue=+(state.oddsBlue+(tB-state.oddsBlue)*rate).toFixed(2);
+function smoothOdds(targetR,targetB,rate=0.25){
+  state.oddsRed=+(state.oddsRed+(targetR-state.oddsRed)*rate).toFixed(2);
+  state.oddsBlue=+(state.oddsBlue+(targetB-state.oddsBlue)*rate).toFixed(2);
 }
 function recalcOdds(){
   const pot=state.red+state.blue; if(!pot) return;
@@ -617,7 +517,7 @@ function recalcOdds(){
   smoothOdds(tR,tB);
 }
 
-/* Bets (card buttons only) */
+/* Bets */
 document.querySelectorAll('[data-bet]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const side=btn.getAttribute('data-bet');
@@ -630,21 +530,6 @@ document.querySelectorAll('[data-bet]').forEach(btn=>{
 });
 el('reset').addEventListener('click',()=>{ el('amount').value=''; beep('low',60,220,0.05); vibe(6); });
 el('maxAmt').addEventListener('click',()=>{ const v=Number(el('amount').value||0); if(v<1) el('amount').value=100; beep('click',70,560,0.05); vibe(6); });
-
-/* Mobile quick-bet rail */
-(function(){
-  const rail=el('mbRail');
-  const isMobile=()=>window.matchMedia('(max-width:680px)').matches;
-  const toggle=()=>rail.hidden=!isMobile();
-  toggle(); addEventListener('resize', toggle);
-  el('mbBet').addEventListener('click', ()=>{
-    const v=Number(el('mbAmount').value||0);
-    if(v<10){ toast('Minimum bet is ₱10'); return; }
-    const side = state.oddsRed>state.oddsBlue ? 'red' : 'blue';
-    state[side]+=v; el('mbAmount').value=''; recalcOdds(); sync();
-    addNotif('Quick Bet', `${side.toUpperCase()} • ₱${fmt(v)}`, 'bet');
-  });
-})();
 
 /* Totals */
 el('resetTotals').addEventListener('click', ()=>{ state.red=0; state.blue=0; recalcOdds(); sync(); addNotif('Totals reset','All bet totals cleared','alert'); });
@@ -659,7 +544,7 @@ function addLog(winner){
   const pot=state.red+state.blue, odds=(winner==='Red'?state.oddsRed:state.oddsBlue).toFixed(2), payout=(100*odds).toFixed(0);
   const tr=document.createElement('tr');
   tr.innerHTML=`<td>${new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'})}</td>
-    <td><span class="b-${winner==='Red'?'red':'blue'} badge">${winner}</span></td>
+    <td><span class="badge ${winner==='Red'?'b-red':'b-blue'}">${winner}</span></td>
     <td>₱${fmt(pot)}</td><td>× ${odds}</td><td>₱${fmt(payout)}</td>`;
   document.getElementById('logBody').prepend(tr); saveAll();
 }
@@ -771,27 +656,10 @@ function show(id){ el(id).style.display='grid'; }
 el('editProfile').addEventListener('click', e=>{ e.preventDefault(); show('modal-edit'); toggleMenu(false); });
 el('cashInBtn').addEventListener('click', e=>{ e.preventDefault(); show('modal-cash'); toggleMenu(false); });
 el('withdrawBtn').addEventListener('click', e=>{ e.preventDefault(); show('modal-withdraw'); toggleMenu(false); });
-document.querySelectorAll('[data-close]').forEach(x=>addEventListener('click', ()=>document.querySelectorAll('.modal').forEach(m=>m.style.display='none')));
+document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click', ()=>document.querySelectorAll('.modal').forEach(m=>m.style.display='none')));
 document.getElementById('saveProfile').addEventListener('click', ()=>{ const name=(el('prof-name').value||'').trim(); const avatar=(el('prof-avatar').value||'').trim(); if(name) document.querySelector('#profileMenu .row strong').textContent=name; if(avatar) document.querySelectorAll('.avatar').forEach(a=>a.style.backgroundImage=`url('${avatar}')`); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); toast('Profile updated'); addNotif('Profile updated', name?`Hello, ${name}!`: 'Avatar changed', 'info'); });
 el('cashSubmit').addEventListener('click', ()=>{ const amt=Number(el('cash-amt').value||0); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); if(amt){ toast(`Cash In submitted: ₱${fmt(amt)}`); addNotif('Cash In submitted', `₱${fmt(amt)}`, 'bet'); } else toast('Please enter an amount.'); });
 el('wdSubmit').addEventListener('click', ()=>{ const amt=Number(el('wd-amt').value||0); document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); if(amt){ toast(`Withdraw requested: ₱${fmt(amt)}`); addNotif('Withdraw requested', `₱${fmt(amt)}`, 'alert'); } else toast('Please enter an amount.'); });
-
-/* Odds shimmer on update */
-(() => {
-  const ids = ['oddsRed','oddsBlue','txRed','txBlue'];
-  const obs = new MutationObserver(mList=>{
-    mList.forEach(m=>{
-      if(m.type==='childList' && m.target.classList){
-        m.target.classList.add('flash');
-        setTimeout(()=>m.target.classList.remove('flash'),220);
-      }
-    });
-  });
-  ids.forEach(id=>{
-    const n=document.getElementById(id);
-    if(n) obs.observe(n,{childList:true});
-  });
-})();
 
 /* CSV / Clear */
 el('exportCsv').addEventListener('click', ()=>{
@@ -808,10 +676,7 @@ el('clearLog').addEventListener('click', ()=>{ el('logBody').innerHTML=''; toast
 function syncSideHeight(){
   const frame=document.querySelector('.videogrid .frame');
   const side=el('kioskSide');
-  if(frame && side){
-    const mobile = window.matchMedia('(max-width:680px)').matches;
-    side.style.maxHeight = mobile ? 'unset' : (frame.clientHeight + 'px');
-  }
+  if(frame && side){ side.style.maxHeight = frame.clientHeight + 'px'; }
 }
 window.addEventListener('resize', syncSideHeight);
 window.addEventListener('load', syncSideHeight);
@@ -827,7 +692,7 @@ document.addEventListener('keydown', (e)=>{
   if (k==='n') el('notifBtn').click();
 });
 
-/* Toast + Init */
+/* Init */
 function toast(msg,ms=2200){
   const t=document.createElement('div'); t.className='emboss';
   t.style.cssText='background:var(--glass);border:1px solid var(--stroke-2);padding:10px 12px;border-radius:12px;backdrop-filter:blur(8px);transform:translateY(10px);opacity:.0;transition:all 220ms cubic-bezier(.2,.8,.2,1)';

@@ -20,12 +20,11 @@
       --bead-gap-x: 6px;              /* space between columns */
       --bead-gap-y: 4px;              /* space between beads */
     }
-    body, html { margin:0; padding:0; height:100%; overflow-x:hidden; background:#000; }
-    .bg-animated{ position:fixed; top:0; left:0; width:112%; height:112%;
-      background:url('https://i.ibb.co/5kK9kT2/green-horse-track.jpg') center/cover no-repeat;
+    body, html { margin:0; padding:0; height:100%; overflow-x:hidden; }
+    .bg-animated{ position:fixed; top:0; left:0; width:110%; height:110%;
+      background:url('https://i.ibb.co/NdjyN48p/download.jpg') center/cover no-repeat;
       opacity:.85; z-index:-1; animation:moveBg 30s infinite alternate ease-in-out; will-change:transform;}
-    @keyframes moveBg{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-2%,-2%,0) scale(1.03)}100%{transform:translate3d(0,-1%,0) scale(1.01)}}
-
+    @keyframes moveBg{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-2%,-2%,0)}100%{transform:translate3d(0,-1%,0)}}
     @keyframes glow-border {
       0% { box-shadow: 0 0 10px -6px rgba(16,185,129,.9), 0 0 24px -10px rgba(239,68,68,.8), 0 0 28px -12px rgba(59,130,246,.8); }
       50% { box-shadow: 0 0 16px -4px rgba(16,185,129,1), 0 0 28px -9px rgba(239,68,68,.9), 0 0 34px -10px rgba(59,130,246,.9); }
@@ -350,7 +349,7 @@
                 box-content bg-gradient-to-tr from-emerald-500/20 via-red-500/20 to-blue-500/20
                 mix-blend-overlay animate-[glow-border_2s_ease-in-out_infinite_alternate]"></div>
             </div>
-            <iframe id="youtube-video-main" class="w-full h-64 md:h-[420px] rounded-lg relative z-20 border-4 border-transparent"
+            <iframe id="youtube-video-main" class="w-full h-64 md:h-[250px] rounded-lg relative z-20 border-4 border-transparent"
               src="https://www.youtube.com/embed/rUC_nHCOUW4?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&controls=0"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -458,15 +457,15 @@
                   <polyline points="6,24 32,60 58,24" fill="none" stroke="#a7ffd8" stroke-width="1" opacity=".7"/>
                   <circle cx="32" cy="30" r="16" fill="url(#gemGlow)" opacity=".35"/>
                 </svg>
-                <span class="text-[11px] opacity-80 tracking-widest">BAL</span>
+                <span class="text-[11px] opacity-80 tracking-widest"></span>
                 <span id="mid-balance" class="amount text-base">5,000</span>
               </div>
             </div>
             <div class="grid grid-cols-2 gap-1 mb-2">
-              <button class="chip3d chip-emerald chip-outline text-sm bet-chip" data-val="100">₱100</button>
-              <button class="chip3d chip-amber   chip-outline text-sm bet-chip" data-val="200">₱200</button>
-              <button class="chip3d chip-emerald chip-outline text-sm bet-chip" data-val="500">₱500</button>
-              <button class="chip3d chip-blue    chip-outline text-sm bet-chip" data-val="1000">₱1000</button>
+              <button class="chip3d chip-emerald chip-outline text-sm bet-chip" data-val="100">♦100</button>
+              <button class="chip3d chip-amber   chip-outline text-sm bet-chip" data-val="200">♦200</button>
+              <button class="chip3d chip-black chip-outline text-sm bet-chip" data-val="500">♦500</button>
+              <button class="chip3d chip-blue    chip-outline text-sm bet-chip" data-val="1000">♦1000</button>
             </div>
 
             <!-- MINI BEAD ROAD (3-color) -->
@@ -552,12 +551,12 @@
       "Blue Tempest","Azure Bolt","Sapphire Sprint","Golden Spur","Night Runner","Silver Streak"
     ];
     const slides = [
-      "https://i.ibb.co/3Y8nqBt/horse-emerald.jpg",
-      "https://i.ibb.co/0j6q5cB/horse-red.jpg",
-      "https://i.ibb.co/F3WnLJm/horse-blue.jpg",
-      "https://i.ibb.co/4t4D9qZ/horse-pack.jpg",
-      "https://i.ibb.co/zH7jcQ2/horse-gate.jpg",
-      "https://i.ibb.co/4NVgVtL/horse-race.jpg"
+      "https://i.ibb.co/GvKcMGqT/kabayo7.webp",
+      "https://i.ibb.co/20Gphj6d/kabayo2.jpg",
+      "https://i.ibb.co/nsHTHK3M/kabayo3.webp",
+      "https://i.ibb.co/KjN9SdS8/kabayo4.jpg",
+      "https://i.ibb.co/Gv99W94c/kabayo5.jpg",
+      "https://i.ibb.co/Xr943DJw/kabayo6.jpg"
     ];
     let slideIndex=0;
 
@@ -977,4 +976,3 @@
   </script>
 </body>
 </html>
-
