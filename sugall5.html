@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WILYONARYO — FAST x5000 • Full Features (BG+Logo)</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --overlayTop: rgba(7,11,22,.66);
+      --overlayBottom: rgba(11,22,48,.66);
+      --ring: rgba(255,255,255,.14);
+      --text:#e9f4ff; --sub:#bcd0ea;
+      --accent:#50e3c2; --accent2:#69a8ff; --gold:#ffd54a; --danger:#ff6b8b;
+      --radius:18px; --br:16px;
+      --cube:112px; --tz:56px; --fs:2.1rem; --ease:cubic-bezier(.22,1,.36,1);
+      --boxColor:#69A8FF;   /* synced color for all 4 boxes while spinning */
+      --locked:#50E3C2;     /* final locked swatch */
+      --focus:0 0 0 3px rgba(80,227,194,.45);
+    }
+    @media (max-width:520px){ :root{ --cube:92px; --tz:46px; --fs:1.8rem } }
+    @media (min-width:1536px){ :root{ --cube:136px; --tz:68px; --fs:2.35rem } }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        linear-gradient(180deg,var(--overlayTop),var(--overlayBottom)),
+        url('https://i.ibb.co/ns5cFnXp/Chat-GPT-Image-Sep-23-2025-03-14-33-PM.png') center/cover fixed no-repeat;
+      overflow-x:hidden;
+    }
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border:1px solid var(--ring);
+      border-radius:var(--radius); padding:16px; box-shadow:0 18px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)}
+    .pill{display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .8rem; background:rgba(255,255,255,.06);
+      border:1px solid var(--ring); border-radius:999px; font-weight:700;}
+
+    .btn{display:inline-flex;align-items:center;gap:.55rem;font-weight:800;padding:.72rem 1rem;border-radius:14px;border:1px solid var(--ring);
+      background:rgba(255,255,255,.06); transition:transform .12s var(--ease), box-shadow .15s var(--ease);}
+    .btn:active{transform:translateY(1px) scale(.99)}
+    .btn:focus-visible{outline:none; box-shadow:var(--focus)}
+    .btn-accent{background:linear-gradient(90deg, var(--accent), var(--accent2)); color:#0b1220; border:0;}
+    .btn-danger{background:linear-gradient(90deg,#ff6b8b,#ff3b55); color:#0b1220; border:0;}
+    .btn-ghost{background:rgba(255,255,255,.06)}
+    .btn-disabled{opacity:.55; pointer-events:none; filter:grayscale(.25)}
+
+    .rack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;place-items:center}
+    @media (min-width:1024px){ .rack{grid-template-columns:repeat(4,minmax(0,1fr))} }
+
+    .cube-wrap{width:var(--cube);height:var(--cube);perspective:1100px}
+    .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+    .face{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:var(--fs); letter-spacing:.06em; color:#0c1222; user-select:none; backface-visibility:hidden;
+      border:2px solid rgba(0,0,0,.25); border-radius:var(--br);
+      background:
+        radial-gradient(120% 120% at 28% 22%, #ffffffaa, transparent 58%),
+        linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.02)),
+        var(--boxColor);
+      box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 -1px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+      transition:border-radius 240ms var(--ease), transform 260ms var(--ease);
+    }
+    .front  { transform: rotateY(  0deg) translateZ(var(--tz)); }
+    .back   { transform: rotateY(180deg) translateZ(var(--tz)); }
+    .right  { transform: rotateY( 90deg) translateZ(var(--tz)); }
+    .left   { transform: rotateY(-90deg) translateZ(var(--tz)); }
+    .top    { transform: rotateX( 90deg) translateZ(var(--tz)); }
+    .bottom { transform: rotateX(-90deg) translateZ(var(--tz)); }
+
+    @keyframes winGlow{0%,100%{box-shadow:0 0 0 rgba(255,213,74,0)}50%{box-shadow:0 0 28px rgba(255,213,74,.9)}}
+    .win .face{animation:winGlow 1.2s ease-in-out 2}
+
+    .stat{display:grid;place-items:center;gap:.25rem;padding:.85rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--ring)}
+    .hint{color:var(--sub)}
+    .kbd{padding:.1rem .4rem;border:1px solid var(--ring);border-bottom-width:2px;border-radius:6px;background:rgba(255,255,255,.04)}
+
+    .tg{ text-transform:uppercase; text-align:center; font-weight:900; letter-spacing:.05em; border-radius:12px; padding:.55rem;
+      background:rgba(255,255,255,.06); border:1px solid var(--ring); }
+    .tg:disabled{opacity:.7}
+    .error-hint{opacity:0; transition:opacity .2s}
+    .error-hint.show{opacity:1}
+
+    .drawer{position:fixed; right:16px; bottom:16px; z-index:40}
+    .drawer .panel{display:none; margin-top:.5rem}
+    .drawer.open .panel{display:block}
+
+    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:50}
+    .overlay.show{display:flex}
+
+    .grid-label{font-size:.78rem; color:var(--sub);}
+    .input{background:rgba(255,255,255,.06); border:1px solid var(--ring); border-radius:10px; padding:.55rem .7rem;}
+    .table-sm th, .table-sm td{padding:.5rem .75rem;}
+
+    /* segmented selectors (no native select issues) */
+    .seg{display:flex;flex-wrap:wrap;gap:.5rem}
+    .seg button{border-radius:999px;padding:.45rem .75rem;border:1px solid var(--ring);background:rgba(255,255,255,.05);font-weight:700}
+    .seg button[aria-pressed="true"]{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0b1220;border-color:transparent;box-shadow:var(--focus)}
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:px-6">
+  <!-- HEADER -->
+  <header class="max-w-7xl mx-auto mb-6">
+    <div class="card p-4 md:p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <!-- your logo -->
+          <img src="https://i.ibb.co/gFBp4N1N/logo-1.gif" alt="Logo" class="h-12 w-auto rounded-lg ring-1 ring-white/20 bg-white/5">
+          <!-- initials kept for JS consistency (hidden) -->
+          <span id="avatarInitials" class="sr-only">PL</span>
+
+          <div>
+            <h1 class="text-2xl md:text-4xl font-black">WILYONARYO</h1>
+            <p class="hint text-xs md:text-sm">FAST locked • Win = Letters + Color • Payout ×5000</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 md:gap-3">
+          <div class="pill">
+            <i class="fa-regular fa-user text-[color:var(--gold)]"></i>
+            <input id="playerName" class="bg-transparent outline-none w-28 md:w-44" placeholder="Player"/>
+            <button id="saveName" class="btn btn-ghost text-xs">Save</button>
+            <button id="useInitials" class="btn btn-ghost text-xs" title="Targets from initials">Initials → Targets</button>
+          </div>
+          <div class="pill">
+            <i class="fa-solid fa-wallet text-[color:var(--accent)]"></i>
+            <span class="hint">Balance</span>
+            <strong id="balanceText" class="font-extrabold">₱0.00</strong>
+            <button id="dailyBonus" class="btn btn-ghost text-xs" title="Daily Bonus +₱50">Bonus +₱50</button>
+            <button id="resetData" class="btn btn-ghost text-xs" title="Reset">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CASHIER -->
+  <section class="max-w-7xl mx-auto mb-6 grid lg:grid-cols-3 gap-5">
+    <div class="card lg:col-span-2">
+      <h2 class="text-xl md:text-2xl font-extrabold mb-2">Cashier</h2>
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- Cash In -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold">Cash In</h3>
+            <span class="hint text-xs">No fees</span>
+          </div>
+          <div class="grid gap-2">
+            <label class="grid-label">Amount (₱)</label>
+            <input id="cashInAmt" type="number" min="1" step="1" class="input" placeholder="e.g. 100">
+            <div class="flex flex-wrap gap-2 mt-1">
+              <button class="btn btn-ghost text-xs" data-cashin="50">+50</button>
+              <button class="btn btn-ghost text-xs" data-cashin="100">+100</button>
+              <button class="btn btn-ghost text-xs" data-cashin="500">+500</button>
+              <button class="btn btn-ghost text-xs" data-cashin="1000">+1000</button>
+              <button id="cashInMax" class="btn btn-ghost text-xs">Round to 100</button>
+            </div>
+            <label class="grid-label mt-2">Method</label>
+            <div id="cashInSeg" class="seg" role="group" aria-label="Cash In Method"></div>
+            <button id="cashInBtn" class="btn btn-accent mt-2"><i class="fa-solid fa-circle-plus"></i> Cash In</button>
+          </div>
+        </div>
+        <!-- Withdraw -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold">Withdraw</h3>
+            <span class="hint text-xs">Min ₱50 • Multiple of 10</span>
+          </div>
+          <div class="grid gap-2">
+            <label class="grid-label">Amount (₱)</label>
+            <input id="wdAmt" type="number" min="10" step="10" class="input" placeholder="e.g. 100">
+            <div class="flex flex-wrap gap-2 mt-1">
+              <button class="btn btn-ghost text-xs" data-wd="50">50</button>
+              <button class="btn btn-ghost text-xs" data-wd="100">100</button>
+              <button class="btn btn-ghost text-xs" data-wd="500">500</button>
+              <button class="btn btn-ghost text-xs" data-wd="1000">1000</button>
+              <button id="wdAll" class="btn btn-ghost text-xs">ALL</button>
+            </div>
+            <label class="grid-label mt-2">Method</label>
+            <div id="wdSeg" class="seg" role="group" aria-label="Withdraw Method"></div>
+            <button id="wdBtn" class="btn btn-danger mt-2"><i class="fa-solid fa-circle-minus"></i> Withdraw</button>
+          </div>
+        </div>
+      </div>
+      <!-- Transaction History -->
+      <div class="card mt-4">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold">Transaction History</h4>
+          <div class="flex gap-2">
+            <button id="exportTx" class="btn btn-ghost text-xs"><i class="fa-solid fa-file-arrow-down"></i> Export CSV</button>
+            <button id="clearTx" class="btn btn-ghost text-xs">Clear</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto mt-3">
+          <table class="min-w-full text-sm table-sm">
+            <thead class="hint">
+              <tr>
+                <th class="text-left">Time</th>
+                <th class="text-left">Type</th>
+                <th class="text-left">Method</th>
+                <th class="text-right">Amount</th>
+                <th class="text-right">Balance After</th>
+                <th class="text-left">Ref</th>
+                <th class="text-left">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="card">
+      <h4 class="font-bold text-lg md:text-xl mb-2">Quick Stats</h4>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="stat"><div class="text-xs hint">Win Streak</div><div id="winStreak" class="text-xl font-extrabold">0</div></div>
+        <div class="stat"><div class="text-xs hint">Loss Streak</div><div id="lossStreak" class="text-xl font-extrabold">0</div></div>
+        <div class="stat"><div class="text-xs hint">Best Payout</div><div id="bestPayout" class="text-xl font-extrabold">₱0.00</div></div>
+        <div class="stat"><div class="text-xs hint">Peak Balance</div><div id="peakBalance" class="text-xl font-extrabold">₱0.00</div></div>
+      </div>
+      <div class="mt-3">
+        <div class="hint text-xs">Last Win</div>
+        <div id="lastWinText" class="text-sm">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLS -->
+  <section class="max-w-7xl mx-auto">
+    <div class="grid xl:grid-cols-3 gap-5">
+      <!-- Play -->
+      <div class="card">
+        <h2 class="text-xl md:text-2xl font-extrabold">Play</h2>
+        <p class="hint mt-1">Need <b>exact 4 letters</b> (unique, in order) <b>AND</b> <b>color match</b>. Hotkeys: <span class="kbd">S</span> start, <span class="kbd">X</span> stop, <span class="kbd">?</span> help.</p>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <div class="pill">
+            <i class="fa-solid fa-coins text-[color:var(--gold)]"></i>
+            <label for="betInput" class="hint">Bet</label>
+            <input id="betInput" type="number" min="2" step="1" class="bg-transparent outline-none w-20 md:w-24 font-semibold" value="2"/>
+            <span class="hint text-xs">₱ (min 2)</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost text-xs" data-quickbet="2">+₂</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="5">+₅</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="10">+₁₀</button>
+            <button class="btn btn-ghost text-xs" id="betMax">MAX</button>
+            <button class="btn btn-ghost text-xs" id="betX2">×2</button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button id="startBtn" class="btn btn-accent"><i class="fa-solid fa-play"></i> START</button>
+          <button id="stopBtn"  class="btn btn-danger" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+
+          <div class="pill text-sm opacity-70">
+            <i class="fa-solid fa-gauge text-[color:var(--gold)]"></i>
+            <span class="whitespace-nowrap">Speed: FAST (locked)</span>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <div class="pill text-sm">
+            <i class="fa-solid fa-repeat"></i>
+            <select id="autoCount" class="bg-transparent outline-none">
+              <option value="5">Auto 5</option>
+              <option value="10">Auto 10</option>
+              <option value="20">Auto 20</option>
+            </select>
+          </div>
+          <button id="autoBtn" class="btn btn-ghost text-xs"><i class="fa-solid fa-robot"></i> Start Auto</button>
+        </div>
+
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <label class="pill text-sm justify-between">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-flag-checkered"></i> Stop on First Win</span>
+            <input id="stopOnWin" type="checkbox" class="accent-emerald-400">
+          </label>
+          <label class="pill text-sm justify-between">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Stop after Loss Streak</span>
+            <input id="lossLimit" type="number" min="1" max="50" value="5" class="bg-transparent outline-none w-16 text-right">
+          </label>
+        </div>
+
+        <div id="resultBar" class="mt-4 hidden">
+          <div class="card p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <i id="resultIcon" class="fa-solid fa-circle-info"></i>
+              <div>
+                <div id="resultText" class="font-semibold">—</div>
+                <div class="text-xs hint" id="resultSub">—</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="hint">Locked Color:</span>
+              <span id="winColorName" class="font-bold">—</span>
+              <span id="winColorSwatch" class="inline-block w-5 h-5 rounded-md ring-1 ring-white/20" style="background:var(--locked)"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mt-4">
+          <div class="stat"><div class="text-xl text-[color:var(--accent)]"><i class="fa-solid fa-arrows-rotate"></i></div><div id="spinCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Spins</div></div>
+          <div class="stat"><div class="text-xl text-[color:var(--gold)]"><i class="fa-solid fa-trophy"></i></div><div id="winCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Wins</div></div>
+          <div class="stat"><div class="text-xl text-[color:var(--accent2)]"><i class="fa-solid fa-bolt"></i></div><div id="comboCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Combos</div></div>
+        </div>
+      </div>
+
+      <!-- Target Letters -->
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Letters (4, unique)</h3>
+          <div class="flex gap-2">
+            <button id="tgRandom" class="btn btn-ghost text-xs">Random</button>
+            <button id="tgClear" class="btn btn-ghost text-xs">Clear</button>
+          </div>
+        </div>
+        <p class="hint text-sm mt-1">Exact order ang panalo. Walang double letter.</p>
+
+        <div class="mt-3 grid grid-cols-4 gap-2">
+          <input class="tg" maxlength="1" placeholder="A">
+          <input class="tg" maxlength="1" placeholder="B">
+          <input class="tg" maxlength="1" placeholder="C">
+          <input class="tg" maxlength="1" placeholder="D">
+        </div>
+        <div class="mt-2 text-xs text-red-300 error-hint" id="dupHint">Duplicate letter! Hindi puwedeng maulit.</div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <button id="submitTargets" class="btn text-xs hidden"><i class="fa-solid fa-check"></i> Submit Targets</button>
+          <button id="unlockTargets" class="btn btn-ghost text-xs hidden"><i class="fa-solid fa-unlock"></i> Unlock</button>
+          <span id="tgError" class="text-xs text-red-300 hidden">Kailangang 4 unique A–Z.</span>
+          <span id="tgOK" class="text-xs text-emerald-300 hidden">Targets locked!</span>
+        </div>
+      </div>
+
+      <!-- Target Color -->
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Color</h3>
+          <button id="tgColorClear" class="btn btn-ghost text-xs">Clear</button>
+        </div>
+        <p class="hint text-sm mt-1">Win requires color match din (same sa “winning color”).</p>
+
+        <div id="colorGrid" class="mt-3 grid grid-cols-6 gap-2"></div>
+
+        <div class="mt-3 flex items-center gap-3">
+          <div class="flex items-center gap-2 text-sm">
+            <span class="hint">Selected:</span>
+            <span id="selColorName" class="font-semibold">—</span>
+            <span id="selColorSwatch" class="inline-block w-4 h-4 rounded ring-1 ring-white/20"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUBES -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="rack">
+      <div class="cube-wrap"><div class="cube" id="cube1">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube2">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube3">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube4">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+    </div>
+
+    <div class="mt-3 md:hidden">
+      <div class="card flex items-center justify-center gap-3">
+        <button id="startBtn2" class="btn btn-accent w-1/2"><i class="fa-solid fa-play"></i> START</button>
+        <button id="stopBtn2"  class="btn btn-danger w-1/2" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMBINATION -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="card text-center">
+      <h3 class="text-base md:text-lg tracking-widest font-bold">YOUR LUCKY COMBINATION</h3>
+      <div id="combination" class="text-4xl md:text-6xl font-black tracking-[.28em] mt-1">- - - -</div>
+      <p class="hint mt-2 text-sm">Win = exact letters + color • Payout: <b>×5000</b></p>
+      <div class="mt-3 flex items-center justify-center gap-2">
+        <button id="exportHistory" class="btn btn-ghost text-xs">Export CSV</button>
+        <button id="copyResult" class="btn btn-ghost text-xs"><i class="fa-regular fa-clipboard"></i> Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME HISTORY -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-lg md:text-xl">Game History</h4>
+        <button id="clearHistory" class="btn btn-ghost text-xs">Clear</button>
+      </div>
+      <div class="overflow-x-auto mt-3">
+        <table class="min-w-full text-sm">
+          <thead class="hint">
+            <tr>
+              <th class="text-left py-2 pr-4">Time</th>
+              <th class="text-left py-2 pr-4">Combo</th>
+              <th class="text-left py-2 pr-4">Result</th>
+              <th class="text-right py-2 pr-4">Bet</th>
+              <th class="text-right py-2 pr-4">Payout</th>
+              <th class="text-left py-2 pr-4">Locked Color</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS & HELP -->
+  <div class="drawer" id="drawer">
+    <button id="drawerBtn" class="btn btn-ghost text-xs"><i class="fa-solid fa-sliders"></i> Settings</button>
+    <div class="panel card p-3 w-64">
+      <label class="flex items-center justify-between text-sm mb-2">
+        <span>Sound Effects</span>
+        <input id="toggleSound" type="checkbox" class="accent-emerald-400" checked>
+      </label>
+      <p class="hint text-xs">FAST speed locked • Win needs letters + color • Hotkeys: S, X, ?</p>
+    </div>
+  </div>
+
+  <div id="helpOverlay" class="overlay">
+    <div class="card max-w-md w-[92vw]">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-lg">Quick Help</h3>
+        <button id="closeHelp" class="btn btn-ghost text-xs"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <ul class="text-sm leading-7">
+        <li>• Set 4 unique letters (A–Z) in order, choose a color, then <b>Start</b>.</li>
+        <li>• Stop to lock. Panalo lang kapag <b>letters + color</b> parehong tama. Payout: <b>bet × 5000</b>.</li>
+        <li>• Cashier: Cash In / Withdraw (GCash/Maya/Bank/Card/Cash or Pickup). Receipt + CSV export available.</li>
+        <li>• Wallet: Daily Bonus +₱50 (once/day).</li>
+        <li>• Auto-spin may Stop on Win or after N losses (Play card).</li>
+        <li>• Hotkeys: <b>S</b> Start, <b>X</b> Stop, <b>?</b> Help.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== GAME + CASHIER SCRIPT ===== -->
+  <script>
+  (function(){
+    const LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const COLORS=[
+      {name:"Mint",hex:"#50E3C2"},{name:"Cyan",hex:"#22D3EE"},{name:"Sky",hex:"#69A8FF"},
+      {name:"Violet",hex:"#A78BFA"},{name:"Gold",hex:"#FFD54A"},{name:"Pink",hex:"#FF6B8B"},
+      {name:"Jade",hex:"#1ABC9C"},{name:"Amber",hex:"#F8C471"}
+    ];
+    const METHODS_IN  = ["GCash","Maya","Bank Transfer","Card","Cash"];
+    const METHODS_OUT = ["GCash","Maya","Bank Transfer","Pickup"];
+    const MULTIPLIER=5000, STORAGE_KEY="wily_full_features_bglogo_v2";
+
+    const qs=(s,r=document)=>r.querySelector(s), qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+    const els={
+      avatar:qs("#avatarInitials"), playerName:qs("#playerName"), saveName:qs("#saveName"), useInitials:qs("#useInitials"),
+      balanceText:qs("#balanceText"), dailyBonus:qs("#dailyBonus"), reset:qs("#resetData"),
+      bet:qs("#betInput"), betMax:qs("#betMax"), betX2:qs("#betX2"),
+      start:qs("#startBtn"), stop:qs("#stopBtn"), start2:qs("#startBtn2"), stop2:qs("#stopBtn2"),
+      autoBtn:qs("#autoBtn"), autoCount:qs("#autoCount"), stopOnWin:qs("#stopOnWin"), lossLimit:qs("#lossLimit"),
+      resultBar:qs("#resultBar"), resultIcon:qs("#resultIcon"), resultText:qs("#resultText"), resultSub:qs("#resultSub"),
+      winColorName:qs("#winColorName"), winColorSwatch:qs("#winColorSwatch"),
+      spinCount:qs("#spinCount"), winCount:qs("#winCount"), comboCount:qs("#comboCount"),
+      historyBody:qs("#historyBody"), exportHistory:qs("#exportHistory"), clearHistory:qs("#clearHistory"),
+      combination:qs("#combination"), copyResult:qs("#copyResult"),
+      tgInputs:qsa(".tg"), tgRandom:qs("#tgRandom"), tgClear:qs("#tgClear"),
+      tgError:qs("#tgError"), tgOK:qs("#tgOK"), dupHint:qs("#dupHint"), submitTargets:qs("#submitTargets"), unlockTargets:qs("#unlockTargets"),
+      colorGrid:qs("#colorGrid"), tgColorClear:qs("#tgColorClear"), selColorName:qs("#selColorName"), selColorSwatch:qs("#selColorSwatch"),
+      drawer:qs("#drawer"), drawerBtn:qs("#drawerBtn"), toggleSound:qs("#toggleSound"),
+      winStreak:qs("#winStreak"), lossStreak:qs("#lossStreak"), bestPayout:qs("#bestPayout"), peakBalance:qs("#peakBalance"), lastWinText:qs("#lastWinText"),
+      helpOverlay:qs("#helpOverlay"), closeHelp:qs("#closeHelp"),
+      cashInAmt:qs("#cashInAmt"), cashInBtn:qs("#cashInBtn"), cashInMax:qs("#cashInMax"), cashInSeg:qs("#cashInSeg"),
+      wdAmt:qs("#wdAmt"), wdBtn:qs("#wdBtn"), wdAll:qs("#wdAll"), wdSeg:qs("#wdSeg"),
+      txBody:qs("#txBody"), exportTx:qs("#exportTx"), clearTx:qs("#clearTx"),
+    };
+
+    const cubeIds=["cube1","cube2","cube3","cube4"];
+    const cubes=cubeIds.map((id,i)=>({ id, el:qs("#"+id), rx:0, vx:540, dir:(i%2===0?1:-1), flipAt:0, active:false }));
+
+    let currentLetters=["-","-","-","-"], letterTimers=[null,null,null,null];
+    let colorTimer=null, isSpinning=false, rafId=null, lastT=0, pendingBet=0, lastColor=getComputedStyle(document.documentElement).getPropertyValue("--boxColor").trim()||"#69A8FF";
+    const auto={enabled:false,left:0};
+
+    const state={name:"Player", balance:200, history:[], tx:[],
+      stats:{spins:0,wins:0,combos:0, winStreak:0, lossStreak:0, bestPayout:0, peakBalance:200},
+      target:{letters:["","","",""],color:null}, targetsSubmitted:false, sound:true, bonus:{last:""},
+      methodIn:METHODS_IN[0], methodOut:METHODS_OUT[0] };
+
+    /* Audio */
+    let ac=null; const ensureAC=()=>{ if(!ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch{} } };
+    const beep=(f=880,d=.08,v=.07)=>{ if(!state.sound||!ac) return; const o=ac.createOscillator(), g=ac.createGain();
+      o.frequency.value=f; o.type="sine"; g.gain.value=v; o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+d); };
+
+    /* Utils */
+    const setBoxColor=h=>document.documentElement.style.setProperty("--boxColor",h);
+    const setLocked=h=>document.documentElement.style.setProperty("--locked",h);
+    const fmt=n=>"₱"+Number(n).toFixed(2);
+    const nowText=()=>new Date().toLocaleString();
+    const todayStr=()=>{ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+    const toast=(msg,ok=true)=>{ const t=document.createElement("div"); t.className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm card";
+      t.style.borderColor=ok?"rgba(80,227,194,.6)":"rgba(255,88,112,.6)"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1600); };
+    const save=()=>localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const load=()=>{ try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) Object.assign(state, JSON.parse(raw));}catch{} };
+    const syncStartStopDisabled=(sd,xd)=>{ [els.start,els.start2].forEach(b=>{ if(!b) return; b.disabled=sd; b.classList.toggle("btn-disabled",sd); });
+      [els.stop,els.stop2].forEach(b=>{ if(!b) return; b.disabled=xd; b.classList.toggle("btn-disabled",xd); }); };
+
+    /* Renderers */
+    function renderBasics(){
+      els.balanceText.textContent=fmt(state.balance);
+      els.spinCount.textContent=state.stats.spins; els.winCount.textContent=state.stats.wins; els.comboCount.textContent=state.stats.combos;
+      els.winStreak.textContent=state.stats.winStreak; els.lossStreak.textContent=state.stats.lossStreak;
+      els.bestPayout.textContent=fmt(state.stats.bestPayout); els.peakBalance.textContent=fmt(state.stats.peakBalance);
+      els.playerName.value=state.name;
+      const p=(state.name||"").trim().split(/\s+/); const A=p[0]?.[0]||"P", B=p[1]?.[0]||p[0]?.[1]||"L"; els.avatar.textContent=(A+B).toUpperCase();
+      els.toggleSound.checked=state.sound;
+      const canBonus = state.bonus.last !== todayStr(); els.dailyBonus.classList.toggle("btn-disabled", !canBonus);
+    }
+    function renderTargets(){
+      els.tgInputs.forEach((inp,i)=>{inp.value=state.target.letters[i]||""; inp.disabled=state.targetsSubmitted;});
+      if(state.target.color){ els.selColorName.textContent=state.target.color.name; els.selColorSwatch.style.background=state.target.color.hex; }
+      else{ els.selColorName.textContent="—"; els.selColorSwatch.style.background="transparent"; }
+      els.tgOK.classList.toggle("hidden",!state.targetsSubmitted);
+      els.unlockTargets.classList.toggle("hidden",!state.targetsSubmitted);
+      updateSubmitVisibility();
+    }
+    function renderHistory(){
+      const tbody=els.historyBody; tbody.innerHTML="";
+      if(state.history.length===0){ tbody.innerHTML=`<tr><td class="py-3 hint" colspan="6">No games yet.</td></tr>`; return; }
+      state.history.slice(0,150).forEach(h=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td class="py-2 pr-4 whitespace-nowrap">${h.t}</td>
+          <td class="py-2 pr-4">${h.combo}</td>
+          <td class="py-2 pr-4 ${/Win/.test(h.winText)?'text-emerald-300':'text-red-300'}">${h.winText}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.bet)}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.payout)}</td>
+          <td class="py-2 pr-4">
+            <span class="inline-flex items-center gap-2">
+              <span class="inline-block w-4 h-4 rounded ring-1 ring-white/20" style="background:${h.colorHex}"></span>
+              <span>${h.colorName||'—'}</span>
+            </span>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function renderTx(){
+      const tbody=els.txBody; tbody.innerHTML="";
+      if(state.tx.length===0){ tbody.innerHTML=`<tr><td class="py-3 hint" colspan="7">No transactions yet.</td></tr>`; return; }
+      state.tx.slice(0,200).forEach(tx=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td>${tx.t}</td>
+          <td class="${tx.type==='CASH IN'?'text-emerald-300':'text-red-300'}">${tx.type}</td>
+          <td>${tx.method||'-'}</td>
+          <td class="text-right">${fmt(tx.amount)}</td>
+          <td class="text-right">${fmt(tx.after)}</td>
+          <td>${tx.ref||'-'}</td>
+          <td><button class="btn btn-ghost text-xs" data-receipt="${tx.id}"><i class="fa-regular fa-file-lines"></i> Receipt</button></td>`;
+        tbody.appendChild(tr);
+      });
+      qsa("[data-receipt]").forEach(b=> b.onclick=()=>downloadReceipt(b.dataset.receipt));
+    }
+
+    /* Color + letters engine (FAST) */
+    function startColorFlashing(){ stopColorFlashing();
+      colorTimer=setInterval(()=>{ const pick=COLORS[Math.floor(Math.random()*COLORS.length)];
+        lastColor=pick.hex; setBoxColor(lastColor); setLocked(lastColor); }, 30); }
+    const stopColorFlashing=()=>{ if(colorTimer){ clearInterval(colorTimer); colorTimer=null; } };
+    function startLetters(i){ stopLetters(i);
+      letterTimers[i]=setInterval(()=>{ const L=LETTERS[Math.floor(Math.random()*LETTERS.length)];
+        cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=L); currentLetters[i]=L; updateCombination(); }, 50+Math.floor(Math.random()*20)); }
+    const stopLetters=i=>{ if(letterTimers[i]){ clearInterval(letterTimers[i]); letterTimers[i]=null; } };
+    function updateCombination(){ els.combination.textContent=currentLetters.join(" "); }
+
+    function physicsLoop(ts){
+      if(!lastT) lastT=ts; const dt=(ts-lastT)/1000; lastT=ts;
+      let any=false, now=performance.now();
+      for(const c of cubes){
+        if(!c.active) continue; any=true;
+        if(now>=c.flipAt){ c.dir*=-1; c.flipAt = now + 500 + Math.random()*120; }
+        c.rx += c.vx * c.dir * dt;
+        c.el.style.transform=`rotateX(${c.rx}deg)`;
+        if(!isSpinning){
+          c.vx*=0.92;
+          if(Math.abs(c.vx)<8){
+            const sx=Math.round(c.rx/360)*360;
+            c.active=false; c.vx=0; c.rx=sx; c.el.style.transition="transform 360ms var(--ease)";
+            c.el.style.transform=`rotateX(${sx}deg)`; setTimeout(()=>{ c.el.style.transition=""; }, 380);
+          }
+        }
+      }
+      if(any||isSpinning){ rafId=requestAnimationFrame(physicsLoop); } else { rafId=null; }
+    }
+    function finalizeUniqueLetters(){
+      const used=new Set(); const pool=[...LETTERS];
+      for(let i=0;i<4;i++){ const L=currentLetters[i];
+        if(L && L!=="-" && !used.has(L)){ used.add(L); const idx=pool.indexOf(L); if(idx>-1) pool.splice(idx,1); }
+        else{ currentLetters[i]=null; } }
+      for(let i=0;i<4;i++){ if(!currentLetters[i]){ const pick=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+        currentLetters[i]=pick; cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=pick); } }
+      updateCombination();
+    }
+    function evaluate(combo,bet){
+      const lettersOK=state.targetsSubmitted && combo===state.target.letters.join("");
+      const colorOK=state.target.color && lastColor.toLowerCase()===state.target.color.hex.toLowerCase();
+      const win=!!(lettersOK&&colorOK); const payout=win? bet*MULTIPLIER : 0;
+      const colorName=(COLORS.find(c=>c.hex.toLowerCase()===lastColor.toLowerCase())||{}).name||"—";
+      return {win,payout,winText:win?`Win (Letters+Color ×${MULTIPLIER})`:`Lose (Need both letters & color)`, colorName, colorHex:lastColor};
+    }
+
+    /* Targets input */
+    const readTargets=()=>els.tgInputs.map(i=>(i.value||"").toUpperCase());
+    const setInputs=v=>els.tgInputs.forEach((inp,i)=> inp.value=v[i]||"");
+    const showDupHint=s=>els.dupHint.classList.toggle("show",!!s);
+    const validTarget=()=>{ const t=readTargets(); if(t.some(v=>!v)) return false; return (new Set(t)).size===4; }
+    const updateSubmitVisibility=()=> els.submitTargets.classList.toggle("hidden", !(validTarget() && !!state.target.color && !state.targetsSubmitted));
+    function validateAndFixInput(idx){
+      const inputs=readTargets(); let val=inputs[idx];
+      if(!val){ showDupHint(false); updateSubmitVisibility(); return true; }
+      if(!/^[A-Z]$/.test(val)){ els.tgInputs[idx].value=""; showDupHint(false); updateSubmitVisibility(); return false; }
+      for(let i=0;i<inputs.length;i++){ if(i!==idx && inputs[i]===val){ els.tgInputs[idx].value=""; showDupHint(true); setTimeout(()=>showDupHint(false),900); updateSubmitVisibility(); return false; } }
+      showDupHint(false); if(idx<3) els.tgInputs[idx+1].focus(); updateSubmitVisibility(); return true;
+    }
+    function submitTargets(){
+      if(!validTarget()){ els.tgError.classList.remove("hidden"); toast("Targets invalid: 4 unique A–Z required.",false); return; }
+      if(!state.target.color){ toast("Pumili ng target color.",false); return; }
+      state.target.letters=readTargets(); state.targetsSubmitted=true; save(); renderTargets();
+      els.tgError.classList.add("hidden"); toast("Targets submitted & locked"); ensureAC(); beep(880,.1);
+    }
+    const unlockTargets=()=>{ state.targetsSubmitted=false; save(); renderTargets(); toast("Targets unlocked"); };
+
+    /* Play */
+    function validBet(){
+      const b=Number(els.bet.value||0);
+      if(!Number.isFinite(b)||b<2){ toast("Minimum bet is ₱2",false); return null; }
+      if(b>state.balance){ toast("Insufficient balance",false); return null; }
+      if(!state.targetsSubmitted){ toast("Submit your letters first.",false); return null; }
+      if(!state.target.color){ toast("Pumili ng target color.",false); return null; }
+      return Math.floor(b);
+    }
+    function startSpin(){
+      if(isSpinning) return;
+      const b=validBet(); if(b===null) return;
+      ensureAC(); beep(660,.06);
+      state.balance-=b; pendingBet=b; renderBasics(); save();
+      state.stats.spins++; renderBasics(); save();
+
+      isSpinning=true; syncStartStopDisabled(true,false);
+      els.resultBar.classList.add("hidden");
+      startColorFlashing();
+
+      cubes.forEach((c,i)=>{ c.active=true; c.vx=540; c.dir=(i%2===0)?1:-1; c.flipAt=performance.now()+500*(0.5+Math.random()*0.5); startLetters(i); });
+      if(!rafId){ lastT=0; rafId=requestAnimationFrame(physicsLoop); }
+    }
+    async function stopSpin(){
+      if(!isSpinning) return;
+      isSpinning=false; syncStartStopDisabled(false,true);
+      stopColorFlashing(); setBoxColor(lastColor); setLocked(lastColor);
+
+      for(let i=0;i<4;i++){ stopLetters(i); await new Promise(r=>setTimeout(r,100)); }
+      finalizeUniqueLetters(); state.stats.combos++; renderBasics(); save();
+
+      const combo=currentLetters.join(""); const res=evaluate(combo, pendingBet);
+
+      if(res.win){
+        state.stats.winStreak++; state.stats.lossStreak=0;
+        state.stats.bestPayout=Math.max(state.stats.bestPayout,res.payout);
+        els.lastWinText.textContent=`${nowText()} • ${combo} • ${res.colorName} • ${fmt(res.payout)}`;
+        cubeIds.forEach(id=>qs("#"+id).classList.add("win")); setTimeout(()=>cubeIds.forEach(id=>qs("#"+id).classList.remove("win")),1600);
+        state.stats.wins++; beep(1040,.12,.09);
+      }else{
+        state.stats.lossStreak++; state.stats.winStreak=0; beep(330,.08,.05);
+      }
+
+      state.balance+=res.payout;
+      state.stats.peakBalance=Math.max(state.stats.peakBalance,state.balance);
+      renderBasics(); save();
+
+      state.history.unshift({t:nowText(), combo, winText:res.winText, bet:pendingBet, payout:res.payout, colorHex:res.colorHex, colorName:res.colorName});
+      if(state.history.length>300) state.history.pop(); renderHistory(); save();
+
+      els.resultBar.classList.remove("hidden");
+      els.resultIcon.className=res.win?"fa-solid fa-trophy text-[color:var(--gold)]":"fa-solid fa-circle-info";
+      els.resultText.textContent=res.win?`PANALO! ${combo}`:`TAPOS. ${combo}`;
+      els.resultSub.textContent=res.win?`Bet ${fmt(pendingBet)} → Payout ${fmt(res.payout)} (×${MULTIPLIER})`:`Bet ${fmt(pendingBet)} → Payout ₱0.00`;
+      els.winColorName.textContent=res.colorName; els.winColorSwatch.style.background=res.colorHex;
+
+      // Auto rules
+      if(auto.enabled){
+        const lossLimit = Math.max(1, parseInt(els.lossLimit.value,10)||5);
+        const stopOnWin = els.stopOnWin.checked;
+        if((stopOnWin && res.win) || state.stats.lossStreak>=lossLimit){ auto.enabled=false; toast("Auto stopped"); pendingBet=0; return; }
+        if(state.balance>=2 && auto.left>0){ auto.left--; startSpin(); } else { auto.enabled=false; if(state.balance<2) toast("Auto stopped: low balance",false); }
+      }
+
+      pendingBet=0;
+    }
+
+    /* Cashier (segmented methods, receipts, CSV) */
+    function buildSegmented(el, options, initial, onChange){
+      el.innerHTML=""; options.forEach(name=>{ const b=document.createElement("button");
+        b.type="button"; b.textContent=name; b.setAttribute("aria-pressed", name===initial?"true":"false"); b.className="text-sm";
+        b.onclick=()=>{ qsa("button",el).forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); onChange(name); };
+        el.appendChild(b); });
+    }
+    function pushTx(type, amount, method, after){
+      const id="TX"+Date.now()+Math.floor(Math.random()*1000);
+      const ref=(Math.random().toString(36).slice(2,6)+"-"+Math.random().toString(36).slice(2,6)).toUpperCase();
+      const rec={ id, t:nowText(), type, amount:Math.floor(amount), method, after, ref };
+      state.tx.unshift(rec); if(state.tx.length>400) state.tx.pop(); save(); renderTx(); return rec;
+    }
+    function downloadReceipt(id){
+      const tx=state.tx.find(x=>x.id===id); if(!tx){ toast("Receipt not found",false); return; }
+      const txt=[
+        "WILYONARYO OFFLINE RECEIPT","--------------------------",
+        `Ref: ${tx.ref}`,`Type: ${tx.type}`,`Method: ${tx.method}`,`Amount: ${fmt(tx.amount)}`,
+        `Balance After: ${fmt(tx.after)}`,`Time: ${tx.t}`,"","Note: Local offline receipt (for demo)."].join("\n");
+      const blob=new Blob([txt],{type:"text/plain"}); const url=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=url; a.download=`receipt_${tx.ref}.txt`; a.click(); URL.revokeObjectURL(url);
+    }
+    function exportTxCSV(){
+      if(state.tx.length===0){ toast("No transactions to export",false); return; }
+      const rows=[["Time","Type","Method","Amount","BalanceAfter","Ref","Id"]];
+      state.tx.forEach(x=> rows.push([x.t,x.type,x.method,x.amount,x.after,x.ref,x.id]));
+      const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
+      const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+      const a=document.createElement("a"); a.href=url; a.download=`wilyonaryo_transactions_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+    }
+    function cashIn(amount){ const amt=Math.floor(Number(amount)||0); if(amt<=0){ toast("Enter valid cash-in amount",false); return; }
+      state.balance+=amt; state.stats.peakBalance=Math.max(state.stats.peakBalance,state.balance);
+      const rec=pushTx("CASH IN",amt,state.methodIn,state.balance); renderBasics(); toast(`Cash In ${fmt(amt)} via ${state.methodIn}`);
+      ensureAC(); beep(920,.09,.08); setTimeout(()=>downloadReceipt(rec.id),120); }
+    function withdraw(amount){ let amt=Math.floor(Number(amount)||0);
+      if(amt<50){ toast("Minimum withdraw ₱50",false); return; } if(amt%10!==0){ toast("Withdraw must be multiple of 10",false); return; }
+      if(amt>state.balance){ toast("Insufficient balance",false); return; }
+      state.balance-=amt; const rec=pushTx("WITHDRAW",amt,state.methodOut,state.balance);
+      renderBasics(); toast(`Withdraw ${fmt(amt)} via ${state.methodOut}`); ensureAC(); beep(380,.08,.06); setTimeout(()=>downloadReceipt(rec.id),120); }
+
+    /* Wallet helpers */
+    function claimDailyBonus(){ const today=todayStr(); if(state.bonus.last===today){ toast("Bonus already claimed today",false); return; }
+      state.bonus.last=today; state.balance+=50; state.stats.peakBalance=Math.max(state.stats.peakBalance,state.balance);
+      pushTx("BONUS",50,"Daily Bonus",state.balance); save(); renderBasics(); toast("Daily Bonus +₱50 🎁"); ensureAC(); beep(940,.09,.08); }
+    function initialsToTargets(){ if(state.targetsSubmitted) return;
+      const name=(els.playerName.value||state.name||"").toUpperCase().replace(/[^A-Z ]/g,"").trim();
+      let letters=(name.split(/\s+/).map(w=>w[0]).join("")+"ABCDEFGHIJKLMNOPQRSTUVWXYZ").split("");
+      const picks=[]; const used=new Set(); for(const ch of letters){ if(ch&&!used.has(ch)){ picks.push(ch); used.add(ch); if(picks.length===4) break; } }
+      while(picks.length<4){ const ch=String.fromCharCode(65+Math.floor(Math.random()*26)); if(!used.has(ch)){ picks.push(ch); used.add(ch); } }
+      setInputs(picks); state.target.letters=[...picks]; save(); updateSubmitVisibility(); toast("Targets filled from initials"); }
+
+    /* Builders */
+    function buildColorPicker(){ els.colorGrid.innerHTML="";
+      COLORS.forEach(c=>{ const b=document.createElement("button"); b.className="w-full aspect-square rounded-lg ring-1 ring-white/20 hover:ring-white/60";
+        b.title=c.name; b.style.background=c.hex; b.onclick=()=>{ state.target.color={name:c.name,hex:c.hex}; save(); renderTargets(); }; els.colorGrid.appendChild(b); });
+      els.tgColorClear.onclick=()=>{ state.target.color=null; save(); renderTargets(); }; }
+    function randomizeInputs(){ if(state.targetsSubmitted) return; const pool=[...LETTERS],picks=[]; for(let i=0;i<4;i++){ picks.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]); }
+      setInputs(picks); state.target.letters=[...picks]; save(); updateSubmitVisibility(); }
+    function clearInputs(){ if(state.targetsSubmitted) return; setInputs(["","","",""]); state.target.letters=["","","",""]; save(); updateSubmitVisibility(); }
+    function buildCubesPrime(){ const all="ABCDEFGHIJKLMNOPQRSTUVWXYZ"; cubeIds.forEach((id)=>{ const el=qs("#"+id); el.querySelectorAll(".face").forEach(f=>f.textContent=all[Math.floor(Math.random()*all.length)]); el.style.transform="rotateX(0deg)"; });
+      setBoxColor(lastColor); setLocked(lastColor); els.combination.textContent="- - - -"; }
+
+    /* Bind */
+    function bind(){
+      els.saveName.onclick=()=>{ state.name=(els.playerName.value||"Player").slice(0,32); save(); renderBasics(); toast("Profile saved"); };
+      els.useInitials.onclick=initialsToTargets;
+
+      els.dailyBonus.onclick=claimDailyBonus;
+      els.reset.onclick=()=>{ if(confirm("Reset all data?")){ localStorage.removeItem(STORAGE_KEY); location.reload(); } };
+
+      buildSegmented(els.cashInSeg, METHODS_IN, state.methodIn, v=>{state.methodIn=v; save();});
+      buildSegmented(els.wdSeg, METHODS_OUT, state.methodOut, v=>{state.methodOut=v; save();});
+
+      qsa("[data-cashin]").forEach(b=> b.onclick=()=>{ const inc=+b.dataset.cashin||0; els.cashInAmt.value=Math.max(1,(+els.cashInAmt.value||0)+inc); });
+      qsa("[data-wd]").forEach(b=> b.onclick=()=>{ const amt=+b.dataset.wd||0; els.wdAmt.value=amt; });
+      els.cashInMax.onclick=()=>{ const v=+els.cashInAmt.value||0; els.cashInAmt.value=Math.ceil(v/100)*100 || 100; };
+      els.wdAll.onclick=()=>{ els.wdAmt.value=Math.floor(state.balance/10)*10; };
+
+      els.cashInBtn.onclick=()=>cashIn(els.cashInAmt.value);
+      els.wdBtn.onclick=()=>withdraw(els.wdAmt.value);
+      els.exportTx.onclick=exportTxCSV;
+      els.clearTx.onclick=()=>{ state.tx=[]; save(); renderTx(); toast("Transactions cleared"); };
+
+      qsa("[data-quickbet]").forEach(b=> b.onclick=()=>{ const inc=+b.dataset.quickbet||0; els.bet.value=Math.max(2,(+els.bet.value||0)+inc); });
+      els.betMax&& (els.betMax.onclick=()=>{ els.bet.value=Math.max(2, Math.floor(state.balance)); });
+      els.betX2&& (els.betX2.onclick=()=>{ els.bet.value=Math.max(2, Math.floor((+els.bet.value||2)*2)); });
+
+      els.tgInputs.forEach((inp,idx)=>{
+        inp.addEventListener("input",(e)=>{
+          if(state.targetsSubmitted){ e.target.value=e.target.value.toUpperCase().slice(0,1); return; }
+          e.target.value=(e.target.value||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
+          validateAndFixInput(idx); state.target.letters=readTargets(); save(); els.tgError.classList.toggle("hidden",validTarget());
+        });
+        inp.addEventListener("keydown",e=>{ if(e.key==="Backspace" && !inp.value && idx>0) els.tgInputs[idx-1].focus(); });
+      });
+
+      els.tgRandom.onclick=randomizeInputs;
+      els.tgClear.onclick=clearInputs;
+      els.submitTargets.onclick=submitTargets;
+      els.unlockTargets.onclick=unlockTargets;
+
+      els.start.onclick=startSpin; els.stop.onclick=stopSpin; els.start2&& (els.start2.onclick=startSpin); els.stop2&& (els.stop2.onclick=stopSpin);
+
+      els.clearHistory.onclick=()=>{ state.history=[]; save(); renderHistory(); toast("Game history cleared"); };
+      els.exportHistory.onclick=()=>{
+        if(state.history.length===0){ toast("No game history to export",false); return; }
+        const rows=[["Time","Combo","Result","Bet","Payout","ColorName","ColorHex"]];
+        state.history.forEach(h=> rows.push([h.t,h.combo,h.winText,h.bet,h.payout,h.colorName||"",h.colorHex||""]));
+        const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
+        const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+        const a=document.createElement("a"); a.href=url; a.download=`wilyonaryo_gamehistory_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+      };
+      els.copyResult.onclick=async ()=>{ try{ await navigator.clipboard.writeText(els.combination.textContent.replace(/\s+/g,"")); toast("Combination copied"); }catch{ toast("Clipboard blocked",false); } };
+
+      els.drawerBtn.onclick=()=> els.drawer.classList.toggle("open");
+      els.toggleSound.onchange=()=>{ state.sound=els.toggleSound.checked; save(); if(state.sound){ ensureAC(); beep(880,.05,.05); } };
+
+      window.addEventListener("keydown",(e)=>{ const k=e.key.toLowerCase(); if(k==="s") startSpin(); if(k==="x") stopSpin();
+        if(e.key==="?") els.helpOverlay.classList.add("show"); if(k==="escape") els.helpOverlay.classList.remove("show"); });
+      els.closeHelp.onclick=()=> els.helpOverlay.classList.remove("show");
+    }
+
+    function init(){
+      load(); buildColorPicker(); renderBasics(); renderTargets(); renderHistory(); renderTx(); buildCubesPrime(); bind(); syncStartStopDisabled(false,true);
+    }
+    init();
+  })();
+  </script>
+</body>
+</html>

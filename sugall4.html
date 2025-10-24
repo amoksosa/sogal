@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WILYONARYO — FAST + x5000 (Letters AND Color)</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --bg:#0b1220; --ring:rgba(255,255,255,.14);
+      --text:#e9f4ff; --sub:#bcd0ea;
+      --accent:#50e3c2; --accent2:#69a8ff; --gold:#ffd54a;
+      --radius:18px; --br:16px;
+      --cube:112px; --tz:56px; --fs:2.1rem; --ease:cubic-bezier(.22,1,.36,1);
+      --boxColor:#69A8FF;   /* synced color for 4 boxes */
+      --locked:#50E3C2;     /* shows in result bar swatch */
+    }
+    @media (max-width:520px){ :root{ --cube:92px; --tz:46px; --fs:1.8rem } }
+    @media (min-width:1536px){ :root{ --cube:136px; --tz:68px; --fs:2.35rem } }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 15% 0%, #1b2b51 0%, transparent 60%),
+        radial-gradient(1000px 700px at 100% 100%, #13223e 0%, transparent 60%),
+        var(--bg);
+      overflow-x:hidden;
+    }
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border:1px solid var(--ring);
+      border-radius:var(--radius); padding:16px; box-shadow:0 18px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)}
+    .pill{display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .8rem; background:rgba(255,255,255,.06);
+      border:1px solid var(--ring); border-radius:999px; font-weight:700;}
+
+    .btn{display:inline-flex;align-items:center;gap:.55rem;font-weight:800;padding:.75rem 1rem;border-radius:14px;border:1px solid var(--ring);
+      background:rgba(255,255,255,.06); transition:transform .12s var(--ease), box-shadow .15s var(--ease);}
+    .btn:active{transform:translateY(1px) scale(.99)}
+    .btn-accent{background:linear-gradient(90deg, var(--accent), var(--accent2)); color:#0b1220; border:0;}
+    .btn-danger{background:linear-gradient(90deg,#ff6b8b,#ff3b55); color:#0b1220; border:0;}
+    .btn-ghost{background:rgba(255,255,255,.06)}
+    .btn-disabled{opacity:.55; pointer-events:none; filter:grayscale(.25)}
+
+    .rack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;place-items:center}
+    @media (min-width:1024px){ .rack{grid-template-columns:repeat(4,minmax(0,1fr))} }
+
+    .cube-wrap{width:var(--cube);height:var(--cube);perspective:1100px}
+    .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+
+    .face{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:var(--fs); letter-spacing:.06em; color:#0c1222; user-select:none; backface-visibility:hidden;
+      border:2px solid rgba(0,0,0,.25); border-radius:var(--br);
+      background:
+        radial-gradient(120% 120% at 28% 22%, #ffffffaa, transparent 58%),
+        linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.02)),
+        var(--boxColor);
+      box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 -1px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+      transition:border-radius 240ms var(--ease), transform 260ms var(--ease);
+    }
+    .front  { transform: rotateY(  0deg) translateZ(var(--tz)); }
+    .back   { transform: rotateY(180deg) translateZ(var(--tz)); }
+    .right  { transform: rotateY( 90deg) translateZ(var(--tz)); }
+    .left   { transform: rotateY(-90deg) translateZ(var(--tz)); }
+    .top    { transform: rotateX( 90deg) translateZ(var(--tz)); }
+    .bottom { transform: rotateX(-90deg) translateZ(var(--tz)); }
+
+    @keyframes winGlow{0%,100%{box-shadow:0 0 0 rgba(255,213,74,0)}50%{box-shadow:0 0 28px rgba(255,213,74,.9)}}
+    .win .face{animation:winGlow 1.2s ease-in-out 2}
+
+    .stat{display:grid;place-items:center;gap:.25rem;padding:.85rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--ring)}
+    .hint{color:var(--sub)}
+    .kbd{padding:.1rem .4rem;border:1px solid var(--ring);border-bottom-width:2px;border-radius:6px;background:rgba(255,255,255,.04)}
+
+    .tg{ text-transform:uppercase; text-align:center; font-weight:900; letter-spacing:.05em; border-radius:12px; padding:.55rem;
+      background:rgba(255,255,255,.06); border:1px solid var(--ring); }
+    .tg:disabled{opacity:.7}
+    .error-hint{opacity:0; transition:opacity .2s}
+    .error-hint.show{opacity:1}
+
+    .drawer{position:fixed; right:16px; bottom:16px; z-index:40}
+    .drawer .panel{display:none; margin-top:.5rem}
+    .drawer.open .panel{display:block}
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:px-6">
+  <!-- HEADER -->
+  <header class="max-w-7xl mx-auto mb-6">
+    <div class="card p-4 md:p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-11 w-11 rounded-xl grid place-items-center bg-white/10 ring-1 ring-white/15">
+            <span id="avatarInitials" class="font-extrabold">PL</span>
+          </div>
+          <div>
+            <h1 class="text-2xl md:text-4xl font-black">WILYONARYO</h1>
+            <p class="hint text-xs md:text-sm">FAST locked • Win needs Letters + Color • Payout ×5000</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 md:gap-3">
+          <div class="pill">
+            <i class="fa-regular fa-user text-[color:var(--gold)]"></i>
+            <input id="playerName" class="bg-transparent outline-none w-28 md:w-44" placeholder="Player"/>
+            <button id="saveName" class="btn btn-ghost text-xs">Save</button>
+          </div>
+          <div class="pill">
+            <i class="fa-solid fa-wallet text-[color:var(--accent)]"></i>
+            <span class="hint">Balance</span>
+            <strong id="balanceText" class="font-extrabold">₱0.00</strong>
+            <button id="add50" class="btn btn-ghost text-xs" title="Add ₱50">+₱50</button>
+            <button id="resetData" class="btn btn-ghost text-xs" title="Reset">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTROLS -->
+  <section class="max-w-7xl mx-auto">
+    <div class="grid xl:grid-cols-3 gap-5">
+      <!-- Play -->
+      <div class="card">
+        <h2 class="text-xl md:text-2xl font-extrabold">Play</h2>
+        <p class="hint mt-1">Win requires <b>exact letters</b> (4 unique, in order) <b>AND</b> <b>color match</b>. Keys: <span class="kbd">S</span> start, <span class="kbd">X</span> stop.</p>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <div class="pill">
+            <i class="fa-solid fa-coins text-[color:var(--gold)]"></i>
+            <label for="betInput" class="hint">Bet</label>
+            <input id="betInput" type="number" min="2" step="1" class="bg-transparent outline-none w-20 md:w-24 font-semibold" value="2"/>
+            <span class="hint text-xs">₱ (min 2)</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost text-xs" data-quickbet="2">+₂</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="5">+₅</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="10">+₁₀</button>
+            <button class="btn btn-ghost text-xs" id="betMax">MAX</button>
+            <button class="btn btn-ghost text-xs" id="betX2">×2</button>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button id="startBtn" class="btn btn-accent"><i class="fa-solid fa-play"></i> START</button>
+          <button id="stopBtn"  class="btn btn-danger" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+
+          <!-- Speed shown as FAST and locked -->
+          <div class="pill text-sm opacity-70">
+            <i class="fa-solid fa-gauge text-[color:var(--gold)]"></i>
+            <span class="whitespace-nowrap">Speed: FAST (locked)</span>
+          </div>
+        </div>
+
+        <!-- Auto spin -->
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <div class="pill text-sm">
+            <i class="fa-solid fa-repeat"></i>
+            <select id="autoCount" class="bg-transparent outline-none">
+              <option value="5">Auto 5</option>
+              <option value="10">Auto 10</option>
+              <option value="20">Auto 20</option>
+            </select>
+          </div>
+          <button id="autoBtn" class="btn btn-ghost text-xs"><i class="fa-solid fa-robot"></i> Start Auto</button>
+        </div>
+
+        <div id="resultBar" class="mt-4 hidden">
+          <div class="card p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <i id="resultIcon" class="fa-solid fa-circle-info"></i>
+              <div>
+                <div id="resultText" class="font-semibold">—</div>
+                <div class="text-xs hint" id="resultSub">—</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="hint">Locked Color:</span>
+              <span id="winColorName" class="font-bold">—</span>
+              <span id="winColorSwatch" class="inline-block w-5 h-5 rounded-md ring-1 ring-white/20" style="background:var(--locked)"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mt-4">
+          <div class="stat"><div class="text-xl text-[color:var(--accent)]"><i class="fa-solid fa-arrows-rotate"></i></div><div id="spinCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Spins</div></div>
+          <div class="stat"><div class="text-xl text-[color:var(--gold)]"><i class="fa-solid fa-trophy"></i></div><div id="winCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Wins</div></div>
+          <div class="stat"><div class="text-xl text-[color:var(--accent2)]"><i class="fa-solid fa-bolt"></i></div><div id="comboCount" class="text-lg font-extrabold">0</div><div class="hint text-xs">Combos</div></div>
+        </div>
+      </div>
+
+      <!-- Target Letters -->
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Letters (4, unique)</h3>
+          <div class="flex gap-2">
+            <button id="tgRandom" class="btn btn-ghost text-xs">Random</button>
+            <button id="tgClear" class="btn btn-ghost text-xs">Clear</button>
+          </div>
+        </div>
+        <p class="hint text-sm mt-1">Exact order ang panalo. Walang double letter.</p>
+
+        <div class="mt-3 grid grid-cols-4 gap-2">
+          <input class="tg" maxlength="1" placeholder="A">
+          <input class="tg" maxlength="1" placeholder="B">
+          <input class="tg" maxlength="1" placeholder="C">
+          <input class="tg" maxlength="1" placeholder="D">
+        </div>
+        <div class="mt-2 text-xs text-red-300 error-hint" id="dupHint">Duplicate letter! Hindi puwedeng maulit.</div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <button id="submitTargets" class="btn text-xs hidden"><i class="fa-solid fa-check"></i> Submit Targets</button>
+          <button id="unlockTargets" class="btn btn-ghost text-xs hidden"><i class="fa-solid fa-unlock"></i> Unlock</button>
+          <span id="tgError" class="text-xs text-red-300 hidden">Kailangang 4 unique A–Z.</span>
+          <span id="tgOK" class="text-xs text-emerald-300 hidden">Targets locked!</span>
+        </div>
+      </div>
+
+      <!-- Target Color -->
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Color</h3>
+          <button id="tgColorClear" class="btn btn-ghost text-xs">Clear</button>
+        </div>
+        <p class="hint text-sm mt-1">Win requires color match din (same sa “winning color”).</p>
+
+        <div id="colorGrid" class="mt-3 grid grid-cols-6 gap-2"></div>
+
+        <div class="mt-3 flex items-center gap-3">
+          <div class="flex items-center gap-2 text-sm">
+            <span class="hint">Selected:</span>
+            <span id="selColorName" class="font-semibold">—</span>
+            <span id="selColorSwatch" class="inline-block w-4 h-4 rounded ring-1 ring-white/20"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUBES -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="rack">
+      <div class="cube-wrap"><div class="cube" id="cube1">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube2">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube3">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+      <div class="cube-wrap"><div class="cube" id="cube4">
+        <div class="face front"></div><div class="face back"></div><div class="face right"></div>
+        <div class="face left"></div><div class="face top"></div><div class="face bottom"></div>
+      </div></div>
+    </div>
+
+    <div class="mt-3 md:hidden">
+      <div class="card flex items-center justify-center gap-3">
+        <button id="startBtn2" class="btn btn-accent w-1/2"><i class="fa-solid fa-play"></i> START</button>
+        <button id="stopBtn2"  class="btn btn-danger w-1/2" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMBINATION -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="card text-center">
+      <h3 class="text-base md:text-lg tracking-widest font-bold">YOUR LUCKY COMBINATION</h3>
+      <div id="combination" class="text-4xl md:text-6xl font-black tracking-[.28em] mt-1">- - - -</div>
+      <p class="hint mt-2 text-sm">Win = exact letters + color • Payout: <b>×5000</b></p>
+      <div class="mt-3 flex items-center justify-center gap-2">
+        <button id="exportHistory" class="btn btn-ghost text-xs">Export CSV</button>
+        <button id="copyResult" class="btn btn-ghost text-xs"><i class="fa-regular fa-clipboard"></i> Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-lg md:text-xl">Game History</h4>
+        <button id="clearHistory" class="btn btn-ghost text-xs">Clear</button>
+      </div>
+      <div class="overflow-x-auto mt-3">
+        <table class="min-w-full text-sm">
+          <thead class="hint">
+            <tr>
+              <th class="text-left py-2 pr-4">Time</th>
+              <th class="text-left py-2 pr-4">Combo</th>
+              <th class="text-left py-2 pr-4">Result</th>
+              <th class="text-right py-2 pr-4">Bet</th>
+              <th class="text-right py-2 pr-4">Payout</th>
+              <th class="text-left py-2 pr-4">Locked Color</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <div class="drawer" id="drawer">
+    <button id="drawerBtn" class="btn btn-ghost text-xs"><i class="fa-solid fa-sliders"></i> Settings</button>
+    <div class="panel card p-3 w-56">
+      <label class="flex items-center justify-between text-sm mb-2">
+        <span>Sound Effects</span>
+        <input id="toggleSound" type="checkbox" class="accent-emerald-400" checked>
+      </label>
+      <p class="hint text-xs">Locked to FAST speed • Win needs letters + color</p>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    /* ===== Constants ===== */
+    const LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const COLORS=[
+      {name:"Mint",hex:"#50E3C2"},{name:"Cyan",hex:"#22D3EE"},{name:"Sky",hex:"#69A8FF"},
+      {name:"Violet",hex:"#A78BFA"},{name:"Gold",hex:"#FFD54A"},{name:"Pink",hex:"#FF6B8B"},
+      {name:"Jade",hex:"#1ABC9C"},{name:"Amber",hex:"#F8C471"}
+    ];
+    const MULTIPLIER = 5000; // fixed x5000 payout
+    const STORAGE_KEY="wily_fast_x5000_both_v1";
+
+    const qs=(s,r=document)=>r.querySelector(s);
+    const qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+    /* ===== DOM refs ===== */
+    const els={
+      avatar:qs("#avatarInitials"), playerName:qs("#playerName"), saveName:qs("#saveName"),
+      balanceText:qs("#balanceText"), add50:qs("#add50"), reset:qs("#resetData"),
+      bet:qs("#betInput"), betMax:qs("#betMax"), betX2:qs("#betX2"),
+      start:qs("#startBtn"), stop:qs("#stopBtn"), start2:qs("#startBtn2"), stop2:qs("#stopBtn2"),
+      resultBar:qs("#resultBar"), resultIcon:qs("#resultIcon"), resultText:qs("#resultText"), resultSub:qs("#resultSub"),
+      winColorName:qs("#winColorName"), winColorSwatch:qs("#winColorSwatch"),
+      spinCount:qs("#spinCount"), winCount:qs("#winCount"), comboCount:qs("#comboCount"),
+      historyBody:qs("#historyBody"), exportHistory:qs("#exportHistory"), clearHistory:qs("#clearHistory"),
+      combination:qs("#combination"),
+      tgInputs:qsa(".tg"), tgRandom:qs("#tgRandom"), tgClear:qs("#tgClear"),
+      tgError:qs("#tgError"), tgOK:qs("#tgOK"), dupHint:qs("#dupHint"), submitTargets:qs("#submitTargets"),
+      unlockTargets:qs("#unlockTargets"),
+      colorGrid:qs("#colorGrid"), tgColorClear:qs("#tgColorClear"),
+      selColorName:qs("#selColorName"), selColorSwatch:qs("#selColorSwatch"),
+      drawer:qs("#drawer"), drawerBtn:qs("#drawerBtn"), toggleSound:qs("#toggleSound"),
+      copyResult:qs("#copyResult"), autoBtn:qs("#autoBtn"), autoCount:qs("#autoCount"),
+    };
+
+    const cubeIds=["cube1","cube2","cube3","cube4"];
+    const cubes=cubeIds.map((id,i)=>({ id, el:qs("#"+id), rx:0, vx:0, dir:(i%2===0?1:-1), flipAt:0, active:false }));
+
+    let currentLetters=["-","-","-","-"];
+    let letterTimers=[null,null,null,null];
+    let colorTimer=null;
+    let isSpinning=false, rafId=null, lastT=0, pendingBet=0;
+    let lastColor=getComputedStyle(document.documentElement).getPropertyValue("--boxColor").trim()||"#69A8FF";
+
+    const auto={enabled:false,left:0};
+
+    /* ===== State ===== */
+    const state={name:"Player",balance:200,history:[],stats:{spins:0,wins:0,combos:0},
+      target:{letters:["","","",""],color:null}, targetsSubmitted:false, sound:true};
+
+    /* ===== Audio ===== */
+    let ac=null; const ensureAC=()=>{ if(!ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch{} } };
+    const beep=(f=880,d=.08,v=.07)=>{ if(!state.sound||!ac) return; const o=ac.createOscillator(), g=ac.createGain();
+      o.frequency.value=f; o.type="sine"; g.gain.value=v; o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+d); };
+
+    /* ===== Utils ===== */
+    const setBoxColor=(hex)=>document.documentElement.style.setProperty("--boxColor",hex);
+    const setLocked=(hex)=>document.documentElement.style.setProperty("--locked",hex);
+    const fmt=n=>"₱"+Number(n).toFixed(2);
+    const nowText=()=>new Date().toLocaleString();
+    const toast=(msg,ok=true)=>{ const t=document.createElement("div"); t.className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm card";
+      t.style.borderColor=ok?"rgba(80,227,194,.6)":"rgba(255,88,112,.6)"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1600); };
+    const save=()=>localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const load=()=>{ try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) Object.assign(state, JSON.parse(raw));}catch{} };
+    const syncStartStopDisabled=(sd,xd)=>{ [els.start,els.start2].forEach(b=>{ if(!b) return; b.disabled=sd; b.classList.toggle("btn-disabled",sd); });
+      [els.stop,els.stop2].forEach(b=>{ if(!b) return; b.disabled=xd; b.classList.toggle("btn-disabled",xd); }); };
+
+    /* ===== Renderers ===== */
+    function renderBasics(){
+      els.balanceText.textContent=fmt(state.balance);
+      els.spinCount.textContent=state.stats.spins;
+      els.winCount.textContent=state.stats.wins;
+      els.comboCount.textContent=state.stats.combos;
+      els.playerName.value=state.name;
+      const p=(state.name||"").trim().split(/\s+/); const A=p[0]?.[0]||"P", B=p[1]?.[0]||p[0]?.[1]||"L";
+      els.avatar.textContent=(A+B).toUpperCase();
+      els.toggleSound.checked=state.sound;
+    }
+    function renderTargets(){
+      els.tgInputs.forEach((inp,i)=>{inp.value=state.target.letters[i]||""; inp.disabled=state.targetsSubmitted;});
+      if(state.target.color){ els.selColorName.textContent=state.target.color.name; els.selColorSwatch.style.background=state.target.color.hex; }
+      else{ els.selColorName.textContent="—"; els.selColorSwatch.style.background="transparent"; }
+      els.tgOK.classList.toggle("hidden",!state.targetsSubmitted);
+      els.unlockTargets.classList.toggle("hidden",!state.targetsSubmitted);
+      updateSubmitVisibility();
+    }
+    function renderHistory(){
+      const tbody=els.historyBody; tbody.innerHTML="";
+      if(state.history.length===0){ tbody.innerHTML=`<tr><td class="py-3 hint" colspan="6">No games yet.</td></tr>`; return; }
+      state.history.slice(0,150).forEach(h=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td class="py-2 pr-4 whitespace-nowrap">${h.t}</td>
+          <td class="py-2 pr-4">${h.combo}</td>
+          <td class="py-2 pr-4 ${/Win/.test(h.winText)?'text-emerald-300':'text-red-300'}">${h.winText}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.bet)}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.payout)}</td>
+          <td class="py-2 pr-4">
+            <span class="inline-flex items-center gap-2">
+              <span class="inline-block w-4 h-4 rounded ring-1 ring-white/20" style="background:${h.colorHex}"></span>
+              <span>${h.colorName||'—'}</span>
+            </span>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function setResultBar({text,sub,colorName,colorHex,win}){
+      els.resultBar.classList.remove("hidden");
+      els.resultIcon.className=win?"fa-solid fa-trophy text-[color:var(--gold)]":"fa-solid fa-circle-info";
+      els.resultText.textContent=text; els.resultSub.textContent=sub;
+      els.winColorName.textContent=colorName||"—"; els.winColorSwatch.style.background=colorHex||"transparent";
+    }
+
+    /* ===== Color Picker ===== */
+    function buildColorPicker(){
+      els.colorGrid.innerHTML="";
+      COLORS.forEach(c=>{
+        const b=document.createElement("button");
+        b.className="w-full aspect-square rounded-lg ring-1 ring-white/20 hover:ring-white/60";
+        b.title=c.name; b.style.background=c.hex;
+        b.addEventListener("click",()=>{ state.target.color={name:c.name,hex:c.hex}; save(); renderTargets(); });
+        els.colorGrid.appendChild(b);
+      });
+      els.tgColorClear.addEventListener("click",()=>{ state.target.color=null; save(); renderTargets(); });
+    }
+
+    /* ===== FAST-only timings ===== */
+    const letterTick = ()=> 50;   // FAST fixed
+    const colorTick  = ()=> 30;   // FAST fixed
+    const baseVel    = ()=> 540;  // deg/s FAST
+    const flipPeriod = ()=> 500;  // ms FAST
+
+    function updateCombination(){ els.combination.textContent=currentLetters.join(" "); }
+
+    /* ===== Synced color flashing ===== */
+    function startColorFlashing(){
+      stopColorFlashing();
+      colorTimer=setInterval(()=>{
+        const pick=COLORS[Math.floor(Math.random()*COLORS.length)];
+        lastColor=pick.hex; setBoxColor(lastColor); setLocked(lastColor);
+      }, colorTick());
+    }
+    const stopColorFlashing=()=>{ if(colorTimer){ clearInterval(colorTimer); colorTimer=null; } };
+
+    /* ===== Letters cycling ===== */
+    function startLetters(i){
+      stopLetters(i);
+      const tick=letterTick();
+      letterTimers[i]=setInterval(()=>{
+        const L=LETTERS[Math.floor(Math.random()*LETTERS.length)];
+        cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=L);
+        currentLetters[i]=L; updateCombination();
+      }, tick + Math.floor(Math.random()*20));
+    }
+    const stopLetters=i=>{ if(letterTimers[i]){ clearInterval(letterTimers[i]); letterTimers[i]=null; } };
+
+    /* ===== X-axis down↔up rotation with timed direction flips ===== */
+    function physicsLoop(ts){
+      if(!lastT) lastT=ts;
+      const dt=(ts-lastT)/1000; lastT=ts;
+
+      let any=false, now=performance.now();
+      for(const c of cubes){
+        if(!c.active) continue; any=true;
+        if(now >= c.flipAt){ c.dir *= -1; c.flipAt = now + flipPeriod() + Math.random()*120; }
+        c.rx += c.vx * c.dir * dt;
+        c.el.style.transform = `rotateX(${c.rx}deg)`;
+        if(!isSpinning){
+          c.vx *= 0.90;
+          if(Math.abs(c.vx) < 8){
+            const sx = Math.round(c.rx/360)*360;
+            c.active=false; c.vx=0; c.rx=sx;
+            c.el.style.transition="transform 360ms var(--ease)";
+            c.el.style.transform=`rotateX(${sx}deg)`;
+            setTimeout(()=>{ c.el.style.transition=""; }, 380);
+          }
+        }
+      }
+      if(any || isSpinning){ rafId=requestAnimationFrame(physicsLoop); } else { rafId=null; }
+    }
+
+    /* ===== Unique letters on stop ===== */
+    function finalizeUniqueLetters(){
+      const used=new Set(); const pool=[...LETTERS];
+      for(let i=0;i<4;i++){
+        const L=currentLetters[i];
+        if(L && L!=="-" && !used.has(L)){ used.add(L); const idx=pool.indexOf(L); if(idx>-1) pool.splice(idx,1); }
+        else{ currentLetters[i]=null; }
+      }
+      for(let i=0;i<4;i++){
+        if(!currentLetters[i]){
+          const pick=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+          currentLetters[i]=pick;
+          cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=pick);
+          used.add(pick);
+        }
+      }
+      updateCombination();
+    }
+
+    /* ===== Evaluate: BOTH letters AND color must match; payout = bet × 5000 ===== */
+    function evaluate(combo,bet){
+      const lettersOK = state.targetsSubmitted && combo===state.target.letters.join("");
+      const colorOK   = state.target.color && lastColor.toLowerCase()===state.target.color.hex.toLowerCase();
+      const win = !!(lettersOK && colorOK);
+      const payout = win ? bet * MULTIPLIER : 0;
+      const colorName=(COLORS.find(c=>c.hex.toLowerCase()===lastColor.toLowerCase())||{}).name || "—";
+      const reason = win ? `Win (Letters+Color ×${MULTIPLIER})`
+                         : `Lose (Need both letters & color)`;
+      return {win, payout, winText:reason, colorName, colorHex:lastColor};
+    }
+
+    /* ===== Targets typing ===== */
+    const readTargets = ()=> els.tgInputs.map(i=>(i.value||"").toUpperCase());
+    const setInputs   = v => els.tgInputs.forEach((inp,i)=> inp.value=v[i]||"");
+    const showDupHint = s => els.dupHint.classList.toggle("show", !!s);
+    const validTarget = ()=>{ const t=readTargets(); if(t.some(v=>!v)) return false; return (new Set(t)).size===4; }
+    const updateSubmitVisibility = ()=> els.submitTargets.classList.toggle("hidden", !(validTarget() && !!state.target.color && !state.targetsSubmitted));
+    function validateAndFixInput(idx){
+      const inputs=readTargets(); let val=inputs[idx];
+      if(!val){ showDupHint(false); updateSubmitVisibility(); return true; }
+      if(!/^[A-Z]$/.test(val)){ els.tgInputs[idx].value=""; showDupHint(false); updateSubmitVisibility(); return false; }
+      for(let i=0;i<inputs.length;i++){ if(i!==idx && inputs[i]===val){ els.tgInputs[idx].value=""; showDupHint(true); setTimeout(()=>showDupHint(false),900); updateSubmitVisibility(); return false; } }
+      showDupHint(false); if(idx<3) els.tgInputs[idx+1].focus(); updateSubmitVisibility(); return true;
+    }
+    function submitTargets(){
+      if(!validTarget()){ els.tgError.classList.remove("hidden"); toast("Targets invalid: 4 unique A–Z required.",false); return; }
+      if(!state.target.color){ toast("Pumili ng target color.",false); return; }
+      state.target.letters=readTargets(); state.targetsSubmitted=true; save(); renderTargets();
+      els.tgError.classList.add("hidden"); toast("Targets submitted & locked"); ensureAC(); beep(880,.1);
+    }
+    const unlockTargets=()=>{ state.targetsSubmitted=false; save(); renderTargets(); toast("Targets unlocked"); };
+
+    /* ===== Bet & Spin flow ===== */
+    function validBet(){
+      const b=Number(els.bet.value||0);
+      if(!Number.isFinite(b)||b<2){ toast("Minimum bet is ₱2",false); return null; }
+      if(b>state.balance){ toast("Insufficient balance",false); return null; }
+      if(!state.targetsSubmitted){ toast("Submit your letters first.",false); return null; }
+      if(!state.target.color){ toast("Pumili ng target color.",false); return null; }
+      return Math.floor(b);
+    }
+
+    function startSpin(isAuto=false){
+      if(isSpinning) return;
+      const b=validBet(); if(b===null) return;
+      ensureAC(); beep(660,.06);
+
+      state.balance-=b; pendingBet=b; renderBasics(); save();
+      state.stats.spins++; renderBasics(); save();
+
+      isSpinning=true; syncStartStopDisabled(true,false);
+      els.resultBar.classList.add("hidden");
+
+      startColorFlashing(); // synced color for 4 boxes
+
+      const base=baseVel();
+      cubes.forEach((c,i)=>{
+        c.active=true;
+        c.vx = base + (Math.random()*2-1)*40;        // deg/s
+        c.dir = (i%2===0)? 1 : -1;                   // alternate start direction
+        c.flipAt = performance.now() + flipPeriod()* (0.5+Math.random()*0.5); // stagger flips
+        startLetters(i);
+      });
+
+      if(!rafId){ lastT=0; rafId=requestAnimationFrame(physicsLoop); }
+    }
+
+    async function stopSpin(){
+      if(!isSpinning) return;
+      isSpinning=false; syncStartStopDisabled(false,true);
+
+      stopColorFlashing(); setBoxColor(lastColor); setLocked(lastColor);
+
+      for(let i=0;i<4;i++){ stopLetters(i); await new Promise(r=>setTimeout(r,100)); }
+
+      finalizeUniqueLetters();
+      state.stats.combos++; renderBasics(); save();
+
+      const combo=currentLetters.join("");
+      const res=evaluate(combo, pendingBet);
+
+      if(res.win){
+        cubeIds.forEach(id=>qs("#"+id).classList.add("win"));
+        setTimeout(()=>cubeIds.forEach(id=>qs("#"+id).classList.remove("win")),1600);
+        state.stats.wins++; renderBasics(); save(); beep(1040,.12,.09);
+      } else { beep(330,.08,.05); }
+
+      state.balance+=res.payout; renderBasics(); save();
+
+      state.history.unshift({t:nowText(), combo, winText:res.winText, bet:pendingBet, payout:res.payout, colorHex:res.colorHex, colorName:res.colorName});
+      if(state.history.length>300) state.history.pop();
+      renderHistory(); save();
+
+      setResultBar({
+        text: res.win? `PANALO! ${combo}` : `TAPOS. ${combo}`,
+        sub:  res.win? `Bet ${fmt(pendingBet)} → Payout ${fmt(res.payout)} (×${MULTIPLIER})` : `Bet ${fmt(pendingBet)} → Payout ₱0.00`,
+        colorName: res.colorName, colorHex: res.colorHex, win:res.win
+      });
+
+      pendingBet=0;
+
+      if(auto.enabled && auto.left>0){
+        if(state.balance>=2){ auto.left--; startSpin(true); }
+        else{ auto.enabled=false; toast("Auto stopped: low balance",false); }
+      }
+    }
+
+    /* ===== Init helpers ===== */
+    function randomizeInputs(){
+      if(state.targetsSubmitted) return;
+      const pool=[...LETTERS], picks=[]; for(let i=0;i<4;i++){ picks.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]); }
+      setInputs(picks); state.target.letters=[...picks]; save(); updateSubmitVisibility();
+    }
+    function clearInputs(){ if(state.targetsSubmitted) return; setInputs(["","","",""]); state.target.letters=["","","",""]; save(); updateSubmitVisibility(); }
+    function primeCubes(){
+      const all="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      cubeIds.forEach((id)=>{ const el=qs("#"+id); el.querySelectorAll(".face").forEach(f=>f.textContent=all[Math.floor(Math.random()*all.length)]); el.style.transform="rotateX(0deg)"; });
+      setBoxColor(lastColor); setLocked(lastColor); els.combination.textContent="- - - -";
+    }
+
+    function bind(){
+      // profile & wallet
+      els.saveName.addEventListener("click",()=>{ state.name=(els.playerName.value||"Player").slice(0,32); save(); renderBasics(); toast("Profile saved"); });
+      els.add50.addEventListener("click",()=>{ state.balance+=50; save(); renderBasics(); toast("Added ₱50"); ensureAC(); beep(880,.05,.06); });
+      els.reset.addEventListener("click",()=>{ if(confirm("Reset all data?")){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+
+      // quick bets
+      qsa("[data-quickbet]").forEach(b=> b.addEventListener("click",()=>{ const inc=+b.dataset.quickbet||0; els.bet.value=Math.max(2,(+els.bet.value||0)+inc); }));
+      els.betMax?.addEventListener("click",()=>{ els.bet.value=Math.max(2, Math.floor(state.balance)); });
+      els.betX2?.addEventListener("click",()=>{ els.bet.value=Math.max(2, Math.floor((+els.bet.value||2)*2)); });
+
+      // typing events
+      els.tgInputs.forEach((inp,idx)=>{
+        inp.addEventListener("input",(e)=>{
+          if(state.targetsSubmitted){ e.target.value=e.target.value.toUpperCase().slice(0,1); return; }
+          e.target.value=(e.target.value||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
+          validateAndFixInput(idx); state.target.letters=readTargets(); save(); els.tgError.classList.toggle("hidden",validTarget());
+        });
+        inp.addEventListener("keydown",e=>{ if(e.key==="Backspace" && !inp.value && idx>0) els.tgInputs[idx-1].focus(); });
+      });
+
+      els.tgRandom.addEventListener("click", randomizeInputs);
+      els.tgClear.addEventListener("click", clearInputs);
+      els.submitTargets.addEventListener("click", submitTargets);
+      els.unlockTargets.addEventListener("click", unlockTargets);
+
+      // start/stop
+      els.start.addEventListener("click", ()=>startSpin(false));
+      els.stop.addEventListener("click", stopSpin);
+      els.start2?.addEventListener("click", ()=>startSpin(false));
+      els.stop2?.addEventListener("click", stopSpin);
+
+      // history & extras
+      els.clearHistory.addEventListener("click",()=>{ state.history=[]; save(); renderHistory(); toast("History cleared"); });
+      els.exportHistory.addEventListener("click",()=>{
+        if(state.history.length===0){ toast("No history to export",false); return; }
+        const rows=[["Time","Combo","Result","Bet","Payout","ColorName","ColorHex"]];
+        state.history.forEach(h=> rows.push([h.t,h.combo,h.winText,h.bet,h.payout,h.colorName||"",h.colorHex||""]));
+        const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
+        const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+        const a=document.createElement("a"); a.href=url; a.download=`wilyonaryo_history_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+      });
+      els.copyResult.addEventListener("click", async ()=>{ try{ await navigator.clipboard.writeText(els.combination.textContent.replace(/\s+/g,"")); toast("Combination copied"); }catch{ toast("Clipboard blocked",false); } });
+
+      // drawer & sound
+      els.drawerBtn.addEventListener("click",()=> els.drawer.classList.toggle("open"));
+      els.toggleSound.addEventListener("change",()=>{ state.sound=els.toggleSound.checked; save(); if(state.sound){ ensureAC(); beep(880,.05,.05); } });
+
+      // keyboard
+      window.addEventListener("keydown",(e)=>{ if(e.key.toLowerCase()==="s") startSpin(false); if(e.key.toLowerCase()==="x") stopSpin(); });
+
+      // auto spin
+      els.autoBtn.addEventListener("click",()=>{ auto.enabled=true; auto.left=parseInt(els.autoCount.value,10)||5; toast(`Auto x${auto.left} started`); startSpin(true); });
+    }
+
+    function init(){ load(); buildColorPicker(); renderBasics(); renderTargets(); renderHistory(); primeCubes(); bind(); syncStartStopDisabled(false,true); }
+    init();
+  })();
+  </script>
+</body>
+</html>
