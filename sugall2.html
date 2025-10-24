@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_self">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WILYONARYO – Forward Spin + Synced Color (All 4 Boxes)</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --emerald:#00E3B0; --gold:#FFD54A; --gold-2:#FFE27A;
+      --radius:22px; --br:18px;
+      --cube:118px; --tz:56px; --fs:2.1rem;
+      --ease:cubic-bezier(.22,1,.36,1);
+      --solid:#00E3B0;              /* locked color indicator (also used for bar swatch) */
+      --n1:#00ffe0; --n2:#00b3ff; --n3:#8a7bff; --n4:#ff52bf; --n5:#ff9a3c; --n6:#ffe34f;
+    }
+    @media (max-width:520px){ :root{ --cube:92px; --tz:44px; --fs:1.7rem } }
+    @media (min-width:1536px){ :root{ --cube:140px; --tz:70px; --fs:2.4rem } }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
+      color:#fff; overflow-x:hidden;
+      background:
+        radial-gradient(1400px 800px at 10% 10%, rgba(255,255,255,.14), rgba(0,0,0,0)),
+        radial-gradient(1200px 700px at 90% 0%, rgba(255,255,255,.12), rgba(0,0,0,0)),
+        radial-gradient(900px 600px at 50% 100%, rgba(255,255,255,.08), rgba(0,0,0,0)),
+        conic-gradient(from 180deg at 50% 50%, var(--n1), var(--n2), var(--n3), var(--n4), var(--n5), var(--n6), var(--n1));
+      background-attachment: fixed;
+    }
+    body::after{
+      content:""; position:fixed; inset:0; pointer-events:none;
+      background:
+        radial-gradient(2px 2px at 20% 30%, #fff6, transparent 60%),
+        radial-gradient(2px 2px at 70% 15%, #fff6, transparent 60%),
+        radial-gradient(2px 2px at 40% 80%, #fff6, transparent 60%),
+        radial-gradient(2px 2px at 85% 65%, #fff6, transparent 60%);
+      mix-blend-mode:screen; opacity:.6;
+    }
+
+    .glass{
+      position:relative; background:linear-gradient(180deg, rgba(9,14,28,.6), rgba(17,19,36,.55));
+      border-radius:var(--radius); padding:16px; border:1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(12px);
+      box-shadow:0 12px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .glass::before{
+      content:""; position:absolute; inset:-1px; padding:1px; border-radius:inherit;
+      background:linear-gradient(135deg,var(--n1),var(--n2),var(--n3),var(--n4),var(--n5),var(--n6));
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; opacity:.75;
+    }
+    .pill{display:inline-flex;align-items:center;gap:.6rem;padding:.55rem .9rem;border-radius:999px;font-weight:800;
+      background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.08)); border:1px solid rgba(255,255,255,.18);
+      backdrop-filter:blur(10px); box-shadow:inset 0 1px 0 rgba(255,255,255,.15);}
+    .btn{display:inline-flex;align-items:center;gap:.6rem;font-weight:900;padding:.8rem 1.05rem;border-radius:16px;
+      border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.09); backdrop-filter:blur(8px);
+      transition:transform .12s var(--ease), filter .15s var(--ease), box-shadow .15s var(--ease)}
+    .btn:active{transform:translateY(1px) scale(.99)}
+    .btn-start{background:linear-gradient(90deg,#19ff9d,#06d6ff); box-shadow:0 12px 30px rgba(6,214,255,.35)}
+    .btn-stop{background:linear-gradient(90deg,#ff5d9e,#ff3b55); box-shadow:0 12px 30px rgba(255,59,85,.35)}
+    .btn-ghost{background:rgba(255,255,255,.10)}
+    .btn-disabled{opacity:.55; pointer-events:none; filter:grayscale(.25)}
+
+    .rack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;place-items:center}
+    @media (min-width:1024px){ .rack{grid-template-columns:repeat(4,minmax(0,1fr))} }
+    .cube-wrap{width:var(--cube);height:var(--cube);perspective:1100px}
+    .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+
+    /* color of boxes driven by --boxColor (same for all) */
+    .face{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:var(--fs); letter-spacing:.05em; color:#111; user-select:none; backface-visibility:hidden;
+      border:2px solid rgba(0,0,0,.18); border-radius:var(--br);
+      background:
+        radial-gradient(120% 120% at 30% 25%, #ffffffba, transparent 55%),
+        linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,.02)),
+        var(--boxColor, #7bf7ff);
+      box-shadow:0 14px 28px rgba(0,0,0,.35), inset 0 -1px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25);
+      transition:border-radius 240ms var(--ease), transform 260ms var(--ease), background-color 40ms linear;
+    }
+    .front  { transform: rotateY(  0deg) translateZ(var(--tz)); }
+    .back   { transform: rotateY(180deg) translateZ(var(--tz)); }
+    .right  { transform: rotateY( 90deg) translateZ(var(--tz)); }
+    .left   { transform: rotateY(-90deg) translateZ(var(--tz)); }
+    .top    { transform: rotateX( 90deg) translateZ(var(--tz)); }
+    .bottom { transform: rotateX(-90deg) translateZ(var(--tz)); }
+
+    @keyframes float {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .floating{animation:float 3.6s ease-in-out infinite}
+    @keyframes winGlow{0%,100%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 28px rgba(255,255,255,.8)}}
+    .win .face{animation:winGlow 1.2s ease-in-out 2}
+
+    .stat-card{display:grid;place-items:center;gap:.2rem;padding:.9rem;border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.06)); border:1px solid rgba(255,255,255,.18)}
+    .kicker{font-size:.8rem;letter-spacing:.08em;opacity:.9}
+
+    .mobile-controls{position:sticky; bottom:0; left:0; right:0; z-index:30; margin-top:.25rem}
+    @media (min-width:768px){ .mobile-controls{display:none} }
+
+    .tg-letter{ text-transform:uppercase; text-align:center; font-weight:900; letter-spacing:.06em; border-radius:14px; padding:.55rem;
+      background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); }
+    .tg-letter:disabled{opacity:.7}
+    .error-hint{opacity:0; transition:opacity .2s}
+    .error-hint.show{opacity:1}
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:px-6">
+  <!-- HEADER -->
+  <header class="max-w-7xl mx-auto mb-6">
+    <div class="glass p-4 md:p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-12 w-12 rounded-2xl bg-white/15 grid place-items-center ring-1 ring-white/25">
+            <span id="avatarInitials" class="font-extrabold text-xl">PL</span>
+          </div>
+          <div>
+            <h1 class="text-3xl md:text-5xl font-black tracking-wide">WILYONARYO</h1>
+            <p class="text-xs md:text-sm text-white/90">Synced Box Color • Forward Spin</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="pill">
+            <i class="fa-regular fa-user"></i>
+            <input id="playerName" class="bg-transparent outline-none w-28 md:w-44 font-semibold" placeholder="Player"/>
+            <button id="saveName" class="btn btn-ghost text-xs">Save</button>
+          </div>
+          <div class="pill">
+            <i class="fa-solid fa-wallet"></i>
+            <span class="opacity-90">Balance</span>
+            <strong id="balanceText" class="font-extrabold">₱0.00</strong>
+            <button id="add50" class="btn btn-ghost text-xs" title="Add ₱50">+₱50</button>
+            <button id="resetData" class="btn btn-ghost text-xs" title="Reset">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTROLS -->
+  <section class="max-w-7xl mx-auto">
+    <div class="grid xl:grid-cols-3 gap-5">
+      <!-- Play -->
+      <div class="glass p-4 md:p-5">
+        <h2 class="text-xl md:text-2xl font-extrabold">PLAY</h2>
+        <p class="text-white/90 mt-1">Bet sa <b>letters</b> (4 unique) at/o <b>kulay</b>.</p>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <div class="pill">
+            <i class="fa-solid fa-coins"></i>
+            <label for="betInput" class="opacity-90">Bet</label>
+            <input id="betInput" type="number" min="2" step="1" class="bg-transparent outline-none w-20 md:w-24 font-semibold" value="2"/>
+            <span class="opacity-80 text-xs">₱ (min 2)</span>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost text-xs" data-quickbet="2">+₂</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="5">+₅</button>
+            <button class="btn btn-ghost text-xs" data-quickbet="10">+₁₀</button>
+            <button class="btn btn-ghost text-xs" id="betMax">MAX</button>
+          </div>
+        </div>
+
+        <div class="mt-4 hidden md:flex flex-wrap items-center gap-3">
+          <button id="startBtn" class="btn btn-start"><i class="fa-solid fa-play"></i> START</button>
+          <button id="stopBtn" class="btn btn-stop" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+
+          <div class="pill text-sm">
+            <i class="fa-solid fa-gauge"></i>
+            <label for="speedSel" class="whitespace-nowrap">Speed</label>
+            <select id="speedSel" class="bg-transparent outline-none">
+              <option value="fast">Fast</option>
+              <option value="normal" selected>Normal</option>
+              <option value="slow">Slow</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="resultBar" class="mt-4 hidden">
+          <div class="glass p-3 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <i id="resultIcon" class="fa-solid fa-circle-info"></i>
+              <div>
+                <div id="resultText" class="font-semibold">—</div>
+                <div class="text-xs opacity-90" id="resultSub">—</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="opacity-80">Locked Color:</span>
+              <span id="winColorName" class="font-bold">—</span>
+              <span id="winColorSwatch" class="inline-block w-5 h-5 rounded-md ring-1 ring-white/30"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mt-4">
+          <div class="stat-card"><div class="text-xl"><i class="fa-solid fa-arrows-rotate"></i></div><div id="spinCount" class="text-lg font-extrabold">0</div><div class="kicker">SPINS</div></div>
+          <div class="stat-card"><div class="text-xl"><i class="fa-solid fa-trophy"></i></div><div id="winCount" class="text-lg font-extrabold">0</div><div class="kicker">WINS</div></div>
+          <div class="stat-card"><div class="text-xl"><i class="fa-solid fa-bolt"></i></div><div id="comboCount" class="text-lg font-extrabold">0</div><div class="kicker">COMBOS</div></div>
+        </div>
+      </div>
+
+      <!-- Target Letters -->
+      <div class="glass p-4 md:p-5">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Letters (4, unique)</h3>
+          <div class="flex gap-2">
+            <button id="tgRandom" class="btn btn-ghost text-xs">Random</button>
+            <button id="tgClear" class="btn btn-ghost text-xs">Clear</button>
+          </div>
+        </div>
+        <p class="text-white/85 text-sm mt-1">Exact order ang panalo. Walang double letter.</p>
+
+        <div class="mt-3 grid grid-cols-4 gap-2">
+          <input class="tg-letter" maxlength="1" placeholder="A">
+          <input class="tg-letter" maxlength="1" placeholder="B">
+          <input class="tg-letter" maxlength="1" placeholder="C">
+          <input class="tg-letter" maxlength="1" placeholder="D">
+        </div>
+        <div class="mt-2 text-xs text-red-300 error-hint" id="dupHint">Duplicate letter! Hindi puwedeng maulit.</div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <label class="flex items-center gap-2 text-sm">
+            <input id="betCombo" type="checkbox" class="accent-emerald-400">
+            Bet on Combo (×10)
+          </label>
+          <button id="submitTargets" class="btn text-xs hidden"><i class="fa-solid fa-check"></i> Submit Targets</button>
+          <button id="unlockTargets" class="btn btn-ghost text-xs hidden"><i class="fa-solid fa-unlock"></i> Unlock</button>
+          <span id="tgError" class="text-xs text-red-300 hidden">Kailangang 4 unique A–Z.</span>
+          <span id="tgOK" class="text-xs text-emerald-300 hidden">Targets locked!</span>
+        </div>
+      </div>
+
+      <!-- Target Color -->
+      <div class="glass p-4 md:p-5">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg md:text-xl">Target Color</h3>
+          <button id="tgColorClear" class="btn btn-ghost text-xs">Clear</button>
+        </div>
+        <p class="text-white/85 text-sm mt-1">Panalo kapag tumapat ang final color sa pinili mo.</p>
+
+        <div id="colorGrid" class="mt-3 grid grid-cols-6 gap-2"></div>
+
+        <div class="mt-3 flex items-center gap-3">
+          <label class="flex items-center gap-2 text-sm">
+            <input id="betColor" type="checkbox" class="accent-emerald-400" checked>
+            Bet on Color (×3)
+          </label>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="opacity-80">Selected:</span>
+            <span id="selColorName" class="font-semibold">—</span>
+            <span id="selColorSwatch" class="inline-block w-4 h-4 rounded ring-1 ring-white/25"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUBES -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="rack">
+      <div class="cube-wrap"><div class="cube floating" id="cube1" style="--boxColor:#7bf7ff"><div class="face front"></div><div class="face back"></div><div class="face right"></div><div class="face left"></div><div class="face top"></div><div class="face bottom"></div></div></div>
+      <div class="cube-wrap"><div class="cube floating" id="cube2" style="--boxColor:#7bf7ff"><div class="face front"></div><div class="face back"></div><div class="face right"></div><div class="face left"></div><div class="face top"></div><div class="face bottom"></div></div></div>
+      <div class="cube-wrap"><div class="cube floating" id="cube3" style="--boxColor:#7bf7ff"><div class="face front"></div><div class="face back"></div><div class="face right"></div><div class="face left"></div><div class="face top"></div><div class="face bottom"></div></div></div>
+      <div class="cube-wrap"><div class="cube floating" id="cube4" style="--boxColor:#7bf7ff"><div class="face front"></div><div class="face back"></div><div class="face right"></div><div class="face left"></div><div class="face top"></div><div class="face bottom"></div></div></div>
+    </div>
+
+    <div class="mobile-controls">
+      <div class="glass p-2 mt-3 flex items-center justify-center gap-3">
+        <button id="startBtn2" class="btn btn-start w-1/2"><i class="fa-solid fa-play"></i> START</button>
+        <button id="stopBtn2" class="btn btn-stop w-1/2" disabled><i class="fa-solid fa-stop"></i> STOP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMBINATION -->
+  <section class="max-w-7xl mx-auto mt-6">
+    <div class="glass p-5 text-center">
+      <h3 class="text-base md:text-lg tracking-widest font-bold opacity-95">YOUR LUCKY COMBINATION</h3>
+      <div id="combination" class="text-4xl md:text-6xl font-black tracking-[.28em] mt-1">- - - -</div>
+      <p class="text-white/85 mt-2 text-sm">Exact combo ×10 • Color match ×3</p>
+      <div class="mt-3 flex items-center justify-center">
+        <button id="exportHistory" class="btn btn-ghost text-xs">Export CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="max-w-7xl mx-auto mt-6 glass p-5">
+    <div class="flex items-center justify-between">
+      <h4 class="font-bold text-lg md:text-xl">Game History</h4>
+      <button id="clearHistory" class="btn btn-ghost text-xs">Clear</button>
+    </div>
+    <div class="overflow-x-auto mt-3">
+      <table class="min-w-full text-sm">
+        <thead class="text-white/90">
+          <tr>
+            <th class="text-left py-2 pr-4">Time</th>
+            <th class="text-left py-2 pr-4">Combo</th>
+            <th class="text-left py-2 pr-4">Result</th>
+            <th class="text-right py-2 pr-4">Bet</th>
+            <th class="text-right py-2 pr-4">Payout</th>
+            <th class="text-left py-2 pr-4">Locked Color</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+  (function(){
+    const LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const COLOR_SET=[
+      {name:"Emerald",hex:"#00E3B0"},{name:"Teal",hex:"#00C79A"},{name:"Cyan",hex:"#22D3EE"},{name:"Mint",hex:"#6EE7B7"},
+      {name:"Sky",hex:"#93C5FD"},{name:"Violet",hex:"#A78BFA"},{name:"Gold",hex:"#FFD54A"},{name:"Lemon",hex:"#FFE27A"},
+      {name:"Pink",hex:"#FF4D9D"},{name:"Aqua",hex:"#45B7D1"},{name:"Jade",hex:"#1ABC9C"},{name:"Amber",hex:"#F8C471"}
+    ];
+    const PAYOUTS={combo:10,color:3};
+    const STORAGE_KEY="wily_synced_forward_v1";
+
+    const qs=(s,r=document)=>r.querySelector(s);
+    const qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+    const els={
+      avatar:qs("#avatarInitials"), playerName:qs("#playerName"), saveName:qs("#saveName"),
+      balanceText:qs("#balanceText"), add50:qs("#add50"), reset:qs("#resetData"),
+      bet:qs("#betInput"), betMax:qs("#betMax"),
+      start:qs("#startBtn"), stop:qs("#stopBtn"), start2:qs("#startBtn2"), stop2:qs("#stopBtn2"),
+      speed:qs("#speedSel"),
+      resultBar:qs("#resultBar"), resultIcon:qs("#resultIcon"), resultText:qs("#resultText"), resultSub:qs("#resultSub"),
+      winColorName:qs("#winColorName"), winColorSwatch:qs("#winColorSwatch"),
+      spinCount:qs("#spinCount"), winCount:qs("#winCount"), comboCount:qs("#comboCount"),
+      historyBody:qs("#historyBody"), exportHistory:qs("#exportHistory"), clearHistory:qs("#clearHistory"),
+      combination:qs("#combination"),
+      tgInputs:qsa(".tg-letter"), tgRandom:qs("#tgRandom"), tgClear:qs("#tgClear"),
+      tgError:qs("#tgError"), tgOK:qs("#tgOK"), dupHint:qs("#dupHint"), submitTargets:qs("#submitTargets"),
+      unlockTargets:qs("#unlockTargets"), betCombo:qs("#betCombo"),
+      colorGrid:qs("#colorGrid"), tgColorClear:qs("#tgColorClear"),
+      selColorName:qs("#selColorName"), selColorSwatch:qs("#selColorSwatch"), betColor:qs("#betColor"),
+    };
+
+    const cubeIds=["cube1","cube2","cube3","cube4"];
+    const cubes=cubeIds.map(id=>({ id, el:qs("#"+id), ry:Math.random()*360, vy:0, active:false }));
+    let currentLetters=["-","-","-","-"];
+    let letterTimers=[null,null,null,null];
+    let colorTimer=null; // global color cycle (also sets all cube colors)
+    let isSpinning=false, rafId=null, lastT=0, pendingBet=0;
+    let lastFlashColor=getComputedStyle(document.documentElement).getPropertyValue("--solid").trim()||"#00E3B0";
+
+    const state={name:"Player",balance:100,history:[],stats:{spins:0,wins:0,combos:0},
+      target:{letters:["","","",""],color:null}, betOn:{combo:false,color:true}, targetsSubmitted:false};
+
+    const setSolid=(c)=>document.documentElement.style.setProperty("--solid",c);
+    const setBR=(px)=>document.documentElement.style.setProperty("--br",px+"px");
+    const fmt=n=>"₱"+Number(n).toFixed(2);
+    const nowText=()=>new Date().toLocaleString();
+    const toast=(msg,ok=true)=>{ const t=document.createElement("div");
+      t.className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm glass";
+      t.style.borderColor=ok?"rgba(0,227,176,.6)":"rgba(255,77,77,.6)"; t.textContent=msg; document.body.appendChild(t);
+      setTimeout(()=>t.remove(),1600); };
+    const save=()=>localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const load=()=>{ try{const raw=localStorage.getItem(STORAGE_KEY); if(raw) Object.assign(state, JSON.parse(raw));}catch{} };
+    const syncStartStopDisabled=(sd,td)=>{ [els.start,els.start2].forEach(b=>{b.disabled=sd;b.classList.toggle("btn-disabled",sd);});
+      [els.stop,els.stop2].forEach(b=>{b.disabled=td;b.classList.toggle("btn-disabled",td);}); };
+
+    /* ===== helpers ===== */
+    const setAllCubeColors=(hex)=> cubes.forEach(c=> c.el.style.setProperty("--boxColor", hex));
+    const pickColor=()=> COLOR_SET[Math.floor(Math.random()*COLOR_SET.length)];
+
+    /* ===== Renderers ===== */
+    function renderBasics(){
+      els.balanceText.textContent=fmt(state.balance);
+      els.spinCount.textContent=state.stats.spins;
+      els.winCount.textContent=state.stats.wins;
+      els.comboCount.textContent=state.stats.combos;
+      els.playerName.value=state.name;
+      const p=(state.name||"").trim().split(/\s+/); const A=p[0]?.[0]||"P", B=p[1]?.[0]||p[0]?.[1]||"L";
+      els.avatar.textContent=(A+B).toUpperCase();
+    }
+    function renderTargets(){
+      els.tgInputs.forEach((inp,i)=>{inp.value=state.target.letters[i]||""; inp.disabled=state.targetsSubmitted;});
+      els.betCombo.checked=!!state.betOn.combo; els.betColor.checked=!!state.betOn.color;
+      if(state.target.color){ els.selColorName.textContent=state.target.color.name; els.selColorSwatch.style.background=state.target.color.hex; }
+      else{ els.selColorName.textContent="—"; els.selColorSwatch.style.background="transparent"; }
+      els.tgOK.classList.toggle("hidden",!state.targetsSubmitted);
+      els.unlockTargets.classList.toggle("hidden",!state.targetsSubmitted);
+      updateSubmitVisibility();
+    }
+    function renderHistory(){
+      const tbody=els.historyBody; tbody.innerHTML="";
+      if(state.history.length===0){ tbody.innerHTML=`<tr><td class="py-3 text-white/80" colspan="6">No games yet.</td></tr>`; return; }
+      state.history.slice(0,150).forEach(h=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td class="py-2 pr-4 whitespace-nowrap">${h.t}</td>
+          <td class="py-2 pr-4">${h.combo}</td>
+          <td class="py-2 pr-4 ${/Win/.test(h.winText)?'text-emerald-300':'text-red-300'}">${h.winText}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.bet)}</td>
+          <td class="py-2 pr-4 text-right">${fmt(h.payout)}</td>
+          <td class="py-2 pr-4">
+            <span class="inline-flex items-center gap-2">
+              <span class="inline-block w-4 h-4 rounded ring-1 ring-white/25" style="background:${h.colorHex}"></span>
+              <span>${h.colorName||'—'}</span>
+            </span>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function setResultBar({text,sub,colorName,colorHex,win}){
+      els.resultBar.classList.remove("hidden");
+      els.resultIcon.className=win?"fa-solid fa-trophy text-emerald-300":"fa-solid fa-circle-info text-white/90";
+      els.resultText.textContent=text; els.resultSub.textContent=sub;
+      els.winColorName.textContent=colorName||"—"; els.winColorSwatch.style.background=colorHex||"transparent";
+    }
+
+    /* ===== Color picker + GLOBAL COLOR FLASH (sync 4 boxes) ===== */
+    function buildColorPicker(){
+      els.colorGrid.innerHTML="";
+      COLOR_SET.forEach(c=>{
+        const b=document.createElement("button");
+        b.className="w-full aspect-square rounded-xl ring-1 ring-white/30 hover:ring-white/80 transition";
+        b.title=c.name; b.style.background=c.hex;
+        b.addEventListener("click",()=>{ state.target.color={name:c.name,hex:c.hex}; save(); renderTargets(); });
+        els.colorGrid.appendChild(b);
+      });
+      els.tgColorClear.addEventListener("click",()=>{ state.target.color=null; save(); renderTargets(); });
+    }
+    function speedLetterTick(){const v=els.speed.value; return v==="fast"?50: v==="slow"?110: 75;}
+    function speedColorTick(){const v=els.speed.value; return v==="fast"?30: v==="slow"?70: 45;}
+    function baseSpinVel(){const v=els.speed.value; return v==="fast"?720: v==="slow"?300: 520;}
+    function jitterVel(){const v=els.speed.value; return v==="fast"?70: v==="slow"?30: 50;}
+
+    function updateCombination(){ els.combination.textContent=currentLetters.join(" "); }
+
+    function startColorFlashing(){
+      stopColorFlashing();
+      colorTimer=setInterval(()=>{
+        const pick=pickColor();                 // one pick for ALL boxes
+        lastFlashColor = pick.hex;
+        setSolid(lastFlashColor);
+        setAllCubeColors(lastFlashColor);       // <— sync color across 4 cubes
+      }, speedColorTick());
+    }
+    function stopColorFlashing(){ if(colorTimer){clearInterval(colorTimer); colorTimer=null;} }
+
+    /* ===== Letter cycling ===== */
+    function startLetters(i){
+      stopLetters(i);
+      const tick=speedLetterTick();
+      letterTimers[i]=setInterval(()=>{
+        const L=LETTERS[Math.floor(Math.random()*LETTERS.length)];
+        cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=L);
+        currentLetters[i]=L; updateCombination();
+      }, tick + Math.floor(Math.random()*20));
+    }
+    function stopLetters(i){ if(letterTimers[i]){ clearInterval(letterTimers[i]); letterTimers[i]=null; } }
+
+    /* ===== Forward-only spin (Y-axis) ===== */
+    function physicsLoop(ts){
+      if(!lastT) lastT=ts;
+      const dt=(ts-lastT)/1000; lastT=ts;
+      let any=false;
+      for(const c of cubes){
+        if(!c.active) continue; any=true;
+        c.ry += c.vy*dt;                             // forward only
+        c.el.style.transform = `rotateY(${c.ry}deg)`;
+        if(!isSpinning){
+          c.vy *= 0.90;
+          if(Math.abs(c.vy) < 6){
+            const sy=Math.round(c.ry/360)*360;       // snap to front
+            c.active=false; c.vy=0; c.ry=sy;
+            c.el.style.transition="transform 360ms var(--ease)";
+            c.el.style.transform=`rotateY(${sy}deg)`;
+            setTimeout(()=>{ c.el.style.transition=""; c.el.classList.add("floating"); }, 380);
+          }
+        }
+      }
+      if(any || isSpinning){ rafId=requestAnimationFrame(physicsLoop); } else { rafId=null; }
+    }
+
+    function finalizeUniqueLetters(){
+      const used=new Set(); const pool=[...LETTERS];
+      for(let i=0;i<4;i++){
+        const L=currentLetters[i];
+        if(L && L!=="-" && !used.has(L)){ used.add(L); const idx=pool.indexOf(L); if(idx>-1) pool.splice(idx,1); }
+        else{ currentLetters[i]=null; }
+      }
+      for(let i=0;i<4;i++){
+        if(!currentLetters[i]){
+          const pick=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+          currentLetters[i]=pick;
+          cubes[i].el.querySelectorAll(".face").forEach(f=>f.textContent=pick);
+          used.add(pick);
+        }
+      }
+      updateCombination();
+    }
+
+    function evaluate(combo,bet){
+      let total=0, parts=[];
+      if(state.betOn.combo && state.targetsSubmitted){
+        const tgt=state.target.letters.join(""); if(combo===tgt){ total+=bet*PAYOUTS.combo; parts.push(`Combo ×${PAYOUTS.combo}`); }
+      }
+      if(state.betOn.color && state.target.color){
+        if(lastFlashColor.toLowerCase()===state.target.color.hex.toLowerCase()){ total+=bet*PAYOUTS.color; parts.push(`Color ×${PAYOUTS.color}`); }
+      }
+      const win=total>0;
+      const colorName=(COLOR_SET.find(c=>c.hex.toLowerCase()===lastFlashColor.toLowerCase())||{}).name || "—";
+      return {win,payout:total,winText:win?`Win (${parts.join(" + ")})`:"Lose", colorName, colorHex:lastFlashColor};
+    }
+
+    /* ===== Targets typing ===== */
+    const readTargetFromInputs=()=> els.tgInputs.map(i=>(i.value||"").toUpperCase());
+    const setInputs=v=> els.tgInputs.forEach((inp,i)=> inp.value=v[i]||"");
+    const showDupHint=s=> els.dupHint.classList.toggle("show", !!s);
+    const validTarget=()=>{ const t=readTargetFromInputs(); if(t.some(v=>!v)) return false; return (new Set(t)).size===4; }
+    const updateSubmitVisibility=()=> els.submitTargets.classList.toggle("hidden", !(validTarget() && !!state.target.color && !state.targetsSubmitted));
+    function validateAndFixInput(idx){
+      const inputs=readTargetFromInputs(); let val=inputs[idx];
+      if(!val){ showDupHint(false); updateSubmitVisibility(); return true; }
+      if(!/^[A-Z]$/.test(val)){ els.tgInputs[idx].value=""; showDupHint(false); updateSubmitVisibility(); return false; }
+      for(let i=0;i<inputs.length;i++){
+        if(i!==idx && inputs[i]===val){ els.tgInputs[idx].value=""; showDupHint(true); setTimeout(()=>showDupHint(false),900); updateSubmitVisibility(); return false; }
+      }
+      showDupHint(false); if(idx<3) els.tgInputs[idx+1].focus(); updateSubmitVisibility(); return true;
+    }
+    function submitTargets(){
+      if(!validTarget()){ els.tgError.classList.remove("hidden"); toast("Targets invalid: 4 unique A–Z required.",false); return; }
+      if(!state.target.color){ toast("Pumili ng target color.",false); return; }
+      state.target.letters=readTargetFromInputs(); state.targetsSubmitted=true; save(); renderTargets();
+      els.tgError.classList.add("hidden"); toast("Targets submitted & locked");
+    }
+    const unlockTargets=()=>{ state.targetsSubmitted=false; save(); renderTargets(); toast("Targets unlocked"); };
+
+    /* ===== Bets & flow ===== */
+    function validBet(){
+      const b=Number(els.bet.value||0);
+      if(!Number.isFinite(b) || b<2){ toast("Minimum bet is ₱2",false); return null; }
+      if(b>state.balance){ toast("Insufficient balance",false); return null; }
+      if(!els.betColor.checked && !els.betCombo.checked){ toast("Piliin ang bet type (Combo at/o Color).",false); return null; }
+      if(els.betCombo.checked && !state.targetsSubmitted){ toast("Submit your letters first.",false); return null; }
+      if(els.betColor.checked && !state.target.color){ toast("Pumili ng target color.",false); return null; }
+      return Math.floor(b);
+    }
+
+    function startSpin(){
+      if(isSpinning) return;
+      const b=validBet(); if(b===null) return;
+
+      state.balance-=b; pendingBet=b; renderBasics(); save();
+      state.stats.spins++; renderBasics(); save();
+
+      isSpinning=true; syncStartStopDisabled(true,false); setBR(24);
+      els.resultBar.classList.add("hidden");
+
+      // start global flashing that also colors all boxes the same
+      startColorFlashing();
+
+      const base=(els.speed.value==="fast"?720: els.speed.value==="slow"?300:520);
+      const jit =(els.speed.value==="fast"?70 : els.speed.value==="slow"?30 :50);
+      cubes.forEach((c,i)=>{ c.active=true; c.el.classList.remove("floating"); c.vy=Math.max(120, base+(Math.random()*2-1)*jit); startLetters(i); });
+
+      if(!rafId){ lastT=0; rafId=requestAnimationFrame(physicsLoop); }
+    }
+
+    async function stopSpin(){
+      if(!isSpinning) return;
+      isSpinning=false; syncStartStopDisabled(false,true); setBR(18);
+
+      stopColorFlashing();                  // keep the lastFlashColor as the final locked color
+      setAllCubeColors(lastFlashColor);     // ensure all boxes show the winning color
+
+      for(let i=0;i<4;i++){ stopLetters(i); await new Promise(r=>setTimeout(r,110)); }
+
+      finalizeUniqueLetters();
+      state.stats.combos++; renderBasics(); save();
+
+      const combo=currentLetters.join("");
+      const res=evaluate(combo, pendingBet);
+
+      if(res.win){
+        setSolid(res.colorHex);
+        cubeIds.forEach(id=>qs("#"+id).classList.add("win"));
+        setTimeout(()=>cubeIds.forEach(id=>qs("#"+id).classList.remove("win")), 2000);
+        state.stats.wins++; renderBasics(); save();
+      }
+
+      state.balance+=res.payout; renderBasics(); save();
+      state.history.unshift({t:nowText(), combo, winText:res.winText, bet:pendingBet, payout:res.payout, colorHex:res.colorHex, colorName:res.colorName});
+      if(state.history.length>300) state.history.pop(); renderHistory(); save();
+
+      setResultBar({
+        text: res.win?`PANALO! ${combo}`:`TAPOS. ${combo}`,
+        sub:  res.win?`Bet ${fmt(pendingBet)} → Payout ${fmt(res.payout)}`:`Bet ${fmt(pendingBet)} → Payout ₱0.00`,
+        colorName:res.colorName, colorHex:res.colorHex, win:res.win
+      });
+
+      pendingBet=0;
+    }
+
+    /* ===== Init ===== */
+    function randomizeInputs(){
+      if(state.targetsSubmitted) return;
+      const pool=[...LETTERS], picks=[]; for(let i=0;i<4;i++){ picks.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]); }
+      setInputs(picks); state.target.letters=[...picks]; save(); updateSubmitVisibility();
+    }
+    function clearInputs(){
+      if(state.targetsSubmitted) return;
+      setInputs(["","","",""]); state.target.letters=["","","",""]; save(); updateSubmitVisibility();
+    }
+    function primeCubes(){
+      const all="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      cubeIds.forEach((id,i)=>{
+        qs("#"+id).querySelectorAll(".face").forEach(f=>f.textContent=all[Math.floor(Math.random()*all.length)]);
+        qs("#"+id).style.transform=`rotateY(${cubes[i].ry}deg)`;
+      });
+      setAllCubeColors(lastFlashColor);   // start in sync
+      els.combination.textContent="- - - -";
+    }
+    function bind(){
+      els.saveName.addEventListener("click",()=>{ state.name=(els.playerName.value||"Player").slice(0,32); save(); renderBasics(); toast("Profile saved"); });
+      els.add50.addEventListener("click",()=>{ state.balance+=50; save(); renderBasics(); toast("Added ₱50"); });
+      els.reset.addEventListener("click",()=>{ if(confirm("Reset all data?")){ localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+
+      qsa("[data-quickbet]").forEach(b=>b.addEventListener("click",()=>{ const inc=+b.dataset.quickbet||0; els.bet.value=Math.max(2,(+els.bet.value||0)+inc); }));
+      els.betMax?.addEventListener("click",()=>{ els.bet.value=Math.max(2, Math.floor(state.balance)); });
+
+      els.tgInputs.forEach((inp,idx)=>{
+        inp.addEventListener("input",(e)=>{
+          if(state.targetsSubmitted){ e.target.value=e.target.value.toUpperCase().slice(0,1); return; }
+          e.target.value=(e.target.value||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,1);
+          validateAndFixInput(idx); state.target.letters=readTargetFromInputs(); save();
+          els.tgError.classList.toggle("hidden", validTarget());
+        });
+        inp.addEventListener("keydown",e=>{ if(e.key==="Backspace" && !inp.value && idx>0) els.tgInputs[idx-1].focus(); });
+      });
+
+      els.tgRandom.addEventListener("click", randomizeInputs);
+      els.tgClear.addEventListener("click", clearInputs);
+      els.submitTargets.addEventListener("click", submitTargets);
+      els.unlockTargets.addEventListener("click", unlockTargets);
+      els.betCombo.addEventListener("change", ()=>{ state.betOn.combo=els.betCombo.checked; save(); });
+      els.betColor.addEventListener("change", ()=>{ state.betOn.color=els.betColor.checked; save(); });
+
+      els.start.addEventListener("click", startSpin);
+      els.stop.addEventListener("click", stopSpin);
+      els.start2.addEventListener("click", startSpin);
+      els.stop2.addEventListener("click", stopSpin);
+
+      els.speed.addEventListener("change",()=>{
+        if(!isSpinning) return;
+        stopColorFlashing(); startColorFlashing();       // will keep all 4 in sync
+        const base=baseSpinVel(), jit=jitterVel();
+        cubes.forEach((c,i)=>{ if(!c.active) return; c.vy=Math.max(120, base+(Math.random()*2-1)*jit); stopLetters(i); startLetters(i); });
+      });
+
+      els.clearHistory.addEventListener("click",()=>{ state.history=[]; save(); renderHistory(); toast("History cleared"); });
+      els.exportHistory.addEventListener("click",()=>{
+        if(state.history.length===0){ toast("No history to export",false); return; }
+        const rows=[["Time","Combo","Result","Bet","Payout","ColorName","ColorHex"]];
+        state.history.forEach(h=> rows.push([h.t,h.combo,h.winText,h.bet,h.payout,h.colorName||"",h.colorHex||""]));
+        const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")).join("\n");
+        const blob=new Blob([csv],{type:"text/csv"}); const url=URL.createObjectURL(blob);
+        const a=document.createElement("a"); a.href=url; a.download=`wilyonaryo_history_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+      });
+    }
+
+    function init(){ load(); buildColorPicker(); renderBasics(); renderTargets(); renderHistory(); primeCubes(); bind(); syncStartStopDisabled(false,true); }
+    init();
+  })();
+  </script>
+</body>
+</html>
